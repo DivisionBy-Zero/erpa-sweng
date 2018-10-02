@@ -3,7 +3,7 @@
 Given the application requirements[^1], we must use cloud-based services for the inner workings of the application. The use of cloud services, such as Firebase is recommended, but this requires Google Play Services[^2] installed on the user's device[^3].
 
 In order to allow users without Google Play services installed to use our application, every remote resource MUST be encapsulated using Java interfaces.
-These interfaces MUST be located in the `ch.epfl.ch.sweng.services` package. Implementations of such interfaces MUST be located under `ch.epfl.sweng.services.<provider>` package (e.g. `ch.epfl.sweng.services.firebase`).
+These interfaces MUST be located in the `ch.epfl.sweng.erpa.services` package. Implementations of such interfaces MUST be located under `ch.epfl.sweng.erpa.services.<provider>` package (e.g. `ch.epfl.sweng.erpa.services.firebase`).
 These services MUST have an implementation using Cloud-based services (such as Firebase). Other implementations not using any Cloud-based integration are also possible.
 The user USER be asked when the application is first launched which provider to use. The user MUST be able to change this parameter from the application settings.
 A single provider MUST be in use at all times.
