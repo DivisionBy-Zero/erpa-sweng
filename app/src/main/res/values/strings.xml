@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ERPA</string>
+    <string name="launch_game_list_button">Game List</string>
+    <string name="launch_create_game_button">Create Game</string>
 </resources>
