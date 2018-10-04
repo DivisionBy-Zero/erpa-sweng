@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ERPA</string>
+    <string name="preference_file_key">erpa_prefs</string>
+    <string name="prop_key_remote_provider">remote_services_provider_class_name</string>
 </resources>
