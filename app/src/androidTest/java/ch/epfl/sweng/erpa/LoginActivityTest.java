@@ -58,4 +58,12 @@ public class LoginActivityTest {
         //check if the correct activity is displayed
         intended(hasComponent(MainActivity.class.getName()));
     }
+
+    @Test
+    public void testWithoutLogin()
+    {
+        onView(ViewMatchers.withId(R.id.no_login_button)).perform(ViewActions.click());
+        //check if the correct activity is displayed
+        intended(hasComponent(MainActivity.class.getName()));
+    }
 }
