@@ -11,4 +11,36 @@
     <!--Titles-->
     <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
     <string name="title_activity_signup">SignupActivity</string>
+
+    <!--Titles-->
+    <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
+
+    <!-- CreateGameActivity -->
+    <string name="create_game_name">Name*:</string>
+    <string name="number_of_players">Number of players*:</string>
+    <string name="difficulty">Difficulty*:</string>
+    <string name="universe">Universe*:</string>
+    <string name="oneshot">Oneshot</string>
+    <string name="campaign">Campaign</string>
+    <string name="num_sessions">Number of sessions:</string>
+    <string name="session_length">Session(s)\' length:</string>
+    <string name="description">Description*: (max.1200 characters)</string>
+    <string name="submit_button">Sumbit game</string>
+
+    <!-- CreateGameActivity Spinner array -->
+    <string name="difficulty_1">NOOB</string>
+    <string name="difficulty_2">Chill</string>
+    <string name="difficulty_3">Hard</string>
+    <string name="universe_1">Warhammer</string>
+    <string name="universe_2">Lovecraft</string>
+    <string name="universe_3">Other</string>
+    <string name="session_length_1">Undefined</string>
+    <string name="session_length_2">-1h</string>
+    <string name="session_length_3">1h</string>
+    <string name="session_length_4">2h</string>
+    <string name="session_length_5">3h</string>
+    <string name="session_length_6">4h</string>
+    <string name="session_length_7">5h</string>
+    <string name="session_length_8">6h</string>
+    <string name="session_length_9">+6h</string>
 </resources>
