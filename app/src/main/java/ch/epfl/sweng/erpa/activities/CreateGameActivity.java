@@ -1,9 +1,11 @@
-package ch.epfl.sweng.erpa;
+package ch.epfl.sweng.erpa.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-public class CreateGame extends Activity {
+import ch.epfl.sweng.erpa.R;
+
+public class CreateGameActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

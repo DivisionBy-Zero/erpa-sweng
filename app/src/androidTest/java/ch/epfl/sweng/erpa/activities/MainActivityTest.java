@@ -1,17 +1,19 @@
-package ch.epfl.sweng.erpa;
+package ch.epfl.sweng.erpa.activities;
 
 import android.content.ComponentName;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.intent.Intents;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.activities.CreateGameActivity;
+import ch.epfl.sweng.erpa.activities.GameListActivity;
+import ch.epfl.sweng.erpa.activities.MainActivity;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
@@ -24,19 +26,14 @@ public class MainActivityTest {
     public final IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
 
     @Test
-    public void testCanLaunchGameList()
-    {
+    public void testCanLaunchGameList() {
         onView(ViewMatchers.withId(R.id.launch_game_list_button)).perform(ViewActions.click());
-        //Intents.init();
-        intended(hasComponent(new ComponentName(getTargetContext(), GameList.class)));
-        //Intents.release();
+        intended(hasComponent(new ComponentName(getTargetContext(), GameListActivity.class)));
     }
+
     @Test
-    public void testCanLaunchCreateGame()
-    {
+    public void testCanLaunchCreateGame() {
         onView(ViewMatchers.withId(R.id.launch_create_game_button)).perform(ViewActions.click());
-        //Intents.init();
-        intended(hasComponent(CreateGame.class.getName()));
-        //Intents.release();
+        intended(hasComponent(CreateGameActivity.class.getName()));
     }
 }
