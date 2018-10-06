@@ -43,4 +43,8 @@
     <string name="session_length_7">5h</string>
     <string name="session_length_8">6h</string>
     <string name="session_length_9">+6h</string>
+
+    <!-- Submit error messages -->
+    <string name="emptyFieldMessage">All the fields with a * should be filled</string>
+    <string name="uncheckedCheckboxMessage">You have to choose either Oneshot or Campaign</string>
 </resources>
