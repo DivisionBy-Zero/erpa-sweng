@@ -1,24 +1,50 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import ch.epfl.sweng.erpa.model.Game;
 
 import ch.epfl.sweng.erpa.R;
 
 public class CreateGameActivity extends Activity {
 
+    EditText universeField;
+    Spinner universesSpinner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_game);
+        universeField = findViewById(R.id.universe_field);
+        universesSpinner = findViewById(R.id.universes_spinner);
+        universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String feedbackType = universesSpinner.getSelectedItem().toString();
+                switch (feedbackType) {
+                    case ("Other"):
+                        universeField.setVisibility(View.VISIBLE);
+                    default:
+                        universeField.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {}
+        });
     }
 
+    //When Oneshot or Campaign checkboxes are checked, uncheck the other one
     public void onCheckboxClicked(View view) {
         final CheckBox campaignCheckBox = findViewById(R.id.campaign);
         final CheckBox oneshotCheckBox = findViewById(R.id.oneshot);
@@ -36,14 +62,7 @@ public class CreateGameActivity extends Activity {
         }
     }
 
-    public void onSpinnerSelection(View view) {
-        final Spinner feedbackSpinner = (Spinner) findViewById(R.id.universes_spinner);
-        String feedbackType = feedbackSpinner.getSelectedItem().toString();
-        if(feedbackType.equals("Other")){
-
-        }
-    }
-
+    //call when the user submit a game and check if no requested field is empty
     public void submitGame(View view) {
         Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
         Spinner universesSpinner = findViewById(R.id.universes_spinner);
@@ -85,16 +104,58 @@ public class CreateGameActivity extends Activity {
                 && checkFilledField(R.id.min_num_player_field)
                 && checkFilledField(R.id.max_num_player_field)
                 && checkFilledField(R.id.description_field))) {
-            //Pop-Up * == oblig
+            createPopup(getString(R.string.emptyFieldMessage));
         }
         else if(!(campaignCheckBox.isChecked() || oneshotCheckBox.isChecked())) {
-            //Pop-Up you must choose either oneshot or campaign
+            createPopup(getString(R.string.uncheckedCheckboxMessage));
         }
-
         else {
+            Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
+            Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
+            String oneShotOrCampaign = oneshotCheckBox.isChecked() ? "Oneshot" : "Campaign";
+            if(checkFilledField(R.id.numb_session_field)){
+                Game newGame = new Game(findViewById(R.id.create_game_name_field).toString(),
+                                        findViewById(R.id.min_num_player_field).toString(),
+                                        findViewById(R.id.max_num_player_field).toString(),
+                                        difficultySpinner.getSelectedItem().toString(),
+                                        universesSpinner.getSelectedItem().toString(),
+                                        oneShotOrCampaign,
+                                        findViewById(R.id.numb_session_field).toString(),
+                                        sessionLengthSpinner.getSelectedItem().toString(),
+                                        findViewById(R.id.description_field).toString());
+            }
+            else{
+                Game newGame = new Game(findViewById(R.id.create_game_name_field).toString(),
+                        findViewById(R.id.min_num_player_field).toString(),
+                        findViewById(R.id.max_num_player_field).toString(),
+                        difficultySpinner.getSelectedItem().toString(),
+                        universesSpinner.getSelectedItem().toString(),
+                        oneShotOrCampaign,
+                        sessionLengthSpinner.getSelectedItem().toString(),
+                        findViewById(R.id.description_field).toString());
+            }
             Intent intent = new Intent(this, GameList.class);
             startActivity(intent);
         }
+    }
+
+    private void createPopup(String text) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        final TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextColor(Color.RED);
+        tv.setTextSize(16);
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(tv);
+        // set dialog message
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
     }
 
     private boolean checkFilledField(@IdRes int myId) {
