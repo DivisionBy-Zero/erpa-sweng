@@ -1,7 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import ch.epfl.sweng.erpa.R;

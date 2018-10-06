@@ -1,31 +1,34 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.activities.CreateGameActivity;
-import ch.epfl.sweng.erpa.activities.GameListActivity;
 
-public class MainActivity extends Activity {
-
+public class MainActivity extends DependencyConfigurationAgnosticActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_remote_service_greeter);
+        if (dependenciesNotReady()) return;
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
     }
 
-    public void launch_game_list(View view)
-    {
-        Intent intent = new Intent(this, GameListActivity.class);
-        startActivity(intent);
+    @OnClick(R.id.launch_storage_provider_greet)
+    public void launchStorageProviderGreet(View view) {
+        startActivity(new Intent(this, RemoteServiceGreeterActivity.class));
     }
 
-    public void launch_create_game(View view)
-    {
-        Intent intent = new Intent(this, CreateGameActivity.class);
-        startActivity(intent);
+    @OnClick(R.id.launch_game_list_button)
+    public void launchGameList(View view) {
+        startActivity(new Intent(this, GameListActivity.class));
+    }
+
+    @OnClick(R.id.launch_create_game_button)
+    public void launchCreateGame(View view) {
+        startActivity(new Intent(this, CreateGameActivity.class));
     }
 }
