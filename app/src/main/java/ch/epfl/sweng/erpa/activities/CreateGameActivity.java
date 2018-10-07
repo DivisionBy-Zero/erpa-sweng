@@ -22,12 +22,18 @@ public class CreateGameActivity extends Activity {
 
     EditText universeField;
     Spinner universesSpinner;
+    TextView numbSession;
+    EditText numbSessionField;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_game);
         universeField = findViewById(R.id.universe_field);
         universesSpinner = findViewById(R.id.universes_spinner);
+        numbSession = findViewById(R.id.num_sessions);
+        numbSessionField = findViewById(R.id.numb_session_field);
+        numbSession.setVisibility(View.GONE);
+        numbSessionField.setVisibility(View.GONE);
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -47,16 +53,17 @@ public class CreateGameActivity extends Activity {
         final CheckBox campaignCheckBox = findViewById(R.id.campaign);
         final CheckBox oneshotCheckBox = findViewById(R.id.oneshot);
         // Check which checkbox was clicked
-        switch(view.getId()) {
-            case R.id.campaign:
-                if (campaignCheckBox.isChecked() && oneshotCheckBox.isChecked()) {
-                    oneshotCheckBox.setChecked(false);
-                }
-            case R.id.oneshot:
-                if (oneshotCheckBox.isChecked() && campaignCheckBox.isChecked()) {
-                    campaignCheckBox.setChecked(false);
-                }
-            default:
+        if (view.getId() == R.id.campaign) {
+            if (campaignCheckBox.isChecked() && oneshotCheckBox.isChecked())
+                oneshotCheckBox.setChecked(false);
+            numbSession.setVisibility(View.VISIBLE);
+            numbSessionField.setVisibility(View.VISIBLE);
+        } else {
+            if (oneshotCheckBox.isChecked() && campaignCheckBox.isChecked())
+                campaignCheckBox.setChecked(false);
+            numbSession.setVisibility(View.GONE);
+            numbSessionField.setVisibility(View.GONE);
+
         }
     }
 
