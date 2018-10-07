@@ -73,16 +73,14 @@ public class CreateGameTest {
     }
 
     @Test
-    public void testEmptyFieldCreatesCorrectPopup()
-    {
+    public void testEmptyFieldCreatesCorrectPopup() {
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
         onView(ViewMatchers.withText(R.string.emptyFieldMessage)).check(matches(isDisplayed())).perform(ViewActions.click());
     }
 
     @Test
-    public void testEmptyCheckboxCreatesCorrectPopup()
-    {
+    public void testEmptyCheckboxCreatesCorrectPopup() {
         onView(ViewMatchers.withId(R.id.create_game_name_field)).perform(typeText("lol")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("2")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
@@ -90,5 +88,31 @@ public class CreateGameTest {
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
         onView(ViewMatchers.withText(R.string.uncheckedCheckboxMessage)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testCanFillUniverseFieldIfOtherIsPicked() {
+        onView(withId(R.id.universes_spinner)).perform(click());
+        onData(hasToString(startsWith("O"))).perform(click());
+        onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
+        onView(withId(R.id.universe_field)).perform(typeText("KazAdrok")).perform(closeSoftKeyboard());
+    }
+
+    @Test
+    public void testCreatePopUpIfMaxSmallerThanMin() {
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("2")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
+        //check if the popup is displayed
+        onView(ViewMatchers.withText(R.string.invalidPlayerNumber)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void test0PlayerCreatePopUp() {
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("0")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
+        //check if the popup is displayed
+        onView(ViewMatchers.withText(R.string.invalidPlayerNumber)).check(matches(isDisplayed()));
     }
 }

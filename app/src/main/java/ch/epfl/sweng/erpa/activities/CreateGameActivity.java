@@ -32,12 +32,10 @@ public class CreateGameActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String feedbackType = universesSpinner.getSelectedItem().toString();
-                switch (feedbackType) {
-                    case ("Other"):
-                        universeField.setVisibility(View.VISIBLE);
-                    default:
-                        universeField.setVisibility(View.GONE);
-                }
+                if(feedbackType.equals("Other"))
+                    universeField.setVisibility(View.VISIBLE);
+                else
+                    universeField.setVisibility(View.GONE);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {}
@@ -114,7 +112,7 @@ public class CreateGameActivity extends Activity {
             Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
             String oneShotOrCampaign = oneshotCheckBox.isChecked() ? "Oneshot" : "Campaign";
             if(checkFilledField(R.id.numb_session_field)){
-                Game newGame = new Game(findViewById(R.id.create_game_name_field).toString(),
+                Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
                                         findViewById(R.id.min_num_player_field).toString(),
                                         findViewById(R.id.max_num_player_field).toString(),
                                         difficultySpinner.getSelectedItem().toString(),
@@ -125,7 +123,7 @@ public class CreateGameActivity extends Activity {
                                         findViewById(R.id.description_field).toString());
             }
             else{
-                Game newGame = new Game(findViewById(R.id.create_game_name_field).toString(),
+                Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
                         findViewById(R.id.min_num_player_field).toString(),
                         findViewById(R.id.max_num_player_field).toString(),
                         difficultySpinner.getSelectedItem().toString(),
