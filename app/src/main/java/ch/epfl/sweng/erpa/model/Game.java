@@ -1,6 +1,10 @@
 package ch.epfl.sweng.erpa.model;
 
+import java.util.Objects;
+
 public class Game {
+    private String gmName;
+    private List<String> players;
     private String name;
     private String minPlayer;
     private String maxPayer;
@@ -11,15 +15,11 @@ public class Game {
     private String sessionLength;
     private String description;
 
-    public Game(String name, String minPlayer){
-        this.name = name;
-        this.minPlayer = minPlayer;
-    }
-
-    public Game(String name, String minPlayer, String maxPayer,
-                String difficulty, String universe,
+    public Game(String gmName, String name, String minPlayer,
+                String maxPayer, String difficulty, String universe,
                 String oneshotOrCampaign, String numberSessions,
                 String sessionLength, String description) {
+        this.gmName = gmName;
         this.name = name;
         this.minPlayer = minPlayer;
         this.maxPayer = maxPayer;
@@ -31,10 +31,11 @@ public class Game {
         this.description = description;
     }
 
-    public Game(String name, String minPlayer, String maxPayer,
-                String difficulty, String universe,
-                String oneshotOrCampaign,
+    public Game(String gmName, String name, String minPlayer,
+                String maxPayer, String difficulty,
+                String universe, String oneshotOrCampaign,
                 String sessionLength, String description) {
+        this.gmName = gmName;
         this.name = name;
         this.minPlayer = minPlayer;
         this.maxPayer = maxPayer;
