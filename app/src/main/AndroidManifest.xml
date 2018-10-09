@@ -4,12 +4,13 @@
     package="ch.epfl.sweng.erpa">
 
     <application
-        android:name=".ErpaApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".ErpaApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:theme="@style/ERPAStyle"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.CreateGameActivity"/>
         <activity android:name=".activities.GameListActivity" />
