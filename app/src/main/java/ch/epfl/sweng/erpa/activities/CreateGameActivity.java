@@ -1,69 +1,65 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import ch.epfl.sweng.erpa.CreateGameFormFragment;
 import ch.epfl.sweng.erpa.model.Game;
-
 import ch.epfl.sweng.erpa.R;
 
-public class CreateGameActivity extends Activity {
+public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
 
-    EditText universeField;
-    Spinner universesSpinner;
-    TextView numbSession;
-    EditText numbSessionField;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_game);
-        universeField = findViewById(R.id.universe_field);
-        universesSpinner = findViewById(R.id.universes_spinner);
-        numbSession = findViewById(R.id.num_sessions);
-        numbSessionField = findViewById(R.id.numb_session_field);
-        numbSession.setVisibility(View.GONE);
-        numbSessionField.setVisibility(View.GONE);
+        ButterKnife.bind(this);
+        final EditText universeField = findViewById(R.id.universe_field);
+        final Spinner universesSpinner = findViewById(R.id.universes_spinner);
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String feedbackType = universesSpinner.getSelectedItem().toString();
-                if(feedbackType.equals("Other"))
+                if (feedbackType.equals("Other")) {
                     universeField.setVisibility(View.VISIBLE);
-                else
+                } else {
                     universeField.setVisibility(View.GONE);
+                }
             }
+
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {}
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
         });
     }
 
-    //When Oneshot or Campaign checkboxes are checked, uncheck the other one
-    public void onCheckboxClicked(View view) {
-        final CheckBox campaignCheckBox = findViewById(R.id.campaign);
-        final CheckBox oneshotCheckBox = findViewById(R.id.oneshot);
-        // Check which checkbox was clicked
-        if (view.getId() == R.id.campaign) {
-            if (campaignCheckBox.isChecked() && oneshotCheckBox.isChecked())
-                oneshotCheckBox.setChecked(false);
-            numbSession.setVisibility(View.VISIBLE);
-            numbSessionField.setVisibility(View.VISIBLE);
-        } else {
-            if (oneshotCheckBox.isChecked() && campaignCheckBox.isChecked())
-                campaignCheckBox.setChecked(false);
-            numbSession.setVisibility(View.GONE);
-            numbSessionField.setVisibility(View.GONE);
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+    }
 
+    // When Oneshot or Campaign checkboxes are checked, uncheck the other one
+    public void onOneShotOrCampaignSelected(View view) {
+        ButterKnife.bind(this, view);
+        if (view.getId() == R.id.campaign) {
+            findViewById(R.id.num_sessions).setVisibility(View.VISIBLE);
+            findViewById(R.id.numb_session_field).setVisibility(View.VISIBLE);
+
+        } else {
+            findViewById(R.id.num_sessions).setVisibility(View.GONE);
+            findViewById(R.id.numb_session_field).setVisibility(View.GONE);
         }
     }
 
@@ -91,57 +87,36 @@ public class CreateGameActivity extends Activity {
                     oneShotOrCampaign, findViewById(R.id.numb_session_field).toString(),
                     sessionLengthSpinner.getSelectedItem().toString(),
                     findViewById(R.id.description_field).toString());
-            Intent intent = new Intent(this, GameList.class);
+            Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
         }
     }
 
-    private boolean aRadioButtonIsChecked() {
+    private boolean aRadioButtonIsChecked(){
         RadioButton campaignRadioButton = findViewById(R.id.campaign);
         RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
         return (campaignRadioButton.isChecked() || oneshotRadioButton.isChecked());
     }
 
-    private boolean allObligFieldsFilled(){
+    private boolean allObligFieldsFilled() {
         return (checkFilledField(R.id.create_game_name_field)
->>>>>>> ce67a11... fixup! Add create_game activity and corresponding testclass
                 && checkFilledField(R.id.min_num_player_field)
                 && checkFilledField(R.id.max_num_player_field)
-                && checkFilledField(R.id.description_field))) {
-            createPopup(getString(R.string.emptyFieldMessage));
-        }
-        else if(!(campaignCheckBox.isChecked() || oneshotCheckBox.isChecked())) {
-            createPopup(getString(R.string.uncheckedCheckboxMessage));
-        }
-        else {
-            Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
-            Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
-            String oneShotOrCampaign = oneshotCheckBox.isChecked() ? "Oneshot" : "Campaign";
-            if(checkFilledField(R.id.numb_session_field)){
-                Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
-                                        findViewById(R.id.min_num_player_field).toString(),
-                                        findViewById(R.id.max_num_player_field).toString(),
-                                        difficultySpinner.getSelectedItem().toString(),
-                                        universesSpinner.getSelectedItem().toString(),
-                                        oneShotOrCampaign,
-                                        findViewById(R.id.numb_session_field).toString(),
-                                        sessionLengthSpinner.getSelectedItem().toString(),
-                                        findViewById(R.id.description_field).toString());
-            }
-            else{
-                Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
-                        findViewById(R.id.min_num_player_field).toString(),
-                        findViewById(R.id.max_num_player_field).toString(),
-                        difficultySpinner.getSelectedItem().toString(),
-                        universesSpinner.getSelectedItem().toString(),
-                        oneShotOrCampaign,
-                        sessionLengthSpinner.getSelectedItem().toString(),
-                        findViewById(R.id.description_field).toString());
-            }
-            Intent intent = new Intent(this, GameList.class);
-            startActivity(intent);
-        }
+                && checkFilledField(R.id.description_field));
+    }
+
+    private boolean playerNumberIsValid(String valueMin, String valueMax) {
+        int min = Integer.parseInt(valueMin);
+        int max = Integer.parseInt(valueMax);
+        return (min > 0 && max >= min);
+    }
+
+    // IdRes denotes that the integer parameter fieldId is expected to be an id resource reference
+    private boolean checkFilledField(@IdRes int fieldId) {
+        final EditText textField = (EditText) findViewById(fieldId);
+        String text = textField.getText().toString();
+        return (!text.isEmpty());
     }
 
     private void createPopup(String text) {
@@ -162,21 +137,5 @@ public class CreateGameActivity extends Activity {
         // show it
         alertDialog.show();
     }
-
-    private boolean checkFilledField(@IdRes int myId) {
-        final EditText textField = (EditText) findViewById(myId);
-        String text = textField.getText().toString();
-        return (!text.isEmpty());
-    }
-
-
-//    Spinner spinner = (Spinner) findViewById(R.id.difficulty_spinner);
-//    // Create an ArrayAdapter using the string array and a default spinner layout
-//    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-//            R.array.difficulties_array, android.R.layout.simple_spinner_item);
-//    // Specify the layout to use when the list of choices appears
-//    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//    // Apply the adapter to the spinner
-//    spinner.setAdapter(adapter);
 
 }
