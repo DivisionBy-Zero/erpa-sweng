@@ -47,4 +47,5 @@
     <!-- Submit error messages -->
     <string name="emptyFieldMessage">All the fields with a * should be filled</string>
     <string name="uncheckedCheckboxMessage">You have to choose either Oneshot or Campaign</string>
+    <string name="invalidPlayerNumber">Invalid number of players: min must be positive and smaller or equal to max</string>
 </resources>

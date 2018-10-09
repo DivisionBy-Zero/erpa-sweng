@@ -42,7 +42,7 @@ public class CreateGameTest {
         onView(withId(R.id.universes_spinner)).perform(click());
         onData(hasToString(startsWith("O"))).perform(click());
         onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
-        onView(withId(R.id.oneshot)).perform(click());
+        onView(withId(R.id.radio)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.numb_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());
         onView(withId(R.id.session_length_spinner)).perform(click());
@@ -74,6 +74,8 @@ public class CreateGameTest {
 
     @Test
     public void testEmptyFieldCreatesCorrectPopup() {
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("2")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
         onView(ViewMatchers.withText(R.string.emptyFieldMessage)).check(matches(isDisplayed())).perform(ViewActions.click());
