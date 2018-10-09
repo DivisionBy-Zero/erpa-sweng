@@ -1,0 +1,212 @@
+package ch.epfl.sweng.erpa.model;
+
+<<<<<<< HEAD
+import com.annimon.stream.Optional;
+
+import java.util.Objects;
+
+public class Game {
+    private String gmUniqueID;
+    private GameParticipants players;
+    private String name;
+    private int minPlayer;
+    private int maxPlayer;
+    private Difficulty difficulty;
+    private String universe;
+    private OneshotOrCampaign oneshotOrCampaign;
+    private Optional<Integer> numberSessions;
+    private Optional<Integer> sessionLengthInMinutes;
+    private String description;
+
+    public Game(String gmUniqueID, String name, int minPlayer,
+                int maxPayer, Difficulty difficulty, String universe,
+                OneshotOrCampaign oneshotOrCampaign, Optional<Integer> numberSessions,
+                Optional sessionLengthInMinutes, String description) {
+        this.gmUniqueID = gmUniqueID;
+        this.name = name;
+        this.minPlayer = minPlayer;
+        this.maxPlayer = maxPayer;
+=======
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Game implements Serializable
+{
+
+
+    private String gid;
+    private String gmUniqueID;
+    private GameParticipants players;
+    private String name;
+    private String minPlayer;
+    private String maxPayer;
+    private String difficulty;
+    private String universe;
+    private String oneshotOrCampaign;
+    private String numberSessions;
+    private String sessionLength;
+    private String description;
+
+    public Game(String gmUniqueID, String name, String minPlayer,
+                String maxPayer, String difficulty, String universe,
+                String oneshotOrCampaign, String numberSessions,
+                String sessionLength, String description) {
+        this.gmUniqueID = gmUniqueID;
+        this.name = name;
+        this.minPlayer = minPlayer;
+        this.maxPayer = maxPayer;
+>>>>>>> bcc9277... Implement an untested database
+        this.difficulty = difficulty;
+        this.universe = universe;
+        this.oneshotOrCampaign = oneshotOrCampaign;
+        this.numberSessions = numberSessions;
+<<<<<<< HEAD
+        this.sessionLengthInMinutes = sessionLengthInMinutes;
+=======
+        this.sessionLength = sessionLength;
+>>>>>>> bcc9277... Implement an untested database
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+<<<<<<< HEAD
+    public int getMinPlayer() {
+        return minPlayer;
+    }
+
+    public int getMaxPlayer() {
+        return maxPlayer;
+=======
+    public String getMinPlayer() {
+        return minPlayer;
+    }
+
+    public String getMaxPayer() {
+        return maxPayer;
+>>>>>>> bcc9277... Implement an untested database
+    }
+
+    public String getUniverse() {
+        return universe;
+    }
+
+<<<<<<< HEAD
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public OneshotOrCampaign getOneshotOrCampaign() {
+        return oneshotOrCampaign;
+    }
+
+    public Optional<Integer> getNumberSessions() {
+        return numberSessions;
+    }
+
+    public Optional<Integer> getSessionLengthInMinutes() {
+        return sessionLengthInMinutes;
+=======
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public String getOneshotOrCampaign() {
+        return oneshotOrCampaign;
+    }
+
+    public String getNumberSessions() {
+        return numberSessions;
+    }
+
+    public String getSessionLength() {
+        return sessionLength;
+>>>>>>> bcc9277... Implement an untested database
+    }
+
+    public String getDescription() {
+        return description;
+    }
+<<<<<<< HEAD
+
+=======
+    public String getGid() {
+        return gid;
+    }
+
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
+>>>>>>> bcc9277... Implement an untested database
+    @Override
+    public String toString() {
+        return "Game{" +
+                "gmUniqueID='" + gmUniqueID + '\'' +
+                ", players=" + players +
+                ", name='" + name + '\'' +
+                ", minPlayer='" + minPlayer + '\'' +
+<<<<<<< HEAD
+                ", maxPayer='" + maxPlayer + '\'' +
+=======
+                ", maxPayer='" + maxPayer + '\'' +
+>>>>>>> bcc9277... Implement an untested database
+                ", difficulty='" + difficulty + '\'' +
+                ", universe='" + universe + '\'' +
+                ", oneshotOrCampaign='" + oneshotOrCampaign + '\'' +
+                ", numberSessions='" + numberSessions + '\'' +
+<<<<<<< HEAD
+                ", sessionLength='" + sessionLengthInMinutes + '\'' +
+=======
+                ", sessionLength='" + sessionLength + '\'' +
+>>>>>>> bcc9277... Implement an untested database
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Game game = (Game) o;
+        return Objects.equals(gmUniqueID, game.gmUniqueID) &&
+                Objects.equals(players, game.players) &&
+                Objects.equals(name, game.name) &&
+                Objects.equals(minPlayer, game.minPlayer) &&
+<<<<<<< HEAD
+                Objects.equals(maxPlayer, game.maxPlayer) &&
+=======
+                Objects.equals(maxPayer, game.maxPayer) &&
+>>>>>>> bcc9277... Implement an untested database
+                Objects.equals(difficulty, game.difficulty) &&
+                Objects.equals(universe, game.universe) &&
+                Objects.equals(oneshotOrCampaign, game.oneshotOrCampaign) &&
+                Objects.equals(numberSessions, game.numberSessions) &&
+<<<<<<< HEAD
+                Objects.equals(sessionLengthInMinutes, game.sessionLengthInMinutes) &&
+=======
+                Objects.equals(sessionLength, game.sessionLength) &&
+>>>>>>> bcc9277... Implement an untested database
+                Objects.equals(description, game.description);
+    }
+
+    @Override
+    public int hashCode() {
+
+<<<<<<< HEAD
+        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPlayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLengthInMinutes, description);
+    }
+
+    public enum Difficulty {
+        NOOB, CHILL, HARD
+    }
+
+    public enum OneshotOrCampaign {
+        ONESHOT, CAMPAIGN
+=======
+        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLength, description);
+>>>>>>> bcc9277... Implement an untested database
+    }
+}

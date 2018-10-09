@@ -17,6 +17,7 @@ public interface RemoteServicesProvider {
     boolean verifyAccessToken(String uid, String accessToken);
 
     void storeNewUser(UserProfile user);
+    GameService getGameService();
 
     // Here be LifeCycle management
     void terminate();

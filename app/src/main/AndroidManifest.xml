@@ -26,6 +26,7 @@
         <activity android:name=".activities.ExampleForToolbarActivity" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.SignupActivity"></activity>
+        <activity android:name=".GameViewerActivity"></activity>
     </application>
 
 </manifest>
