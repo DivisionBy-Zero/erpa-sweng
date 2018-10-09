@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Game {
-    private String gmName;
-    private List<String> players;
+    private String gmUniqueID;
+    private GameParticipants players;
     private String name;
     private String minPlayer;
     private String maxPayer;
@@ -16,11 +16,11 @@ public class Game {
     private String sessionLength;
     private String description;
 
-    public Game(String gmName, String name, String minPlayer,
+    public Game(String gmUniqueID, String name, String minPlayer,
                 String maxPayer, String difficulty, String universe,
                 String oneshotOrCampaign, String numberSessions,
                 String sessionLength, String description) {
-        this.gmName = gmName;
+        this.gmUniqueID = gmUniqueID;
         this.name = name;
         this.minPlayer = minPlayer;
         this.maxPayer = maxPayer;
@@ -71,7 +71,7 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "gmName='" + gmName + '\'' +
+                "gmUniqueID='" + gmUniqueID + '\'' +
                 ", players=" + players +
                 ", name='" + name + '\'' +
                 ", minPlayer='" + minPlayer + '\'' +
@@ -90,7 +90,7 @@ public class Game {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(gmName, game.gmName) &&
+        return Objects.equals(gmUniqueID, game.gmUniqueID) &&
                 Objects.equals(players, game.players) &&
                 Objects.equals(name, game.name) &&
                 Objects.equals(minPlayer, game.minPlayer) &&
@@ -106,6 +106,6 @@ public class Game {
     @Override
     public int hashCode() {
 
-        return Objects.hash(gmName, players, name, minPlayer, maxPayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLength, description);
+        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLength, description);
     }
 }

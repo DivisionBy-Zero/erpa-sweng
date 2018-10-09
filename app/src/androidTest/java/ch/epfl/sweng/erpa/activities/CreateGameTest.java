@@ -1,5 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.support.design.widget.CoordinatorLayout;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
@@ -43,12 +44,15 @@ public class CreateGameTest {
         onData(hasToString(startsWith("O"))).perform(click());
         onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
         onView(withId(R.id.radio)).perform(click());
+        onView(withId(R.id.radio_form)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.numb_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());
         onView(withId(R.id.session_length_spinner)).perform(click());
         onData(hasToString(startsWith("5"))).perform(click());
         onView(withId(R.id.session_length_spinner)).check(matches(withSpinnerText(containsString("5h"))));
         onView(withId(R.id.description_field)).perform(typeText("Une petite description de partie")).perform(closeSoftKeyboard());
+        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(R.id.createGameCoordinatorLayout);
+        view.scrollTo(0, view.getBottom());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
@@ -69,6 +73,8 @@ public class CreateGameTest {
         onData(hasToString(startsWith("5"))).perform(click());
         onView(withId(R.id.session_length_spinner)).check(matches(withSpinnerText(containsString("5h"))));
         onView(withId(R.id.description_field)).perform(typeText("Une petite description de partie")).perform(closeSoftKeyboard());
+        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(R.id.createGameCoordinatorLayout);
+        view.scrollTo(0, view.getBottom());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
