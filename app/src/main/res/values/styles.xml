@@ -1,0 +1,27 @@
+<resources>
+
+    <style name="ERPAStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!--BaseColor-->
+        <item name="android:colorPrimary">@color/primaryColor</item>
+        <item name="android:colorPrimaryDark">@color/primaryColor</item>
+        <item name="android:colorBackground">@color/secondaryColor</item>
+        <!--TextStyle-->
+        <item name="android:colorAccent">@color/primaryColor</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textColorPrimary">@color/textColor</item>
+        <item name="android:baselineAligned">true</item>
+        <item name="android:textSize">23sp</item>
+        <!--ButtonStyle-->
+        <item name="android:colorButtonNormal">@color/primaryColor</item>
+        <item name="android:colorControlHighlight">@color/primaryDarkColor</item>
+        <!--title and menu police-->
+        <item name="android:fontFamily">@font/yatraone_regular</item>
+        <!--preview card police-->
+        <!--<item name="android:fontFamily">@font/italianno_regular</item>-->
+        <!--Noob/chill/hard police-->
+        <!--<item name="android:fontFamily"> @font/nanumbrushscript_regular</item>-->
+        <!--form Police-->
+        <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
+    </style>
+
+</resources>
