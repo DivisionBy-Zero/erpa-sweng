@@ -33,4 +33,10 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(R.id.launch_create_game_button)).perform(ViewActions.click());
         intended(hasComponent(CreateGameActivity.class.getName()));
     }
+
+    @Test
+    public void testCanLaunchMyAccount() {
+        onView(ViewMatchers.withId(R.id.launch_my_account_button)).perform(ViewActions.click());
+        intended(hasComponent(MyAccountActivity.class.getName()));
+    }
 }
