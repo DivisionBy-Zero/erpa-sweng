@@ -35,7 +35,7 @@ public class RemoteServiceGreeterActivity extends DependencyConfigurationAgnosti
     }
 
     @OnClick(R.id.disconnectRspButton)
-    protected void onDisconnectRspButton(){
+    protected void onDisconnectRspButton() {
         remoteServicesProviderCoordinator.bindRemoteServicesProvider(null);
         recreate();
     }

@@ -18,7 +18,7 @@ import toothpick.smoothie.provider.SharedPreferencesProvider;
 public class ErpaApplicationModule extends Module {
     public ErpaApplicationModule(ErpaApplication application) {
         SharedPreferencesProvider preferencesProvider =
-            new SharedPreferencesProvider(application, application.getString(R.string.preference_file_key));
+                new SharedPreferencesProvider(application, application.getString(R.string.preference_file_key));
 
         this.bind(Application.class).toInstance(application);
         this.bind(Context.class).toInstance(application);

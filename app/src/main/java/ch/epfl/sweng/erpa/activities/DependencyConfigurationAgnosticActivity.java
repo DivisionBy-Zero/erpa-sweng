@@ -59,7 +59,7 @@ public abstract class DependencyConfigurationAgnosticActivity extends Activity {
         }
     }
 
-    public boolean dependenciesNotReady(){
+    public boolean dependenciesNotReady() {
         return isFinishing();
     }
 

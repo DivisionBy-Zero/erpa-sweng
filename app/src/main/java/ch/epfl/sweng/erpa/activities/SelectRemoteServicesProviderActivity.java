@@ -47,10 +47,11 @@ public class SelectRemoteServicesProviderActivity extends Activity {
         });
     }
 
-    @OnClick(R.id.rspSelectionSubmit) public void rspSelect() {
+    @OnClick(R.id.rspSelectionSubmit)
+    public void rspSelect() {
         @SuppressLint("FindViewByIdCast")  // Linter is wrong. This will always be a RadioButton
         Optional<RadioButton> maybeSelection = Optional.ofNullable(
-                findViewById(rspSelectionRadioGroup.getCheckedRadioButtonId()));
+        findViewById(rspSelectionRadioGroup.getCheckedRadioButtonId()));
         maybeSelection.ifPresent(selection -> {
             String selectedRspClassName = selection.getText().toString();
             Log.i("RSP Selection", String.format("Selected Remote Storage Provider %s", selectedRspClassName));

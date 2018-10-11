@@ -26,29 +26,28 @@ import toothpick.Toothpick;
 /**
  * This is responsible of memoizing and proxying the selected RemoteServicesProvider.
  * This class' life cycle is managed by Toothpick.
- *
+ * <p>
  * Hereafter rsp = Remote Services Provider.
- *
+ * <p>
  * This class implements the Proxy Pattern for RemoteServicesProvider.class.
  */
 @Singleton
 public class RemoteServicesProviderCoordinator implements InvocationHandler,
-                                                          DependencyConfigurator<RemoteServicesProvider> {
+        DependencyConfigurator<RemoteServicesProvider> {
     /*
      * A word or wary: This singleton may be called prior to an activity creation and may start
      * SelectRemoteServicesProviderActivity. Be conservative about injecting stuff here since it
      * may lead to an infinite dependency loop.
      */
-    @Inject @Named("application") Scope applicationScope;
-    @Inject SharedPreferences sharedPreferences;
-
     private final String REMOTE_PROVIDER_KEY;
     private final Context applicationContext;
-
+    @Inject @Named("application") Scope applicationScope;
+    @Inject SharedPreferences sharedPreferences;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RemoteServicesProvider> currentProvider = Optional.empty();
 
-    @Inject public RemoteServicesProviderCoordinator(@Named("application") Scope scope, Context appCtx) {
+    @Inject
+    public RemoteServicesProviderCoordinator(@Named("application") Scope scope, Context appCtx) {
         this.applicationContext = appCtx;
         Toothpick.inject(this, scope);
         REMOTE_PROVIDER_KEY = appCtx.getString(R.string.prop_key_remote_provider);
@@ -81,7 +80,7 @@ public class RemoteServicesProviderCoordinator implements InvocationHandler,
     }
 
     public Optional<Class<? extends RemoteServicesProvider>> rspClassFromFullyQualifiedName(String rspClassName) {
-        if (rspClassName == null || rspClassName.trim().isEmpty()){
+        if (rspClassName == null || rspClassName.trim().isEmpty()) {
             return Optional.empty();
         }
 
@@ -91,7 +90,7 @@ public class RemoteServicesProviderCoordinator implements InvocationHandler,
                 //noinspection unchecked
                 return Optional.of((Class<? extends RemoteServicesProvider>) referencedClass);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             // we couldn't find the target class, no problem.
         }
         return Optional.empty();
@@ -118,7 +117,8 @@ public class RemoteServicesProviderCoordinator implements InvocationHandler,
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (!currentProvider.isPresent()) throw new IllegalStateException("RemoteServicesProvider not loaded");
+        if (!currentProvider.isPresent())
+            throw new IllegalStateException("RemoteServicesProvider not loaded");
         return method.invoke(currentProvider.get(), args);
     }
 }
