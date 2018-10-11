@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".activities.RemoteServiceGreeterActivity" />
         <activity android:name=".activities.SelectRemoteServicesProviderActivity" />
+        <activity android:name=".activities.LoginActivity" />
     </application>
 
 </manifest>
