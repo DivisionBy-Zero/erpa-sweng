@@ -17,8 +17,11 @@ import android.widget.TextView;
 
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.CreateGameFormFragment;
-import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.Game;
+import ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign;
+
+import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.*;
 
 public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
 
@@ -33,11 +36,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String feedbackType = universesSpinner.getSelectedItem().toString();
-                if (feedbackType.equals("Other")) {
-                    universeField.setVisibility(View.VISIBLE);
-                } else {
-                    universeField.setVisibility(View.GONE);
-                }
+                universeField.setVisibility((feedbackType.equals("Other")) ? View.VISIBLE : View.GONE);
             }
 
             @Override
@@ -53,25 +52,15 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     // When Oneshot or Campaign checkboxes are checked, uncheck the other one
     public void onOneShotOrCampaignSelected(View view) {
         ButterKnife.bind(this, view);
-        if (view.getId() == R.id.campaign) {
-            findViewById(R.id.num_sessions).setVisibility(View.VISIBLE);
-            findViewById(R.id.numb_session_field).setVisibility(View.VISIBLE);
-
-        } else {
-            findViewById(R.id.num_sessions).setVisibility(View.GONE);
-            findViewById(R.id.numb_session_field).setVisibility(View.GONE);
-        }
+        findViewById(R.id.layout_num_sessions).setVisibility((view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
     }
 
     //call when the user submit a game and check if no requested field is empty
     public void submitGame(View view) {
-        Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
-        Spinner universesSpinner = findViewById(R.id.universes_spinner);
-        Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
         EditText minPlayer = findViewById(R.id.min_num_player_field);
         EditText maxPlayer = findViewById(R.id.max_num_player_field);
-        String valueMin = minPlayer.getText().toString();
-        String valueMax = maxPlayer.getText().toString();
+        int valueMin = Integer.parseInt(minPlayer.getText().toString());
+        int valueMax = Integer.parseInt(maxPlayer.getText().toString());
         if (!playerNumberIsValid(valueMin, valueMax)) {
             createPopup(getString(R.string.invalidPlayerNumber));
         } else if (!allObligFieldsFilled()) {
@@ -79,13 +68,18 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         } else if (!aRadioButtonIsChecked()) {
             createPopup(getString(R.string.uncheckedCheckboxMessage));
         } else {
+            Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
+            Spinner universesSpinner = findViewById(R.id.universes_spinner);
+            Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
             RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
-            String oneShotOrCampaign = oneshotRadioButton.isChecked() ? "Oneshot" : "Campaign";
+            OneshotOrCampaign oneShotOrCampaign = oneshotRadioButton.isChecked() ? ONESHOT : CAMPAIGN;
+            Game.Difficulty difficulty = findDifficulty(difficultySpinner.getSelectedItem().toString());
+            Game.SessionLength sessionLength = findSessionLength(sessionLengthSpinner.getSelectedItem().toString());
             Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
-                    valueMin, valueMax, difficultySpinner.getSelectedItem().toString(),
+                    valueMin, valueMax, difficulty,
                     universesSpinner.getSelectedItem().toString(),
-                    oneShotOrCampaign, findViewById(R.id.numb_session_field).toString(),
-                    sessionLengthSpinner.getSelectedItem().toString(),
+                    oneShotOrCampaign, Integer.parseInt(findViewById(R.id.num_session_field).toString()),
+                    sessionLength,
                     findViewById(R.id.description_field).toString());
             Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
@@ -93,7 +87,31 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         }
     }
 
-    private boolean aRadioButtonIsChecked(){
+    private Game.SessionLength findSessionLength(String sessionLength) {
+        switch (sessionLength) {
+            case "Undefined": return Game.SessionLength.UNDEFINED;
+            case "-1h": return Game.SessionLength.LESSH1;
+            case "1h": return Game.SessionLength.H1;
+            case "2h": return Game.SessionLength.H2;
+            case "3h": return Game.SessionLength.H3;
+            case "4h": return Game.SessionLength.H4;
+            case "5h": return Game.SessionLength.H5;
+            case "6h": return Game.SessionLength.H6;
+            case "+6h": return Game.SessionLength.MOREH6;
+            default: return null;
+        }
+    }
+
+    private Game.Difficulty findDifficulty(String diff) {
+        switch (diff){
+            case "NOOB": return Game.Difficulty.NOOB;
+            case "Chill": return Game.Difficulty.CHILL;
+            case "Hard": return Game.Difficulty.HARD;
+            default: return null;
+        }
+    }
+
+    private boolean aRadioButtonIsChecked() {
         RadioButton campaignRadioButton = findViewById(R.id.campaign);
         RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
         return (campaignRadioButton.isChecked() || oneshotRadioButton.isChecked());
@@ -106,10 +124,8 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
                 && checkFilledField(R.id.description_field));
     }
 
-    private boolean playerNumberIsValid(String valueMin, String valueMax) {
-        int min = Integer.parseInt(valueMin);
-        int max = Integer.parseInt(valueMax);
-        return (min > 0 && max >= min);
+    private boolean playerNumberIsValid(int valueMin, int valueMax) {
+        return (valueMin > 0 && valueMax >= valueMin);
     }
 
     // IdRes denotes that the integer parameter fieldId is expected to be an id resource reference
