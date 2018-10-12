@@ -10,9 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.activities.CreateGameActivity;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -46,7 +44,7 @@ public class CreateGameTest {
         onView(withId(R.id.radio)).perform(click());
         onView(withId(R.id.radio_form)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
-        onView(withId(R.id.numb_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());
+        onView(withId(R.id.num_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());
         onView(withId(R.id.session_length_spinner)).perform(click());
         onData(hasToString(startsWith("5"))).perform(click());
         onView(withId(R.id.session_length_spinner)).check(matches(withSpinnerText(containsString("5h"))));
