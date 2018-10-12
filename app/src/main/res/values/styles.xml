@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="ERPAStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="ERPAStyle" parent="Theme.AppCompat.Light.NoActionBar">
         <!--BaseColor-->
         <item name="android:colorPrimary">@color/primaryColor</item>
         <item name="android:colorPrimaryDark">@color/primaryColor</item>
@@ -22,6 +22,11 @@
         <!--<item name="android:fontFamily"> @font/nanumbrushscript_regular</item>-->
         <!--form Police-->
         <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
+    </style>
+
+    <style name="ToolBarTitleStyle" parent="ERPAStyle">
+        <item name="android:textSize">40sp</item>
+        <item name="android:fontFamily">@font/nanumbrushscript_regular</item>
     </style>
 
 </resources>

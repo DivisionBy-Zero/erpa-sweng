@@ -11,9 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.activities.CreateGameActivity;
-import ch.epfl.sweng.erpa.activities.GameListActivity;
-import ch.epfl.sweng.erpa.activities.MainActivity;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;

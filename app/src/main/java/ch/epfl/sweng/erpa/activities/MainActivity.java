@@ -31,4 +31,5 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
     public void launchCreateGame(View view) {
         startActivity(new Intent(this, CreateGameActivity.class));
     }
+
 }

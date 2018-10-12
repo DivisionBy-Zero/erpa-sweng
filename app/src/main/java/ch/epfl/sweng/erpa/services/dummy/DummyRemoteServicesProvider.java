@@ -3,7 +3,8 @@ package ch.epfl.sweng.erpa.services.dummy;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
-    public DummyRemoteServicesProvider() { }
+    public DummyRemoteServicesProvider() {
+    }
 
     @Override
     public String getFriendlyProviderName() {

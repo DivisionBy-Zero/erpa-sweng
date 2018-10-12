@@ -3,7 +3,8 @@ package ch.epfl.sweng.erpa.services.firebase;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
-    public FirebaseRemoteServicesProvider() { }
+    public FirebaseRemoteServicesProvider() {
+    }
 
     @Override
     public String getFriendlyProviderName() {

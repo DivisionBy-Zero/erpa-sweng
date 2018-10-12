@@ -51,25 +51,25 @@ public class ErpaApplication extends Application {
         // Install trivial application modules
         appScope.installModules(new ErpaApplicationModule(this));
         // Publish the general application scope
-        appScope.installModules(new Module(){{
+        appScope.installModules(new Module() {{
             bind(Scope.class).withName("application").toInstance(appScope);
         }});
 
         // Publish
-        appScope.installModules(new Module(){{
+        appScope.installModules(new Module() {{
             bind(Set.class).withName("Remote Service Providers").toInstance(remoteServicesProviders);
             bind(Set.class).withName("Dependency Configurators").toInstance(
-                Stream.of(dependencyConfiguratorClasses).map(appScope::getInstance).collect(Collectors.toSet()));
+                    Stream.of(dependencyConfiguratorClasses).map(appScope::getInstance).collect(Collectors.toSet()));
         }});
 
         // Create Remote Service Provider singleton instance proxy
         RemoteServicesProvider proxifiedRspInstance = (RemoteServicesProvider)
-            Proxy.newProxyInstance(RemoteServicesProvider.class.getClassLoader(),
-                new Class[] { RemoteServicesProvider.class },
-                appScope.getInstance(RemoteServicesProviderCoordinator.class));
+                Proxy.newProxyInstance(RemoteServicesProvider.class.getClassLoader(),
+                        new Class[]{RemoteServicesProvider.class},
+                        appScope.getInstance(RemoteServicesProviderCoordinator.class));
 
         // Publish
-        appScope.installModules(new Module(){{
+        appScope.installModules(new Module() {{
             bind(RemoteServicesProvider.class).toInstance(proxifiedRspInstance);
         }});
     }

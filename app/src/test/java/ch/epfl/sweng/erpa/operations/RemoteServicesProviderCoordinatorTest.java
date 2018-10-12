@@ -32,9 +32,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RemoteServicesProviderCoordinatorTest {
-    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule public final ToothPickRule toothPickRule = new ToothPickRule(this, "rspCoordinatorTest");
-
+    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock Context androidApplicationContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) // Methods calls return mocks (e.g. builders).
             SharedPreferences sharedPreferences;
@@ -48,7 +47,7 @@ public class RemoteServicesProviderCoordinatorTest {
         when(sharedPreferences.getString(anyString(), any())).thenReturn(DummyRemoteServicesProvider.class.getName());
 
         scope = toothPickRule.getScope();
-        scope.installModules(new Module(){{
+        scope.installModules(new Module() {{
             bind(Scope.class).withName("application").toInstance(scope);
         }});
         toothPickRule.inject(this);
@@ -106,7 +105,7 @@ public class RemoteServicesProviderCoordinatorTest {
 
         RemoteServicesProvider proxifiedInstance =
                 (RemoteServicesProvider) Proxy.newProxyInstance(RemoteServicesProvider.class.getClassLoader(),
-                        new Class[] { RemoteServicesProvider.class }, underTest);
+                        new Class[]{RemoteServicesProvider.class}, underTest);
 
         assertEquals(SyntheticRemoteServicesProvider.mlp, proxifiedInstance.getFriendlyProviderName());
     }
@@ -127,15 +126,32 @@ public class RemoteServicesProviderCoordinatorTest {
 
 class Fuse {
     boolean ignited = false;
-    void ignite() { ignited = true; }
+
+    void ignite() {
+        ignited = true;
+    }
 }
 
 @SuppressWarnings("WeakerAccess")
 class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     final static String mlp = "My little pony";
     public final Fuse fuse = new Fuse();
-    public SyntheticRemoteServicesProvider(){}
-    @Override public String getFriendlyProviderName() { return mlp; }
-    @Override public String getFriendlyProviderDescription() { return null; }
-    @Override public void terminate() { fuse.ignite(); }
+
+    public SyntheticRemoteServicesProvider() {
+    }
+
+    @Override
+    public String getFriendlyProviderName() {
+        return mlp;
+    }
+
+    @Override
+    public String getFriendlyProviderDescription() {
+        return null;
+    }
+
+    @Override
+    public void terminate() {
+        fuse.ignite();
+    }
 }

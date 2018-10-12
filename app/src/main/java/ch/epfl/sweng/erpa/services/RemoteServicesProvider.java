@@ -5,8 +5,10 @@ public interface RemoteServicesProvider {
 
     // Here be metadata
     String getFriendlyProviderName();
+
     String getFriendlyProviderDescription();
 
     // Here be LifeCycle management
-    default void terminate(){}
+    default void terminate() {
+    }
 }
