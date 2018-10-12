@@ -7,24 +7,24 @@
         <item>Expert</item>
     //create_game spinner array
     <string-array name="difficulties_array">
-        <item>@string/difficulty_1</item>
-        <item>@string/difficulty_2</item>
-        <item>@string/difficulty_3</item>
+        <item>NOOB</item>
+        <item>Chill</item>
+        <item>Hard</item>
     </string-array>
     <string-array name="universes_array">
-        <item>@string/universe_1</item>
-        <item>@string/universe_2</item>
-        <item>@string/universe_3</item>
+        <item>Warhammer</item>
+        <item>Lovecraft</item>
+        <item>Other</item>
     </string-array>
     <string-array name="session_length_array">
-        <item>@string/session_length_1</item>
-        <item>@string/session_length_2</item>
-        <item>@string/session_length_3</item>
-        <item>@string/session_length_4</item>
-        <item>@string/session_length_5</item>
-        <item>@string/session_length_6</item>
-        <item>@string/session_length_7</item>
-        <item>@string/session_length_8</item>
-        <item>@string/session_length_9</item>
+        <item>Undefined</item>
+        <item>-1h</item>
+        <item>1h</item>
+        <item>2h</item>
+        <item>3h</item>
+        <item>4h</item>
+        <item>5h</item>
+        <item>6h</item>
+        <item>7h</item>
     </string-array>
 </resources>
