@@ -3,6 +3,8 @@ package ch.epfl.sweng.erpa.operations;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.annimon.stream.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -153,5 +155,15 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public void terminate() {
         fuse.ignite();
+    }
+
+    @Override
+    public Optional<String> getUidFromUsername(String username) {
+        return null;
+    }
+
+    @Override
+    public boolean verifyAccessToken(String uid, String accessToken) {
+        return false;
     }
 }

@@ -1,26 +1,51 @@
 package ch.epfl.sweng.erpa.model;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
 public class UserAuth {
 
-    private ArrayList<UserProfile> userList;
+    private String uid;
+    private String accessToken;
 
-    public UserAuth() {
-        userList = new ArrayList<>();
-        userList.add(new UserProfile("admin", "admin"));
+    public UserAuth(String uid, String accessToken) {
+        this.uid = uid.toUpperCase();
+        this.accessToken = accessToken;
     }
 
-    public boolean checkLogin(UserProfile user) {
-        for(UserProfile u : userList) {
-            if (user.equals(u))
-                return true;
-        }
-        return false;
+    public String getuid() {
+        return uid;
     }
 
-    public boolean checkLogin(String name, String pass) {
-        UserProfile toCheck = new UserProfile(name, pass);
-        return checkLogin(toCheck);
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserAuth userAuth = (UserAuth) o;
+        return Objects.equals(uid, userAuth.uid) &&
+                Objects.equals(accessToken, userAuth.accessToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uid, accessToken);
+    }
+
+    @Override
+    public String toString() {
+        return "UserAuth{" +
+                "uid='" + uid + '\'' +
+                ", accessToken=REDACTED}";
     }
 }

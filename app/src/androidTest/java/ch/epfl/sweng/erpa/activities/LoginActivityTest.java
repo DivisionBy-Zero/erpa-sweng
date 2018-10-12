@@ -18,6 +18,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class LoginActivityTest {
@@ -58,7 +59,7 @@ public class LoginActivityTest {
         onView(ViewMatchers.withId(R.id.password)).perform(typeText("admin")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click());
         // Check if the correct activity is displayed
-        intended(hasComponent(ch.epfl.sweng.erpa.activities.MainActivity.class.getName()));
+        assertTrue(intentsTestRule.getActivity().isFinishing());
     }
 
     @Test
