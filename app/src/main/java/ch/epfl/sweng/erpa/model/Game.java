@@ -2,28 +2,29 @@ package ch.epfl.sweng.erpa.model;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Game {
     private String gmUniqueID;
     private GameParticipants players;
     private String name;
-    private String minPlayer;
-    private String maxPayer;
-    private String difficulty;
+    private int minPlayer;
+    private int maxPlayer;
+    private Difficulty difficulty;
     private String universe;
-    private String oneshotOrCampaign;
-    private String numberSessions;
-    private String sessionLength;
+    private OneshotOrCampaign oneshotOrCampaign;
+    private int numberSessions;
+    private SessionLength sessionLength;
     private String description;
 
-    public Game(String gmUniqueID, String name, String minPlayer,
-                String maxPayer, String difficulty, String universe,
-                String oneshotOrCampaign, String numberSessions,
-                String sessionLength, String description) {
+    public Game(String gmUniqueID, String name, int minPlayer,
+                int maxPayer, Difficulty difficulty, String universe,
+                OneshotOrCampaign oneshotOrCampaign, int numberSessions,
+                SessionLength sessionLength, String description) {
         this.gmUniqueID = gmUniqueID;
         this.name = name;
         this.minPlayer = minPlayer;
-        this.maxPayer = maxPayer;
+        this.maxPlayer = maxPayer;
         this.difficulty = difficulty;
         this.universe = universe;
         this.oneshotOrCampaign = oneshotOrCampaign;
@@ -36,31 +37,31 @@ public class Game {
         return name;
     }
 
-    public String getMinPlayer() {
+    public int getMinPlayer() {
         return minPlayer;
     }
 
-    public String getMaxPayer() {
-        return maxPayer;
+    public int getMaxPlayer() {
+        return maxPlayer;
     }
 
     public String getUniverse() {
         return universe;
     }
 
-    public String getDifficulty() {
+    public Difficulty getDifficulty() {
         return difficulty;
     }
 
-    public String getOneshotOrCampaign() {
+    public OneshotOrCampaign getOneshotOrCampaign() {
         return oneshotOrCampaign;
     }
 
-    public String getNumberSessions() {
+    public int getNumberSessions() {
         return numberSessions;
     }
 
-    public String getSessionLength() {
+    public SessionLength getSessionLength() {
         return sessionLength;
     }
 
@@ -75,7 +76,7 @@ public class Game {
                 ", players=" + players +
                 ", name='" + name + '\'' +
                 ", minPlayer='" + minPlayer + '\'' +
-                ", maxPayer='" + maxPayer + '\'' +
+                ", maxPayer='" + maxPlayer + '\'' +
                 ", difficulty='" + difficulty + '\'' +
                 ", universe='" + universe + '\'' +
                 ", oneshotOrCampaign='" + oneshotOrCampaign + '\'' +
@@ -94,7 +95,7 @@ public class Game {
                 Objects.equals(players, game.players) &&
                 Objects.equals(name, game.name) &&
                 Objects.equals(minPlayer, game.minPlayer) &&
-                Objects.equals(maxPayer, game.maxPayer) &&
+                Objects.equals(maxPlayer, game.maxPlayer) &&
                 Objects.equals(difficulty, game.difficulty) &&
                 Objects.equals(universe, game.universe) &&
                 Objects.equals(oneshotOrCampaign, game.oneshotOrCampaign) &&
@@ -106,6 +107,16 @@ public class Game {
     @Override
     public int hashCode() {
 
-        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLength, description);
+        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPlayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLength, description);
+    }
+
+    public enum Difficulty {
+        NOOB, CHILL, HARD
+    }
+    public enum OneshotOrCampaign {
+        ONESHOT, CAMPAIGN
+    }
+    public enum SessionLength {
+        UNDEFINED, LESSH1, H1, H2, H3, H4, H5, H6, MOREH6
     }
 }
