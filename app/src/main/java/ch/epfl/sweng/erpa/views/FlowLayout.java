@@ -1,4 +1,4 @@
-package views;
+package ch.epfl.sweng.erpa.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
