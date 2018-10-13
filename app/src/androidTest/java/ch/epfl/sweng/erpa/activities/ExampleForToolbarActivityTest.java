@@ -1,5 +1,7 @@
 package ch.epfl.sweng.erpa.activities;
 
+import ch.epfl.sweng.erpa.activities.ExampleForToolbarActivity;
+
 import android.support.design.widget.CoordinatorLayout;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -24,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class ExampleForToolbarActivityTest {
     @Rule
-    public final IntentsTestRule<ExampleForToolbarActivity> intentsTestRule = new IntentsTestRule<>(ExampleForToolbarActivity.class);
+    public final IntentsTestRule<ExampleForToolbarActivity> intentsTestRule = new IntentsTestRule<>(ch.epfl.sweng.erpa.activities.ExampleForToolbarActivity.class);
 
     @Test
     public void testScrolling() {

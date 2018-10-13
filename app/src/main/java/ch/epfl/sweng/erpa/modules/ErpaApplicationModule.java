@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
+import ch.epfl.sweng.erpa.services.UserAuthService;
 import toothpick.config.Module;
 import toothpick.smoothie.provider.SharedPreferencesProvider;
 
@@ -25,5 +26,6 @@ public class ErpaApplicationModule extends Module {
         this.bind(ErpaApplication.class).toInstance(application);
         this.bind(RemoteServicesProviderCoordinator.class).to(RemoteServicesProviderCoordinator.class);
         this.bind(SharedPreferences.class).toProviderInstance(preferencesProvider);
+        this.bind(UserAuthService.class).to(UserAuthService.class);
     }
 }

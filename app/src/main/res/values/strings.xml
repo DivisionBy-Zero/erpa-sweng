@@ -2,8 +2,9 @@
     <string name="app_name">ERPA</string>
     <string name="preference_file_key">erpa_prefs</string>
     <string name="prop_key_remote_provider">remote_services_provider_class_name</string>
-
-    // Titles
+    <string name="noNameMessage">No username</string>
+    <string name="noPassMessage">No password</string>
+    <string name="incorrectLogin">Username or password is incorrect</string>
+    <!--Titles-->
     <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
-
 </resources>
