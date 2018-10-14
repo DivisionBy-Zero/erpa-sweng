@@ -9,256 +9,258 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.constraint.ConstraintLayout
+        <LinearLayout
+            android:id="@+id/myAccountLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <LinearLayout
-                android:id="@+id/launch_pending_request_activity_layout"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/border">
-
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraint_layout_PR"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/pending_request_text"
-                        android:text="@string/pendingRequestText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PR"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PR"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_PR"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerInside"
-                        android:contentDescription="die"
-                        app:layout_constraintRight_toRightOf="@id/constraint_layout_PR"/>
-
-                </android.support.constraint.ConstraintLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/launch_confirmed_games_activity_layout"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/launch_pending_request_activity_layout"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/border">
-
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraint_layout_CG"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/confirmed_games_text"
-                        android:text="@string/confirmedGamesText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        app:layout_constraintLeft_toLeftOf="@id/constraint_layout_CG"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_CG"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_CG"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher"
-                        android:adjustViewBounds="true"
-                        android:scaleType="center"
-                        android:contentDescription="die"
-                        app:layout_constraintRight_toRightOf="@id/constraint_layout_CG"/>
-
-                </android.support.constraint.ConstraintLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/launch_past_games_activity_layout"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/launch_confirmed_games_activity_layout"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/border">
-
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraint_layout_PG"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/past_games_text"
-                        android:text="@string/pastGamesText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PG"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PG"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_PG"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitEnd"
-                        android:contentDescription="die"
-                        app:layout_constraintRight_toRightOf="@id/constraint_layout_PG"/>
-
-                </android.support.constraint.ConstraintLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/launch_hosted_games_activity_layout"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/launch_past_games_activity_layout"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/border">
-
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraint_layout_HG"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/hosted_games_text"
-                        android:text="@string/hostedGamesText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        app:layout_constraintLeft_toLeftOf="@id/constraint_layout_HG"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_HG"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_HG"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitEnd"
-                        android:contentDescription="die"
-                        app:layout_constraintRight_toRightOf="@id/constraint_layout_HG"/>
-
-                </android.support.constraint.ConstraintLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/launch_past_hosted_games_activity_layout"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/launch_hosted_games_activity_layout"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/border">
-
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraint_layout_PHG"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/past_hosted_games_text"
-                        android:text="@string/pastHostedGamesText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PHG"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PHG"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_PHG"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
-                        android:contentDescription="die"
-                        app:layout_constraintRight_toRightOf="@id/constraint_layout_PHG"/>
-
-                </android.support.constraint.ConstraintLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/launch_profile_activity_layout"
-                android:orientation="vertical"
-                android:clickable="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@id/launch_past_hosted_games_activity_layout"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:background="@drawable/border">
-
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/constraint_layout_P"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:id="@+id/profile_text"
-                        android:text="@string/profileText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        app:layout_constraintLeft_toLeftOf="@id/constraint_layout_P"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_P"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_P"/>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@mipmap/ic_launcher"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="die"
-                        app:layout_constraintTop_toTopOf="@id/constraint_layout_P"
-                        app:layout_constraintBottom_toBottomOf="@id/constraint_layout_P"
-                        app:layout_constraintRight_toRightOf="@id/constraint_layout_P"/>
-
-                </android.support.constraint.ConstraintLayout>
-
-            </LinearLayout>
-        </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
     </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
+
+<!--<LinearLayout-->
+<!--android:id="@+id/launch_pending_request_activity_layout"-->
+<!--android:orientation="horizontal"-->
+<!--android:clickable="true"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:focusable="true"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_marginLeft="16dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:background="@drawable/button_border">-->
+
+<!--<android.support.constraint.ConstraintLayout-->
+    <!--android:id="@+id/constraint_layout_PR"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/pending_request_text"-->
+        <!--android:text="@string/pendingRequestText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PR"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PR"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_PR"/>-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:scaleType="centerInside"-->
+        <!--android:contentDescription="die"-->
+        <!--app:layout_constraintRight_toRightOf="@id/constraint_layout_PR"/>-->
+
+<!--</android.support.constraint.ConstraintLayout>-->
+
+<!--</LinearLayout>-->
+
+<!--<LinearLayout-->
+<!--android:id="@+id/launch_confirmed_games_activity_layout"-->
+<!--android:orientation="horizontal"-->
+<!--android:clickable="true"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:focusable="true"-->
+<!--app:layout_constraintTop_toBottomOf="@id/launch_pending_request_activity_layout"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_marginLeft="16dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:background="@drawable/button_border">-->
+
+<!--<android.support.constraint.ConstraintLayout-->
+    <!--android:id="@+id/constraint_layout_CG"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/confirmed_games_text"-->
+        <!--android:text="@string/confirmedGamesText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="@id/constraint_layout_CG"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_CG"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_CG"/>-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:scaleType="center"-->
+        <!--android:contentDescription="die"-->
+        <!--app:layout_constraintRight_toRightOf="@id/constraint_layout_CG"/>-->
+
+<!--</android.support.constraint.ConstraintLayout>-->
+
+<!--</LinearLayout>-->
+
+<!--<LinearLayout-->
+<!--android:id="@+id/launch_past_games_activity_layout"-->
+<!--android:orientation="horizontal"-->
+<!--android:clickable="true"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:focusable="true"-->
+<!--app:layout_constraintTop_toBottomOf="@id/launch_confirmed_games_activity_layout"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_marginLeft="16dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:background="@drawable/button_border">-->
+
+<!--<android.support.constraint.ConstraintLayout-->
+    <!--android:id="@+id/constraint_layout_PG"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/past_games_text"-->
+        <!--android:text="@string/pastGamesText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PG"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PG"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_PG"/>-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:scaleType="fitEnd"-->
+        <!--android:contentDescription="die"-->
+        <!--app:layout_constraintRight_toRightOf="@id/constraint_layout_PG"/>-->
+
+<!--</android.support.constraint.ConstraintLayout>-->
+
+<!--</LinearLayout>-->
+
+<!--<LinearLayout-->
+<!--android:id="@+id/launch_hosted_games_activity_layout"-->
+<!--android:orientation="horizontal"-->
+<!--android:clickable="true"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:focusable="true"-->
+<!--app:layout_constraintTop_toBottomOf="@id/launch_past_games_activity_layout"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_marginLeft="16dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:background="@drawable/button_border">-->
+
+<!--<android.support.constraint.ConstraintLayout-->
+    <!--android:id="@+id/constraint_layout_HG"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/hosted_games_text"-->
+        <!--android:text="@string/hostedGamesText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="@id/constraint_layout_HG"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_HG"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_HG"/>-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:scaleType="fitEnd"-->
+        <!--android:contentDescription="die"-->
+        <!--app:layout_constraintRight_toRightOf="@id/constraint_layout_HG"/>-->
+
+<!--</android.support.constraint.ConstraintLayout>-->
+
+<!--</LinearLayout>-->
+
+<!--<LinearLayout-->
+<!--android:id="@+id/launch_past_hosted_games_activity_layout"-->
+<!--android:orientation="horizontal"-->
+<!--android:clickable="true"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:focusable="true"-->
+<!--app:layout_constraintTop_toBottomOf="@id/launch_hosted_games_activity_layout"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_marginLeft="16dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:background="@drawable/button_border">-->
+
+<!--<android.support.constraint.ConstraintLayout-->
+    <!--android:id="@+id/constraint_layout_PHG"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/past_hosted_games_text"-->
+        <!--android:text="@string/pastHostedGamesText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PHG"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PHG"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_PHG"/>-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:scaleType="centerCrop"-->
+        <!--android:contentDescription="die"-->
+        <!--app:layout_constraintRight_toRightOf="@id/constraint_layout_PHG"/>-->
+
+<!--</android.support.constraint.ConstraintLayout>-->
+
+<!--</LinearLayout>-->
+
+<!--<LinearLayout-->
+<!--android:id="@+id/launch_profile_activity_layout"-->
+<!--android:orientation="vertical"-->
+<!--android:clickable="true"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:focusable="true"-->
+<!--app:layout_constraintTop_toBottomOf="@id/launch_past_hosted_games_activity_layout"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_marginLeft="16dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:background="@drawable/button_border">-->
+
+<!--<android.support.constraint.ConstraintLayout-->
+    <!--android:id="@+id/constraint_layout_P"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/profile_text"-->
+        <!--android:text="@string/profileText"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--app:layout_constraintLeft_toLeftOf="@id/constraint_layout_P"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_P"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_P"/>-->
+
+    <!--<ImageView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:contentDescription="die"-->
+        <!--app:layout_constraintTop_toTopOf="@id/constraint_layout_P"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/constraint_layout_P"-->
+        <!--app:layout_constraintRight_toRightOf="@id/constraint_layout_P"/>-->
+
+<!--</android.support.constraint.ConstraintLayout>-->
+
+<!--</LinearLayout>-->

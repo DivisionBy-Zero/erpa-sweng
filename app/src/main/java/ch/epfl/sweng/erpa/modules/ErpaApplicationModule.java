@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import javax.inject.Provider;
+
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
@@ -26,12 +28,14 @@ public class ErpaApplicationModule extends Module {
         this.bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(applicationScope);
 
         SharedPreferencesProvider preferencesProvider =
-                new SharedPreferencesProvider(application, application.getString(R.string.preference_file_key));
+                new SharedPreferencesProvider(application,
+                        application.getString(R.string.preference_file_key));
 
         this.bind(Application.class).toInstance(application);
         this.bind(Context.class).toInstance(application);
         this.bind(ErpaApplication.class).toInstance(application);
-        this.bind(RemoteServicesProviderCoordinator.class).to(RemoteServicesProviderCoordinator.class);
+        this.bind(RemoteServicesProviderCoordinator.class).to(
+                RemoteServicesProviderCoordinator.class);
         this.bind(SharedPreferences.class).toProviderInstance(preferencesProvider);
         this.bind(UserAuthService.class).to(UserAuthService.class);
         this.bind(UserSignupService.class).to(UserSignupService.class);
