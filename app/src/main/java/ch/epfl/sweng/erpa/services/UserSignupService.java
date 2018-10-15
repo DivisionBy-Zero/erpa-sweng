@@ -34,7 +34,7 @@ public class UserSignupService {
         return Optional.of(user);
     }
 
-    private String createAccessToken(String uid, String password) {
+    public static String createAccessToken(String uid, String password) {
         byte[] uidBytes = uid.getBytes(StandardCharsets.UTF_8);
         int uidBytesLength = uidBytes.length;
         byte[] salt16Bytes = new byte[16];
@@ -44,5 +44,4 @@ public class UserSignupService {
         String str = new String(hashBytes, StandardCharsets.UTF_8);
         return str;
     }
-
 }

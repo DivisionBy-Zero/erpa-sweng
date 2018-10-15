@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+    android:id="@+id/constraint_layout_PR"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+    android:id="@+id/buttonName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="16dp"
+    app:layout_constraintLeft_toLeftOf="@id/constraint_layout_PR"
+    app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PR"
+    app:layout_constraintTop_toTopOf="@id/constraint_layout_PR"/>
+
+    <ImageView
+    android:id="@+id/buttonImage"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:adjustViewBounds="true"
+    android:scaleType="centerInside"
+    android:contentDescription="die"
+    android:layout_marginRight="16dp"
+    app:layout_constraintRight_toRightOf="@id/constraint_layout_PR"
+    app:layout_constraintBottom_toBottomOf="@id/constraint_layout_PR"
+    app:layout_constraintTop_toTopOf="@id/constraint_layout_PR"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>

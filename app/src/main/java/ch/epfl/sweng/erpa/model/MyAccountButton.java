@@ -1,8 +1,10 @@
 package ch.epfl.sweng.erpa.model;
 
+import lombok.Data;
 import lombok.NonNull;
 
-public class MyAccountButtons {
+@Data
+public class MyAccountButton {
 
     @NonNull private String text;
     @NonNull private Class activityClass;
