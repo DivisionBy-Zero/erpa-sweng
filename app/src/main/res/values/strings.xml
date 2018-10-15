@@ -7,4 +7,5 @@
     <string name="incorrectLogin">Username or password is incorrect</string>
     <!--Titles-->
     <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
+    <string name="title_activity_signup">SignupActivity</string>
 </resources>
