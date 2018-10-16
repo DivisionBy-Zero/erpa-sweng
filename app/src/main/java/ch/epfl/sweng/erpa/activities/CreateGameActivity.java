@@ -1,7 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -15,7 +14,9 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import butterknife.ButterKnife;
+import com.annimon.stream.Optional;
+
+import butterknife.OnClick;
 import ch.epfl.sweng.erpa.CreateGameFormFragment;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
@@ -29,7 +30,6 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_game);
-        ButterKnife.bind(this);
         final EditText universeField = findViewById(R.id.universe_field);
         final Spinner universesSpinner = findViewById(R.id.universes_spinner);
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -50,18 +50,21 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     }
 
     // When Oneshot or Campaign checkboxes are checked, uncheck the other one
+    @OnClick ({R.id.oneshot, R.id.campaign})
     public void onOneShotOrCampaignSelected(View view) {
-        ButterKnife.bind(this, view);
         findViewById(R.id.layout_num_sessions).setVisibility((view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
     }
 
     //call when the user submit a game and check if no requested field is empty
+//    @OnClick(R.id.submit_button)
     public void submitGame(View view) {
-        EditText minPlayer = findViewById(R.id.min_num_player_field);
-        EditText maxPlayer = findViewById(R.id.max_num_player_field);
-        int valueMin = Integer.parseInt(minPlayer.getText().toString());
-        int valueMax = Integer.parseInt(maxPlayer.getText().toString());
-        if (!playerNumberIsValid(valueMin, valueMax)) {
+        EditText valueMin = findViewById(R.id.min_num_player_field);
+        EditText valueMax = findViewById(R.id.max_num_player_field);
+        String min = valueMin.getText().toString();
+        String max = valueMax.getText().toString();
+        int minPlayer = min.isEmpty() ? -1 : Integer.parseInt(min);
+        int maxPlayer = max.isEmpty() ? -1 : Integer.parseInt(max);
+        if (!playerNumberIsValid(minPlayer, maxPlayer)) {
             createPopup(getString(R.string.invalidPlayerNumber));
         } else if (!allObligFieldsFilled()) {
             createPopup(getString(R.string.emptyFieldMessage));
@@ -74,31 +77,41 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
             OneshotOrCampaign oneShotOrCampaign = oneshotRadioButton.isChecked() ? ONESHOT : CAMPAIGN;
             Game.Difficulty difficulty = findDifficulty(difficultySpinner.getSelectedItem().toString());
-            Game.SessionLength sessionLength = findSessionLength(sessionLengthSpinner.getSelectedItem().toString());
+            Optional<Integer> sessionLength = findSessionLength(sessionLengthSpinner.getSelectedItem().toString());
+            EditText numSess = findViewById(R.id.num_session_field);
+            String nbSessionString = numSess.getText().toString();
+            Optional<Integer> numbSession = nbSessionString.isEmpty() ? Optional.empty() : Optional.of(Integer.parseInt(nbSessionString));
             Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
-                    valueMin, valueMax, difficulty,
-                    universesSpinner.getSelectedItem().toString(),
-                    oneShotOrCampaign, Integer.parseInt(findViewById(R.id.num_session_field).toString()),
-                    sessionLength,
-                    findViewById(R.id.description_field).toString());
+                    minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
+                    oneShotOrCampaign, numbSession, sessionLength, findViewById(R.id.description_field).toString());
             Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
         }
     }
 
-    private Game.SessionLength findSessionLength(String sessionLength) {
+    private Optional<Integer> findSessionLength(String sessionLength) {
         switch (sessionLength) {
-            case "Undefined": return Game.SessionLength.UNDEFINED;
-            case "-1h": return Game.SessionLength.LESSH1;
-            case "1h": return Game.SessionLength.H1;
-            case "2h": return Game.SessionLength.H2;
-            case "3h": return Game.SessionLength.H3;
-            case "4h": return Game.SessionLength.H4;
-            case "5h": return Game.SessionLength.H5;
-            case "6h": return Game.SessionLength.H6;
-            case "+6h": return Game.SessionLength.MOREH6;
-            default: return null;
+            case "Undefined":
+                return Optional.empty();
+            case "-1h":
+                return Optional.of(30);
+            case "1h":
+                return Optional.of(60);
+            case "2h":
+                return Optional.of(120);
+            case "3h":
+                return Optional.of(180);
+            case "4h":
+                return Optional.of(240);
+            case "5h":
+                return Optional.of(300);
+            case "6h":
+                return Optional.of(360);
+            case "+6h":
+                return Optional.of(Integer.MAX_VALUE);
+            default:
+                return Optional.empty();
         }
     }
 
@@ -130,7 +143,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
 
     // IdRes denotes that the integer parameter fieldId is expected to be an id resource reference
     private boolean checkFilledField(@IdRes int fieldId) {
-        final EditText textField = (EditText) findViewById(fieldId);
+        final EditText textField = findViewById(fieldId);
         String text = textField.getText().toString();
         return (!text.isEmpty());
     }
@@ -144,9 +157,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(tv);
         // set dialog message
-        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            }
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", (dialog, id) -> {
         });
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
