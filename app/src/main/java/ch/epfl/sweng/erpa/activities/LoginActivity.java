@@ -22,7 +22,7 @@ import ch.epfl.sweng.erpa.services.UserAuthService;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends DependencyConfigurationAgnosticActivity {
     @Inject UserAuthService uas;
 
     @Override
