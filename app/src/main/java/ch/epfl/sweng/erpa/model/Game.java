@@ -17,10 +17,20 @@ public class Game {
     private Optional<Integer> sessionLengthInMinutes;
     private String description;
 
+    final private String name;
+    final private int minPlayer;
+    final private int maxPlayer;
+    final private Difficulty difficulty;
+    final private String universe;
+    final private OneshotOrCampaign oneshotOrCampaign;
+    final private Optional<Integer> numberSessions;
+    final private Optional<Integer> sessionLengthInMinutes;
+    final private String description;
+
     public Game(String gmUniqueID, String name, int minPlayer,
                 int maxPayer, Difficulty difficulty, String universe,
                 OneshotOrCampaign oneshotOrCampaign, Optional<Integer> numberSessions,
-                Optional sessionLengthInMinutes, String description) {
+                Optional<Integer> sessionLengthInMinutes, String description, String gid) {
         this.gmUniqueID = gmUniqueID;
         this.name = name;
         this.minPlayer = minPlayer;
@@ -31,6 +41,7 @@ public class Game {
         this.numberSessions = numberSessions;
         this.sessionLengthInMinutes = sessionLengthInMinutes;
         this.description = description;
+        this.gid = gid;
     }
 
     public String getName() {

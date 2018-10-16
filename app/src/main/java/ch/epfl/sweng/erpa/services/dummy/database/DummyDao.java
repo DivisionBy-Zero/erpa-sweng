@@ -7,6 +7,8 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import ch.epfl.sweng.erpa.model.Game;
+
 @Dao
 public interface DummyDao
 {
@@ -18,4 +20,13 @@ public interface DummyDao
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insert(GameEntity g);
+
+
+    default void insert(Game g)
+    {
+        GameEntity g0=new GameEntity(g);
+        g0.setGame(g);
+        g0.setUid(g.getGid());
+        insert(g0);
+    }
 }

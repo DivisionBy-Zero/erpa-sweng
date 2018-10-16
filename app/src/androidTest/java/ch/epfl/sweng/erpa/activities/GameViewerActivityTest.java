@@ -15,6 +15,8 @@ import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.annimon.stream.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +30,8 @@ public class GameViewerActivityTest {
     @Rule
     public final ActivityTestRule<GameViewerActivity> activityTestRule = new ActivityTestRule<>(GameViewerActivity.class, false, false);
 
-    private final Game g = new Game("John Smith", "Lord of the Smith", "0", "5", "HELL", "Earth", "Oneshot", "1", "30 minutes", "Loremp impums lollol");
+    private final Game g =
+            new Game("John Smith", "Lord of the Smith", 0, 5, Game.Difficulty.CHILL, "hello", Game.OneshotOrCampaign.CAMPAIGN, Optional.empty(), Optional.empty(), "Loremp impums lollol", "");
 
     private final Intent intent = initIntent();
 

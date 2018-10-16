@@ -56,8 +56,12 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     // When Oneshot or Campaign checkboxes are checked, uncheck the other one
     @OnClick({R.id.oneshot, R.id.campaign})
     public void onOneShotOrCampaignSelected(View view) {
+<<<<<<< HEAD
         findViewById(R.id.layout_num_sessions).setVisibility(
                 (view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
+=======
+        findViewById(R.id.layout_num_sessions).setVisibility((view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
+>>>>>>> b8c2c0b... Add tests for Database
     }
 
     //call when the user submit a game and check if no requested field is empty
@@ -81,6 +85,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
             RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
             OneshotOrCampaign oneShotOrCampaign = oneshotRadioButton.isChecked() ? ONESHOT : CAMPAIGN;
+<<<<<<< HEAD
             Game.Difficulty difficulty = findDifficulty(
                     difficultySpinner.getSelectedItem().toString());
             Optional<Integer> sessionLength = findSessionLength(
@@ -93,6 +98,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
                     minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
                     oneShotOrCampaign, numbSession, sessionLength,
                     findViewById(R.id.description_field).toString());
+=======
             Game.Difficulty difficulty = findDifficulty(difficultySpinner.getSelectedItem().toString());
             Optional<Integer> sessionLength = findSessionLength(sessionLengthSpinner.getSelectedItem().toString());
             EditText numSess = findViewById(R.id.num_session_field);
@@ -101,6 +107,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
                     minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
                     oneShotOrCampaign, numbSession, sessionLength, findViewById(R.id.description_field).toString(),"");
+>>>>>>> b8c2c0b... Add tests for Database
             Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
@@ -128,7 +135,11 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             case "+6h":
                 return Optional.of(Integer.MAX_VALUE);
             default:
+<<<<<<< HEAD
                 return Optional.empty();
+=======
+                return null;
+>>>>>>> b8c2c0b... Add tests for Database
         }
     }
 
@@ -185,4 +196,8 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         // show it
         alertDialog.show();
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> b8c2c0b... Add tests for Database
 }

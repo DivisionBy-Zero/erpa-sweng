@@ -10,9 +10,15 @@ import ch.epfl.sweng.erpa.model.Game;
 @Entity
 class GameEntity
 {
+    GameEntity(){};
+    GameEntity (Game g)
+    {
+        this.setGame(g);
+        this.setUid(g.getGid());
+    }
     @PrimaryKey
     @NonNull
-    private String uid;
+    private String uid = "";
 
     @ColumnInfo(name = "game")
     private Game game;
@@ -25,6 +31,7 @@ class GameEntity
         this.game = game;
     }
 
+    @NonNull
     public String getUid() {
         return uid;
     }

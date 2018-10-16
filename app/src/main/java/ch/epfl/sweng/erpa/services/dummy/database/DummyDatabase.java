@@ -7,7 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 
 @Database(entities = {GameEntity.class},version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
-public abstract class GameDB extends RoomDatabase
+public abstract class DummyDatabase extends RoomDatabase
 {
-    public abstract DummyDao gameDao();
+    public abstract DummyDao getGameDao();
 }
