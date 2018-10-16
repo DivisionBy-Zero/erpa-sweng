@@ -159,7 +159,7 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
 
     @Override
     public Optional<String> getUidFromUsername(String username) {
-        return null;
+        return Optional.empty();
     }
 
     @Override
