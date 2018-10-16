@@ -28,7 +28,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         // The uid returned is a random uid generate with javaZ.util.UUID.randomUUID()
         // This will work for all users but it's for testing purposes because user sign up and
         // database isn't set up yet
-        return Optional.of("5b915f75-0ff0-43f8-90bf-f9e92533f926");
+        return Optional.of("user|5b915f75-0ff0-43f8-90bf-f9e92533f926");
     }
 
     @Override

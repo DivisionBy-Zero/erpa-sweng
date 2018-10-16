@@ -8,7 +8,7 @@ public class UserAuth {
     private String accessToken;
 
     public UserAuth(String uid, String accessToken) {
-        if (!uid.contains("user|"))
+        if (uid.indexOf("user|") != 0)
             throw new IllegalArgumentException("The uid doesn't start with user|");
         this.uid = uid.toUpperCase();
         this.accessToken = accessToken;
