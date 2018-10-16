@@ -23,7 +23,7 @@ public class UserAuthService {
         if (uid.isPresent()) {
             String id = uid.get();
             String accessToken = createAccessToken(id, password);
-            if(rsp.verifyAccessToken(id, accessToken)) {
+            if (rsp.verifyAccessToken(id, accessToken)) {
                 return Optional.of(new UserAuth(id, accessToken));
             }
         }
@@ -34,7 +34,7 @@ public class UserAuthService {
         byte[] uidBytes = uid.getBytes(StandardCharsets.UTF_8);
         int uidBytesLength = uidBytes.length;
         byte[] salt16Bytes = new byte[16];
-        for (int i = 0; i<16; ++i)
+        for (int i = 0; i < 16; ++i)
             salt16Bytes[i] = uidBytes[uidBytesLength - 16 + i];
         byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes, password.getBytes(StandardCharsets.UTF_8));
         String str = new String(hashBytes, StandardCharsets.UTF_8);

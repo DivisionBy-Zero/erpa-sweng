@@ -176,7 +176,7 @@
                 android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:id="@+id/radio"
+                    android:id="@+id/radio_form"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintLeft_toLeftOf="parent">
@@ -191,7 +191,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="onOneShotOrCampaignSelected"
-                            android:text="Oneshot"/>
+                            android:text="Oneshot" />
 
                         <RadioButton
                             android:id="@+id/campaign"
@@ -223,8 +223,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:ems="3"
-                        android:maxLength="3"
                         android:inputType="number"
+                        android:maxLength="3"
                         app:layout_constraintBaseline_toBaselineOf="@id/num_sessions"
                         app:layout_constraintLeft_toRightOf="@id/num_sessions" />
                 </LinearLayout>
@@ -270,10 +270,10 @@
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:text="Description*: (max.1200 characters)"
                 app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -292,10 +292,10 @@
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Submit"
+            android:layout_marginTop="8dp"
             android:onClick="submitGame"
+            android:text="Submit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

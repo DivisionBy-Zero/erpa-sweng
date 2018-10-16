@@ -13,6 +13,7 @@ public interface RemoteServicesProvider {
     String getFriendlyProviderDescription();
 
     Optional<String> getUidFromUsername(String username);
+
     boolean verifyAccessToken(String uid, String accessToken);
 
     void storeNewUser(UserProfile user);

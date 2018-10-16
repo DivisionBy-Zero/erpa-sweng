@@ -41,7 +41,6 @@ public class CreateGameTest {
         onView(withId(R.id.universes_spinner)).perform(click());
         onData(hasToString(startsWith("O"))).perform(click());
         onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
-        onView(withId(R.id.radio)).perform(click());
         onView(withId(R.id.radio_form)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.num_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());

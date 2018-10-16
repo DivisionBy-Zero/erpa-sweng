@@ -1,8 +1,8 @@
 package ch.epfl.sweng.erpa.model;
 
-import java.util.List;
-import java.util.Objects;
 import com.annimon.stream.Optional;
+
+import java.util.Objects;
 
 public class Game {
     private String gmUniqueID;
@@ -14,13 +14,13 @@ public class Game {
     private String universe;
     private OneshotOrCampaign oneshotOrCampaign;
     private Optional<Integer> numberSessions;
-    private Optional<Integer> sessionLength;
+    private Optional<Integer> sessionLengthInMinutes;
     private String description;
 
     public Game(String gmUniqueID, String name, int minPlayer,
                 int maxPayer, Difficulty difficulty, String universe,
                 OneshotOrCampaign oneshotOrCampaign, Optional<Integer> numberSessions,
-                Optional<Integer> sessionLength, String description) {
+                Optional sessionLengthInMinutes, String description) {
         this.gmUniqueID = gmUniqueID;
         this.name = name;
         this.minPlayer = minPlayer;
@@ -29,7 +29,7 @@ public class Game {
         this.universe = universe;
         this.oneshotOrCampaign = oneshotOrCampaign;
         this.numberSessions = numberSessions;
-        this.sessionLength = sessionLength;
+        this.sessionLengthInMinutes = sessionLengthInMinutes;
         this.description = description;
     }
 
@@ -61,8 +61,8 @@ public class Game {
         return numberSessions;
     }
 
-    public Optional<Integer> getSessionLength() {
-        return sessionLength;
+    public Optional<Integer> getSessionLengthInMinutes() {
+        return sessionLengthInMinutes;
     }
 
     public String getDescription() {
@@ -81,7 +81,7 @@ public class Game {
                 ", universe='" + universe + '\'' +
                 ", oneshotOrCampaign='" + oneshotOrCampaign + '\'' +
                 ", numberSessions='" + numberSessions + '\'' +
-                ", sessionLength='" + sessionLength + '\'' +
+                ", sessionLength='" + sessionLengthInMinutes + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
@@ -100,19 +100,20 @@ public class Game {
                 Objects.equals(universe, game.universe) &&
                 Objects.equals(oneshotOrCampaign, game.oneshotOrCampaign) &&
                 Objects.equals(numberSessions, game.numberSessions) &&
-                Objects.equals(sessionLength, game.sessionLength) &&
+                Objects.equals(sessionLengthInMinutes, game.sessionLengthInMinutes) &&
                 Objects.equals(description, game.description);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPlayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLength, description);
+        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPlayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLengthInMinutes, description);
     }
 
     public enum Difficulty {
         NOOB, CHILL, HARD
     }
+
     public enum OneshotOrCampaign {
         ONESHOT, CAMPAIGN
     }
