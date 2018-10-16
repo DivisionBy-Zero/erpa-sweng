@@ -64,7 +64,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
     private Optional<UserProfile> getUserFromUid(String uid) {
         for (UserProfile u: userList) {
-            if (u.getUsername().equals(uid))
+            if (u.getUid().equals(uid))
                 return Optional.of(u);
         }
         return Optional.empty();
