@@ -21,14 +21,14 @@ import ch.epfl.sweng.erpa.services.UserAuthService;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends DependencyConfigurationAgnosticActivity {
     @Inject UserAuthService uas;
+    @Inject Scope scope;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Application application = getApplication();
-        Scope scope = Toothpick.openScopes(application, this);
         Toothpick.inject(this, scope);
         setContentView(R.layout.activity_login);
     }
