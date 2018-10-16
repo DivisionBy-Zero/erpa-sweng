@@ -24,14 +24,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
 
 //    @BindView(R.id.myAccountLayout) ConstraintLayout myAccountLayout;
 
-    private List<MyAccountButton> maListe = Arrays.asList(
-            new MyAccountButton("@string/pendingRequestText", PendingRequestActivity.class, "@mipmap/ic_launcher", true, false),
-            new MyAccountButton("1", ConfirmedGamesActivity.class, "@mipmap/ic_launcher",true, false),
-            new MyAccountButton("2", PastGamesActivity.class, "@mipmap/ic_launcher",true, false),
-            new MyAccountButton("3", HostedGamesActivity.class,"@mipmap/ic_launcher", false, true),
-            new MyAccountButton("4", PastHostedGamesActivity.class,"@mipmap/ic_launcher", false, true),
-            new MyAccountButton("5", ProfileActivity.class,"@mipmap/ic_launcher", true, true)
-    );
+    private List<MyAccountButton> maListe;
 
     public LinearLayout createButton(MyAccountButton myAccountButton) {
         LinearLayout linearLayout = new LinearLayout(this);
@@ -52,6 +45,8 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_my_account);
 
+        createGameData();
+
         maListe.forEach(myAccountButton -> {
             if(myAccountButton.isActiveForPlayer() == userProfile.isPlayer() ||
                     myAccountButton.isActiveForGM() == userProfile.isGM()){
@@ -70,7 +65,25 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     // onResume
     }
 
+    private void createGameData(){
+        maListe = Arrays.asList(
+                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.pendingRequestText), PendingRequestActivity.class,
+                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), true, false),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.confirmedGamesText), ConfirmedGamesActivity.class,
+                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()),true, false),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.pastGamesText), PastGamesActivity.class,
+                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()),true, false),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.hostedGamesText), HostedGamesActivity.class,
+                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), false, true),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.pastHostedGamesText), PastHostedGamesActivity.class,
+                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), false, true),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.profileText), ProfileActivity.class,
+                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), true, true)
+        );
+    }
+
 }
+
 
 //    private RecyclerView recyclerView;
 //    private MyAccountButtonAdapter adapter;
