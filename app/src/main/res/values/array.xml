@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--create_game spinner array-->
+    <string-array name="difficulties_array">
+        <item>NOOB</item>
+        <item>Chill</item>
+        <item>Hard</item>
+    </string-array>
+    <string-array name="universes_array">
+        <item>Warhammer</item>
+        <item>Lovecraft</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="session_length_array">
+        <item>Undefined</item>
+        <item>-1h</item>
+        <item>1h</item>
+        <item>2h</item>
+        <item>3h</item>
+        <item>4h</item>
+        <item>5h</item>
+        <item>6h</item>
+        <item>7h</item>
+    </string-array>
+    <string-array name="experience_array">
+        <item>Noob</item>
+        <item>Casual</item>
+        <item>Expert</item>
+    </string-array>
+</resources>
