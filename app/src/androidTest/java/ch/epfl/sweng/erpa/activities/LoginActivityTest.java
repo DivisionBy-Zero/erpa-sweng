@@ -26,16 +26,14 @@ public class LoginActivityTest {
     public final IntentsTestRule<LoginActivity> intentsTestRule = new IntentsTestRule<>(LoginActivity.class);
 
     @Test
-    public void testEmptyUsernameCreatesCorrectPopup()
-    {
+    public void testEmptyUsernameCreatesCorrectPopup() {
         onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click());
         // Check if the popup is displayed
         onView(ViewMatchers.withText(R.string.noNameMessage)).check(matches(isDisplayed())).perform(ViewActions.click());
     }
 
     @Test
-    public void testEmptyPasswordCreatesCorrectPopup()
-    {
+    public void testEmptyPasswordCreatesCorrectPopup() {
         onView(ViewMatchers.withId(R.id.username)).perform(typeText("lol")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click());
         // Check if the popup is displayed
@@ -43,8 +41,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIncorrectLoginCreatesCorrectPopup()
-    {
+    public void testIncorrectLoginCreatesCorrectPopup() {
         onView(ViewMatchers.withId(R.id.username)).perform(typeText("lol"));
         onView(ViewMatchers.withId(R.id.password)).perform(typeText("lol")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click());
@@ -53,8 +50,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testCorrectLogin()
-    {
+    public void testCorrectLogin() {
         onView(ViewMatchers.withId(R.id.username)).perform(typeText("admin"));
         onView(ViewMatchers.withId(R.id.password)).perform(typeText("admin")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click());
@@ -63,8 +59,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testWithoutLogin()
-    {
+    public void testWithoutLogin() {
         onView(ViewMatchers.withId(R.id.no_login_button)).perform(ViewActions.click());
         // Check if the correct activity is displayed
         intended(hasComponent(ch.epfl.sweng.erpa.activities.MainActivity.class.getName()));

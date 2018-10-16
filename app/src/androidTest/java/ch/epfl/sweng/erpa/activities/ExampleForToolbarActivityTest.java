@@ -1,7 +1,5 @@
 package ch.epfl.sweng.erpa.activities;
 
-import ch.epfl.sweng.erpa.activities.ExampleForToolbarActivity;
-
 import android.support.design.widget.CoordinatorLayout;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;

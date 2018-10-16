@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,8 +15,8 @@ import com.annimon.stream.Optional;
 
 import javax.inject.Inject;
 
-import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.services.UserAuthService;
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -27,7 +26,8 @@ public class LoginActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);  Application application = getApplication();
+        super.onCreate(savedInstanceState);
+        Application application = getApplication();
         Scope scope = Toothpick.openScopes(application, this);
         Toothpick.inject(this, scope);
         setContentView(R.layout.activity_login);

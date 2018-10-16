@@ -2,6 +2,7 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,14 +23,15 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign;
 
-import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.*;
+import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
+import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
 
 public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_game);
+        DataBindingUtil.setContentView(this, R.layout.activity_create_game);
         final EditText universeField = findViewById(R.id.universe_field);
         final Spinner universesSpinner = findViewById(R.id.universes_spinner);
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -50,13 +52,13 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     }
 
     // When Oneshot or Campaign checkboxes are checked, uncheck the other one
-    @OnClick ({R.id.oneshot, R.id.campaign})
+    @OnClick({R.id.oneshot, R.id.campaign})
     public void onOneShotOrCampaignSelected(View view) {
         findViewById(R.id.layout_num_sessions).setVisibility((view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
     }
 
     //call when the user submit a game and check if no requested field is empty
-//    @OnClick(R.id.submit_button)
+    @OnClick(R.id.submit_button)
     public void submitGame(View view) {
         EditText valueMin = findViewById(R.id.min_num_player_field);
         EditText valueMax = findViewById(R.id.max_num_player_field);
@@ -116,11 +118,15 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     }
 
     private Game.Difficulty findDifficulty(String diff) {
-        switch (diff){
-            case "NOOB": return Game.Difficulty.NOOB;
-            case "Chill": return Game.Difficulty.CHILL;
-            case "Hard": return Game.Difficulty.HARD;
-            default: return null;
+        switch (diff) {
+            case "NOOB":
+                return Game.Difficulty.NOOB;
+            case "Chill":
+                return Game.Difficulty.CHILL;
+            case "Hard":
+                return Game.Difficulty.HARD;
+            default:
+                return null;
         }
     }
 
