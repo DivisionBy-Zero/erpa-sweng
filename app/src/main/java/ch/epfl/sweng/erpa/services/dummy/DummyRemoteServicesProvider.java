@@ -13,6 +13,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Optional;
@@ -36,6 +37,7 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.dummy.database.DummyDatabase;
 
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
@@ -106,16 +108,18 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         return new String(hashBytes, StandardCharsets.UTF_8);
     }
 
-
-    private GameService gs = new DummyGameService();
+    @Inject Context ctx;
+    private GameService gs = null;
 
     @Override
     public GameService getGameService()
     {
+        if(gs == null) gs = new DummyGameService();
         return gs;
     }
 
-    private static class DummyGameService implements GameService
+
+    public class DummyGameService implements GameService
     {
         @Entity
         class GameEntity
@@ -180,11 +184,13 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         }
 
 
+        DummyDatabase d = Room.databaseBuilder(ctx, DummyDatabase.class,"DummyDB").build();
+
 
         @Override
         public Optional<Game> getGame(String uid)
         {
-            return Optional.empty();
+            return Optional.of(new Game());
         }
 
         @Override

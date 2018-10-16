@@ -1,10 +1,82 @@
 package ch.epfl.sweng.erpa.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import java.io.Serializable;
 import com.annimon.stream.Optional;
 
 import java.util.Objects;
 
-public class Game {
+@Entity
+public class Game implements Serializable
+{
+
+    public Game(){}
+
+    @PrimaryKey
+    @NonNull
+    private String gid;
+
+    public String getGmUniqueID() { return gmUniqueID; }
+
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
+
+    public void setGmUniqueID(String gmUniqueID) {
+        this.gmUniqueID = gmUniqueID;
+    }
+
+    public GameParticipants getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(GameParticipants players) {
+        this.players = players;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMinPlayer(int minPlayer) {
+        this.minPlayer = minPlayer;
+    }
+
+    public void setMaxPlayer(int maxPlayer) {
+        this.maxPlayer = maxPlayer;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public void setUniverse(String universe) {
+        this.universe = universe;
+    }
+
+    public void setOneshotOrCampaign(OneshotOrCampaign oneshotOrCampaign) {
+        this.oneshotOrCampaign = oneshotOrCampaign;
+    }
+
+    public void setNumberSessions(Optional<Integer> numberSessions) {
+        this.numberSessions = numberSessions;
+    }
+
+    public Optional<Integer> getSessionLengthInMinutes() {
+        return sessionLengthInMinutes;
+    }
+
+    public void setSessionLengthInMinutes(Optional<Integer> sessionLengthInMinutes) {
+        this.sessionLengthInMinutes = sessionLengthInMinutes;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     private String gmUniqueID;
     private GameParticipants players;
     private String name;
@@ -16,16 +88,6 @@ public class Game {
     private Optional<Integer> numberSessions;
     private Optional<Integer> sessionLengthInMinutes;
     private String description;
-
-    final private String name;
-    final private int minPlayer;
-    final private int maxPlayer;
-    final private Difficulty difficulty;
-    final private String universe;
-    final private OneshotOrCampaign oneshotOrCampaign;
-    final private Optional<Integer> numberSessions;
-    final private Optional<Integer> sessionLengthInMinutes;
-    final private String description;
 
     public Game(String gmUniqueID, String name, int minPlayer,
                 int maxPayer, Difficulty difficulty, String universe,

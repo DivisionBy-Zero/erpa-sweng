@@ -62,9 +62,9 @@ public class DatabaseTest
         }
         for(int i = 0; i<numGames;i++)
         {
-            GameEntity g = dummyDao.getGame(""+i);
+            Game g = dummyDao.getGame(""+i);
             assert(g!=null);
-            assert(g.getGame().equals(games.get(i)));
+            assert(g.equals(games.get(i)));
         }
         assert(dummyDao.getAll().size()==games.size());
     }

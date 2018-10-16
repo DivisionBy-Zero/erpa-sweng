@@ -12,21 +12,13 @@ import ch.epfl.sweng.erpa.model.Game;
 @Dao
 public interface DummyDao
 {
-    @Query("SELECT * FROM gameentity")
-    List<GameEntity> getAll();
+    @Query("SELECT * FROM game")
+    List<Game> getAll();
 
-    @Query("SELECT * FROM gameentity WHERE uid IS (:gid)")
-    GameEntity getGame(String gid);
+    @Query("SELECT * FROM game WHERE gid IS (:gid)")
+    Game getGame(String gid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insert(GameEntity g);
+    public void insert(Game g);
 
-
-    default void insert(Game g)
-    {
-        GameEntity g0=new GameEntity(g);
-        g0.setGame(g);
-        g0.setUid(g.getGid());
-        insert(g0);
-    }
 }
