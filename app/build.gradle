@@ -61,8 +61,12 @@ dependencies {
     androidTestImplementation 'org.mockito:mockito-android:2.22.0'
     annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.1.3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation "com.kosprov.jargon2:jargon2-api:1.1.1"
+    implementation "com.kosprov.jargon2:jargon2-native-ri-backend:1.1.1"
+    implementation 'at.favre.lib:bcrypt:0.5.0'
+    implementation 'com.amdelamar:jhash:2.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.annimon:stream:1.1.4'
@@ -71,11 +75,6 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
     implementation 'me.tatarka:gradle-retrolambda:3.2.5'
-    implementation 'com.amdelamar:jhash:2.1.0'
-    implementation "com.kosprov.jargon2:jargon2-api:1.1.1"
-    implementation "com.kosprov.jargon2:jargon2-native-ri-backend:1.1.1"
-    implementation 'at.favre.lib:bcrypt:0.5.0'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'com.github.stephanenicolas.toothpick:toothpick-testing:1.1.3'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.22.0'
