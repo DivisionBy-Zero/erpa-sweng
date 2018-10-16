@@ -2,7 +2,7 @@ package ch.epfl.sweng.erpa.model;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import com.annimon.stream.Optional;
 
 public class Game {
     private String gmUniqueID;
@@ -13,14 +13,14 @@ public class Game {
     private Difficulty difficulty;
     private String universe;
     private OneshotOrCampaign oneshotOrCampaign;
-    private int numberSessions;
-    private SessionLength sessionLength;
+    private Optional<Integer> numberSessions;
+    private Optional<Integer> sessionLength;
     private String description;
 
     public Game(String gmUniqueID, String name, int minPlayer,
                 int maxPayer, Difficulty difficulty, String universe,
-                OneshotOrCampaign oneshotOrCampaign, int numberSessions,
-                SessionLength sessionLength, String description) {
+                OneshotOrCampaign oneshotOrCampaign, Optional<Integer> numberSessions,
+                Optional<Integer> sessionLength, String description) {
         this.gmUniqueID = gmUniqueID;
         this.name = name;
         this.minPlayer = minPlayer;
@@ -57,11 +57,11 @@ public class Game {
         return oneshotOrCampaign;
     }
 
-    public int getNumberSessions() {
+    public Optional<Integer> getNumberSessions() {
         return numberSessions;
     }
 
-    public SessionLength getSessionLength() {
+    public Optional<Integer> getSessionLength() {
         return sessionLength;
     }
 
@@ -115,8 +115,5 @@ public class Game {
     }
     public enum OneshotOrCampaign {
         ONESHOT, CAMPAIGN
-    }
-    public enum SessionLength {
-        UNDEFINED, LESSH1, H1, H2, H3, H4, H5, H6, MOREH6
     }
 }
