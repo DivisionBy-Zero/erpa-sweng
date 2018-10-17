@@ -1,27 +1,20 @@
 package ch.epfl.sweng.erpa.services;
 
 import android.app.Application;
-import android.content.Intent;
 
-import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
-import com.annimon.stream.Stream;
-
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.operations.DependencyConfigurator;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
-import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
 import toothpick.Toothpick;
+
+import static ch.epfl.sweng.erpa.utils.ActivityUtils.createAccessToken;
 
 public class UserAuthService {
     @Inject @Named("Dependency Configurators") Set<DependencyConfigurator> coordinators;
@@ -44,16 +37,5 @@ public class UserAuthService {
             }
         }
         return Optional.empty();
-    }
-
-    private String createAccessToken(String uid, String password) {
-        byte[] uidBytes = uid.getBytes(StandardCharsets.UTF_8);
-        int uidBytesLength = uidBytes.length;
-        byte[] salt16Bytes = new byte[16];
-        for (int i = 0; i<16; ++i)
-            salt16Bytes[i] = uidBytes[uidBytesLength - 16 + i];
-        byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes, password.getBytes(StandardCharsets.UTF_8));
-        String str = new String(hashBytes, StandardCharsets.UTF_8);
-        return str;
     }
 }
