@@ -34,10 +34,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public Optional<String> getUidFromUsername(String username) {
         Optional<UserProfile> u = getUserFromUsername(username);
-        if (u.isPresent())
-            return Optional.of(u.get().getUid());
-        else
-            return Optional.empty();
+        return u.map(UserProfile::getUid);
     }
 
     @Override
