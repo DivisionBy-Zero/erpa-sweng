@@ -1,15 +1,14 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.content.Intent;
-import android.os.Build;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.annimon.stream.function.Predicate;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,107 +16,88 @@ import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
+import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     @Inject UserProfile userProfile;
 
-//    @BindView(R.id.myAccountLayout) ConstraintLayout myAccountLayout;
+    // TODO: (Anne) add Butterknife for better readability
+    private ListView myListView;
+    private ArrayAdapter myAdapter;
 
-    private List<MyAccountButton> maListe;
+    private List<MyAccountButton> myAccountButtonList;
+    private List<Drawable> myDrawablesList;
 
-    public LinearLayout createButton(MyAccountButton myAccountButton) {
-        LinearLayout linearLayout = new LinearLayout(this);
-        ConstraintLayout constraintLayout = new ConstraintLayout(this);
-        TextView textView = new TextView(this);
-        ImageView imageView = new ImageView(this);
-        textView.setText(myAccountButton.getText());
-        constraintLayout.addView(textView);
-        constraintLayout.addView(imageView);
-        linearLayout.addView(constraintLayout);
-        linearLayout.setOnClickListener(view -> startActivity(new Intent(this, myAccountButton.getActivityClass())));
-        return linearLayout;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N) @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_my_account);
-
-        createGameData();
-
-        maListe.forEach(myAccountButton -> {
-            if(myAccountButton.isActiveForPlayer() == userProfile.isPlayer() ||
-                    myAccountButton.isActiveForGM() == userProfile.isGM()){
-                LinearLayout myAccountLayout = findViewById(R.id.myAccountLayout);
-                LinearLayout newButton = createButton(myAccountButton);
-                View lastChild = myAccountLayout.getChildAt(
-                        myAccountLayout.getChildCount()-1);
-                if(lastChild != null){
-                    int lastBottom = lastChild.getBottom();
-                    newButton.setTop(lastBottom);
-                }
-                myAccountLayout.addView(newButton);
-            }
-        });
-
-    // onResume
+        onResume();
     }
 
-    private void createGameData(){
-        maListe = Arrays.asList(
-                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.pendingRequestText), PendingRequestActivity.class,
-                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), true, false),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.confirmedGamesText), ConfirmedGamesActivity.class,
-                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()),true, false),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.pastGamesText), PastGamesActivity.class,
-                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()),true, false),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.hostedGamesText), HostedGamesActivity.class,
-                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), false, true),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.pastHostedGamesText), PastHostedGamesActivity.class,
-                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), false, true),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(R.string.profileText), ProfileActivity.class,
-                        this.getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher_background,getTheme()), true, true)
+    @Override protected void onResume() {
+        super.onResume();
+
+        myListView = findViewById(R.id.myAccountLayout);
+        initializeArrays();
+
+        ArrayList<MyAccountButton> myFilteredAccountButtons = filterButtonList(
+                myAccountButtonList, (b -> (b.isActiveForPlayer() == userProfile.getIsPlayer() ||
+                        b.isActiveForGM() == userProfile.getIsGm())));
+        List<Drawable> myFilteredDrawables = cutDownImagesList();
+
+        myAdapter = new MyAccountButtonAdapter(this, myFilteredAccountButtons, myFilteredDrawables);
+        myListView.setAdapter(myAdapter);
+        myListView.setOnItemClickListener((l, v, position, id) -> startActivity(
+                new Intent(this, myFilteredAccountButtons.get(position).getActivityClass())));
+
+    }
+
+    private void initializeArrays() {
+        myAccountButtonList = Arrays.asList(
+                new MyAccountButton(this.getApplicationContext().getResources().getString(
+                        R.string.pendingRequestText), PendingRequestActivity.class, true, false),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(
+                        R.string.confirmedGamesText), ConfirmedGamesActivity.class, true, false),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(
+                        R.string.pastGamesText), PastGamesActivity.class, true, false),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(
+                        R.string.hostedGamesText), HostedGamesActivity.class, false, true),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(
+                        R.string.pastHostedGamesText), PastHostedGamesActivity.class, false, true),
+                new MyAccountButton(this.getApplicationContext().getResources().getString(
+                        R.string.profileText), ProfileActivity.class, true, true)
+        );
+        myDrawablesList = Arrays.asList(
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
+                this.getApplicationContext().getDrawable(R.drawable.drawable_temp)
         );
     }
 
+    private List<Drawable> cutDownImagesList() {
+        ArrayList<Drawable> myFilterDrawableList = new ArrayList<>(myDrawablesList);
+        for (int i = myDrawablesList.size() - 2; i >= myAccountButtonList.size() - 1; --i) {
+            myFilterDrawableList.remove(i);
+        }
+        return myFilterDrawableList;
+    }
+
+    private ArrayList<MyAccountButton> filterButtonList(List<MyAccountButton> l,
+                                                        Predicate<MyAccountButton> predicate) {
+        ArrayList<MyAccountButton> newL = new ArrayList<>();
+        for (int i = 0; i < l.size(); ++i) {
+            if (predicate.test(l.get(i)))
+                newL.add(l.get(i));
+        }
+        return newL;
+    }
 }
-
-
-//    private RecyclerView recyclerView;
-//    private MyAccountButtonAdapter adapter;
-//    private ArrayList<MyAccountButton> myAccountButtonArrayList;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_my_account);
-//
-//        recyclerView = findViewById(R.id.recyclerView);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//
-//        myAccountButtonArrayList = new ArrayList<>();
-//        adapter = new MyAccountButtonAdapter(this, myAccountButtonArrayList);
-//        recyclerView.setAdapter(adapter);
-//
-//        createListData();
-//
-//    }
-//
-//    private void createListData() {
-//        MyAccountButton myAccountButton = new MyAccountButton("@string/pendingRequestText", PendingRequestActivity.class, "@mipmap/ic_launcher", true, false);
-//        myAccountButtonArrayList.add(myAccountButton);
-//        myAccountButton = new MyAccountButton("1", ConfirmedGamesActivity.class, "@mipmap/ic_launcher",true, false);
-//        myAccountButtonArrayList.add(myAccountButton);
-//        myAccountButton = new MyAccountButton("2", PastGamesActivity.class, "@mipmap/ic_launcher",true, false);
-//        myAccountButtonArrayList.add(myAccountButton);
-//        myAccountButton = new MyAccountButton("3", HostedGamesActivity.class,"@mipmap/ic_launcher", false, true);
-//        myAccountButtonArrayList.add(myAccountButton);
-//        myAccountButton = new MyAccountButton("4", PastHostedGamesActivity.class,"@mipmap/ic_launcher", false, true);
-//        myAccountButtonArrayList.add(myAccountButton);
-//        myAccountButton = new MyAccountButton("5", ProfileActivity.class,"@mipmap/ic_launcher", true, true);
-//        myAccountButtonArrayList.add(myAccountButton);
-//        adapter.notifyDataSetChanged();
-//    }
-
