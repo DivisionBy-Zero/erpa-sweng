@@ -37,6 +37,9 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         return accessToken.equals(createAccessToken(uid, "admin"));
     }
 
+    @Override public void terminate() {
+    }
+
     // This function is temporary and will be removed it is just here so I can test everything
     private String createAccessToken(String uid, String password) {
         byte[] uidBytes = uid.getBytes(StandardCharsets.UTF_8);

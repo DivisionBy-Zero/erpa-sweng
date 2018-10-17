@@ -27,4 +27,7 @@ public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
     public boolean verifyAccessToken(String uid, String accessToken) {
         return false;
     }
+
+    @Override public void terminate() {
+    }
 }

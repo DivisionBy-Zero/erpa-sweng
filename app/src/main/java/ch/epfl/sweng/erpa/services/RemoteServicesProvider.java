@@ -13,6 +13,5 @@ public interface RemoteServicesProvider {
     boolean verifyAccessToken(String uid, String accessToken);
 
     // Here be LifeCycle management
-    default void terminate() {
-    }
+    void terminate();
 }
