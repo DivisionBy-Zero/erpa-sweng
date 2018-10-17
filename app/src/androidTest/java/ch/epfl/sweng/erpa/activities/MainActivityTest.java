@@ -33,4 +33,22 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(R.id.launch_create_game_button)).perform(ViewActions.click());
         intended(hasComponent(CreateGameActivity.class.getName()));
     }
+
+    @Test
+    public void testCanLaunchRSPGreeter() {
+        onView(ViewMatchers.withId(R.id.launch_storage_provider_greet)).perform(ViewActions.click());
+        intended(hasComponent(RemoteServiceGreeterActivity.class.getName()));
+    }
+
+    @Test
+    public void testCanLaunchLogin() {
+        onView(ViewMatchers.withId(R.id.launch_login_button)).perform(ViewActions.click());
+        intended(hasComponent(LoginActivity.class.getName()));
+    }
+
+    @Test
+    public void testCanLaunchSignUp() {
+        onView(ViewMatchers.withId(R.id.launch_signup_button)).perform(ViewActions.click());
+        intended(hasComponent(SignupActivity.class.getName()));
+    }
 }
