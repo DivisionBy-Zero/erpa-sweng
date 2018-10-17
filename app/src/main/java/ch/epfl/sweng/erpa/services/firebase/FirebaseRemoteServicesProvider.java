@@ -33,4 +33,9 @@ public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
     public void storeNewUser(UserProfile user) {
         return;
     }
+  
+    @Override 
+    public void terminate() {
+
+    }
 }

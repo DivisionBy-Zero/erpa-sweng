@@ -18,6 +18,5 @@ public interface RemoteServicesProvider {
     void storeNewUser(UserProfile user);
 
     // Here be LifeCycle management
-    default void terminate() {
-    }
+    void terminate();
 }
