@@ -18,6 +18,7 @@ import javax.inject.Named;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.operations.DependencyConfigurator;
+import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -29,32 +30,8 @@ public class UserAuthService {
     @Inject RemoteServicesProvider rsp;
 
     @Inject public UserAuthService(@Named("application") Scope scope, Application app) {
-        Toothpick.inject(this, scope);
-
-        Set<Class> autowiredClasses = Stream.of(this.getClass().getFields())
-                // Injected fields
-                .filter(f -> f.isAnnotationPresent(Inject.class))
-                // Field class
-                .map(Field::getType)
-                .collect(Collectors.toSet());
-
-        Set<DependencyConfigurator> coordinatorsWithUnconfiguredDependencies = Stream.of(coordinators)
-                .filter(cc -> autowiredClasses.contains(cc.configuredDependencyClass()))
-                // Only coordinators with non-configured dependencies
-                .filter(cc -> !cc.dependencyIsConfigured())
-                .collect(Collectors.toSet());
-
-        if (!coordinatorsWithUnconfiguredDependencies.isEmpty()) {
-            List<Intent> configurationActivities = Stream.of(coordinatorsWithUnconfiguredDependencies)
-                    .map(DependencyConfigurator::dependencyConfigurationIntent)
-                    .map(i -> i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME))
-                    .collect(Collectors.toList());
-
-            // Push the configuration activities on top
-            //noinspection SimplifyStreamApiCallChains: This warning is wrong
-            app.startActivities(Stream.of(configurationActivities).toArray(Intent[]::new));
-        }
-        //rsp = new DummyRemoteServicesProvider();
+        RemoteServicesProviderCoordinator rsp = scope.getInstance(RemoteServicesProviderCoordinator.class);
+        rsp.rspClassFromFullyQualifiedName("ch.epfl.sweng.erpa.services.dummy.DummyRemoteServiceProvider").ifPresent(rsp::bindRemoteServicesProvider);
     }
 
     public Optional<UserAuth> getUserAuth(String username, String password) {
