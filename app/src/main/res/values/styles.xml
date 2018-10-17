@@ -29,4 +29,8 @@
         <item name="android:fontFamily">@font/nanumbrushscript_regular</item>
     </style>
 
+    <style name="ERPAStyle.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="ERPAStyle.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>

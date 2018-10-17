@@ -5,6 +5,10 @@
     <string name="noNameMessage">No username</string>
     <string name="noPassMessage">No password</string>
     <string name="incorrectLogin">Username or password is incorrect</string>
+    <string name="passwords_not_match">The password do not match</string>
+    <string name="not_select_GM_or_player">Are you a GM and/or a player</string>
+    <string name="username_in_use">Username is already in user. Please change your username</string>
     <!--Titles-->
     <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
+    <string name="title_activity_signup">SignupActivity</string>
 </resources>

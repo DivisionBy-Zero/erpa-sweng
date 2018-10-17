@@ -2,6 +2,7 @@ package ch.epfl.sweng.erpa.services.firebase;
 
 import com.annimon.stream.Optional;
 
+import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
@@ -28,6 +29,13 @@ public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
         return false;
     }
 
-    @Override public void terminate() {
+    @Override
+    public void storeNewUser(UserProfile user) {
+        return;
+    }
+  
+    @Override 
+    public void terminate() {
+
     }
 }

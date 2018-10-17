@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.lang.reflect.Proxy;
 
+import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
@@ -165,5 +166,10 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public boolean verifyAccessToken(String uid, String accessToken) {
         return false;
+    }
+
+    @Override
+    public void storeNewUser(UserProfile user) {
+        return;
     }
 }

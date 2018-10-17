@@ -3,14 +3,22 @@ package ch.epfl.sweng.erpa.services.dummy;
 import com.annimon.stream.Optional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
+import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
+
+    private ArrayList<UserProfile> userList;
+
     public DummyRemoteServicesProvider() {
+        UserProfile defaultUser = new UserProfile("user|5b915f75-0ff0-43f8-90bf-f9e92533f926", "admin", createAccessToken("user|5b915f75-0ff0-43f8-90bf-f9e92533f926", "admin"), UserProfile.Experience.Casual, false, true);
+        userList = new ArrayList<>();
+        userList.add(defaultUser);
     }
 
     @Override
@@ -25,16 +33,38 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
     @Override
     public Optional<String> getUidFromUsername(String username) {
-        // The uid returned is a random uid generate with javaZ.util.UUID.randomUUID()
-        // This will work for all users but it's for testing purposes because user sign up and
-        // database isn't set up yet
-        return Optional.of("5b915f75-0ff0-43f8-90bf-f9e92533f926");
+        Optional<UserProfile> u = getUserFromUsername(username);
+        return u.map(UserProfile::getUid);
     }
 
     @Override
     public boolean verifyAccessToken(String uid, String accessToken) {
-        // I left the password in plain here for testing with one single user
-        return accessToken.equals(createAccessToken(uid, "admin"));
+        Optional<UserProfile> u = getUserFromUid(uid);
+        if (u.isPresent())
+            return accessToken.equals(u.get().getAccessToken());
+        else
+            return false;
+    }
+
+    @Override
+    public void storeNewUser(UserProfile user) {
+        userList.add(user);
+    }
+
+    private Optional<UserProfile> getUserFromUsername(String username) {
+        for (UserProfile u: userList) {
+            if (u.getUsername().equals(username))
+                return Optional.of(u);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<UserProfile> getUserFromUid(String uid) {
+        for (UserProfile u: userList) {
+            if (u.getUid().equals(uid))
+                return Optional.of(u);
+        }
+        return Optional.empty();
     }
 
     @Override public void terminate() {
