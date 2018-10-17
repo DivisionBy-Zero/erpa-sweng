@@ -4,8 +4,14 @@
     <string name="prop_key_remote_provider">remote_services_provider_class_name</string>
 
     <!--Titles-->
-    <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
+    <string name="confirmedGamesText">Confirmed Games</string>
     <string name="title_create_game_activity">Create Game</string>
+    <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
+    <string name="hostedGamesText">Hosted Games</string>
+    <string name="pastGamesText">Past Games</string>
+    <string name="pastHostedGamesText">Past Hosted Games</string>
+    <string name="pendingRequestText">Pending Request</string>
+    <string name="profileText">Profile</string>
     <string name="title_activity_signup">SignupActivity</string>
 
     <!-- Login error messages-->
