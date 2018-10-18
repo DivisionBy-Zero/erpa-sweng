@@ -36,9 +36,11 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         final Spinner universesSpinner = findViewById(R.id.universes_spinner);
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
                 String feedbackType = universesSpinner.getSelectedItem().toString();
-                universeField.setVisibility((feedbackType.equals("Other")) ? View.VISIBLE : View.GONE);
+                universeField.setVisibility((feedbackType.equals(
+                        getString(R.string.univOther))) ? View.VISIBLE : View.GONE);
             }
 
             @Override
@@ -54,7 +56,8 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     // When Oneshot or Campaign checkboxes are checked, uncheck the other one
     @OnClick({R.id.oneshot, R.id.campaign})
     public void onOneShotOrCampaignSelected(View view) {
-        findViewById(R.id.layout_num_sessions).setVisibility((view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
+        findViewById(R.id.layout_num_sessions).setVisibility(
+                (view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
     }
 
     //call when the user submit a game and check if no requested field is empty
@@ -78,14 +81,18 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
             RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
             OneshotOrCampaign oneShotOrCampaign = oneshotRadioButton.isChecked() ? ONESHOT : CAMPAIGN;
-            Game.Difficulty difficulty = findDifficulty(difficultySpinner.getSelectedItem().toString());
-            Optional<Integer> sessionLength = findSessionLength(sessionLengthSpinner.getSelectedItem().toString());
+            Game.Difficulty difficulty = findDifficulty(
+                    difficultySpinner.getSelectedItem().toString());
+            Optional<Integer> sessionLength = findSessionLength(
+                    sessionLengthSpinner.getSelectedItem().toString());
             EditText numSess = findViewById(R.id.num_session_field);
             String nbSessionString = numSess.getText().toString();
-            Optional<Integer> numbSession = nbSessionString.isEmpty() ? Optional.empty() : Optional.of(Integer.parseInt(nbSessionString));
+            Optional<Integer> numbSession = nbSessionString.isEmpty() ? Optional.empty() : Optional.of(
+                    Integer.parseInt(nbSessionString));
             Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
                     minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
-                    oneShotOrCampaign, numbSession, sessionLength, findViewById(R.id.description_field).toString());
+                    oneShotOrCampaign, numbSession, sessionLength,
+                    findViewById(R.id.description_field).toString());
             Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
