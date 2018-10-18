@@ -1,7 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.support.design.widget.CoordinatorLayout;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
@@ -29,86 +28,119 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 @RunWith(AndroidJUnit4.class)
 public class CreateGameTest {
     @Rule
-    public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(CreateGameActivity.class);
+    public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(
+            CreateGameActivity.class);
 
-    // TODO: (Anne) fix length_spinner bug (API 22 bug)
     @Test
     public void testCanFillFormWithCorrectInputsAndNbSessions() {
-        onView(withId(R.id.create_game_name_field)).perform(typeText("Game Name")).perform(closeSoftKeyboard());
-        onView(withId(R.id.min_num_player_field)).perform(typeText("1")).perform(closeSoftKeyboard());
-        onView(withId(R.id.max_num_player_field)).perform(typeText("5")).perform(closeSoftKeyboard());
+        onView(withId(R.id.create_game_name_field)).perform(typeText("Game Name")).perform(
+                closeSoftKeyboard());
+        onView(withId(R.id.min_num_player_field)).perform(typeText("1")).perform(
+                closeSoftKeyboard());
+        onView(withId(R.id.max_num_player_field)).perform(typeText("5")).perform(
+                closeSoftKeyboard());
+
         onView(withId(R.id.difficulty_spinner)).perform(click());
         onData(hasToString(startsWith("N"))).perform(click());
-        onView(withId(R.id.difficulty_spinner)).check(matches(withSpinnerText(containsString("NOOB"))));
+        onView(withId(R.id.difficulty_spinner)).check(
+                matches(withSpinnerText(containsString("NOOB"))));
+
         onView(withId(R.id.universes_spinner)).perform(click());
         onData(hasToString(startsWith("O"))).perform(click());
-        onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
+        onView(withId(R.id.universes_spinner)).check(
+                matches(withSpinnerText(containsString("Other"))));
+
+        onView(withId(R.id.session_length_spinner)).perform(click());
+        onData(hasToString(startsWith("5"))).perform(click());
+        onView(withId(R.id.session_length_spinner)).check(
+                matches(withSpinnerText(containsString("5h"))));
+
         onView(withId(R.id.radio_form)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.num_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());
-//        onView(withId(R.id.session_length_spinner)).perform(click());
-//        onData(hasToString(startsWith("5"))).perform(click());
-//        onView(withId(R.id.session_length_spinner)).check(matches(withSpinnerText(containsString("5h"))));
-        onView(withId(R.id.description_field)).perform(typeText("Une petite description de partie")).perform(closeSoftKeyboard());
-        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(R.id.createGameCoordinatorLayout);
+
+        onView(withId(R.id.description_field)).perform(
+                typeText("Une petite description de partie")).perform(closeSoftKeyboard());
+        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(
+                R.id.createGameCoordinatorLayout);
         view.scrollTo(0, 1000);
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
     @Test
     public void testCanFillFormWithCorrectInputsWithoutNbSessions() throws InterruptedException {
-        onView(withId(R.id.create_game_name_field)).perform(typeText("Game Name")).perform(closeSoftKeyboard());
-        onView(withId(R.id.min_num_player_field)).perform(typeText("1")).perform(closeSoftKeyboard());
-        onView(withId(R.id.max_num_player_field)).perform(typeText("5")).perform(closeSoftKeyboard());
+        onView(withId(R.id.create_game_name_field)).perform(typeText("Game Name")).perform(
+                closeSoftKeyboard());
+        onView(withId(R.id.min_num_player_field)).perform(typeText("1")).perform(
+                closeSoftKeyboard());
+        onView(withId(R.id.max_num_player_field)).perform(typeText("5")).perform(
+                closeSoftKeyboard());
         onView(withId(R.id.difficulty_spinner)).perform(click());
         onData(hasToString(startsWith("N"))).perform(click());
-        onView(withId(R.id.difficulty_spinner)).check(matches(withSpinnerText(containsString("NOOB"))));
+        onView(withId(R.id.difficulty_spinner)).check(
+                matches(withSpinnerText(containsString("NOOB"))));
         onView(withId(R.id.universes_spinner)).perform(click());
         onData(hasToString(startsWith("O"))).perform(click());
-        onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
+        onView(withId(R.id.universes_spinner)).check(
+                matches(withSpinnerText(containsString("Other"))));
+        onView(withId(R.id.session_length_spinner)).perform(click());
+        onData(hasToString(startsWith("5"))).perform(click());
+        onView(withId(R.id.session_length_spinner)).check(
+                matches(withSpinnerText(containsString("5h"))));
         onView(withId(R.id.oneshot)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
-//        onView(withId(R.id.session_length_spinner)).perform(click());
-//        onData(hasToString(startsWith("5"))).perform(click());
-//        onView(withId(R.id.session_length_spinner)).check(matches(withSpinnerText(containsString("5h"))));
-        onView(withId(R.id.description_field)).perform(typeText("Une petite description de partie")).perform(closeSoftKeyboard());
-        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(R.id.createGameCoordinatorLayout);
+        onView(withId(R.id.description_field)).perform(
+                typeText("Une petite description de partie")).perform(closeSoftKeyboard());
+        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(
+                R.id.createGameCoordinatorLayout);
         view.scrollTo(0, 1000);
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
     @Test
     public void testEmptyFieldCreatesCorrectPopup() {
-        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("2")).perform(closeSoftKeyboard());
-        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("2")).perform(
+                closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(
+                closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
-        onView(ViewMatchers.withText(R.string.emptyFieldMessage)).check(matches(isDisplayed())).perform(ViewActions.click());
+        onView(ViewMatchers.withText(R.string.emptyFieldMessage)).check(
+                matches(isDisplayed())).perform(ViewActions.click());
     }
 
     @Test
     public void testEmptyCheckboxCreatesCorrectPopup() {
-        onView(ViewMatchers.withId(R.id.create_game_name_field)).perform(typeText("lol")).perform(closeSoftKeyboard());
-        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("2")).perform(closeSoftKeyboard());
-        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
-        onView(ViewMatchers.withId(R.id.description_field)).perform(typeText("bla bla bla")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.create_game_name_field)).perform(typeText("lol")).perform(
+                closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("2")).perform(
+                closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(
+                closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.description_field)).perform(
+                typeText("bla bla bla")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
-        onView(ViewMatchers.withText(R.string.uncheckedCheckboxMessage)).check(matches(isDisplayed()));
+        onView(ViewMatchers.withText(R.string.uncheckedCheckboxMessage)).check(
+                matches(isDisplayed()));
     }
 
     @Test
     public void testCanFillUniverseFieldIfOtherIsPicked() {
         onView(withId(R.id.universes_spinner)).perform(click());
         onData(hasToString(startsWith("O"))).perform(click());
-        onView(withId(R.id.universes_spinner)).check(matches(withSpinnerText(containsString("Other"))));
-        onView(withId(R.id.universe_field)).perform(typeText("KazAdrok")).perform(closeSoftKeyboard());
+        onView(withId(R.id.universes_spinner)).check(
+                matches(withSpinnerText(containsString("Other"))));
+        onView(withId(R.id.universe_field)).perform(typeText("KazAdrok")).perform(
+                closeSoftKeyboard());
     }
 
     @Test
     public void testCreatePopUpIfMaxSmallerThanMin() {
-        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
-        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("2")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("3")).perform(
+                closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("2")).perform(
+                closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
         onView(ViewMatchers.withText(R.string.invalidPlayerNumber)).check(matches(isDisplayed()));
@@ -116,8 +148,10 @@ public class CreateGameTest {
 
     @Test
     public void test0PlayerCreatePopUp() {
-        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("0")).perform(closeSoftKeyboard());
-        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.min_num_player_field)).perform(typeText("0")).perform(
+                closeSoftKeyboard());
+        onView(ViewMatchers.withId(R.id.max_num_player_field)).perform(typeText("3")).perform(
+                closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
         onView(ViewMatchers.withText(R.string.invalidPlayerNumber)).check(matches(isDisplayed()));
