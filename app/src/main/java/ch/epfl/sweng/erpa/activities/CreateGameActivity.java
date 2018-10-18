@@ -93,14 +93,6 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
                     minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
                     oneShotOrCampaign, numbSession, sessionLength,
                     findViewById(R.id.description_field).toString());
-            Game.Difficulty difficulty = findDifficulty(difficultySpinner.getSelectedItem().toString());
-            Optional<Integer> sessionLength = findSessionLength(sessionLengthSpinner.getSelectedItem().toString());
-            EditText numSess = findViewById(R.id.num_session_field);
-            String nbSessionString = numSess.getText().toString();
-            Optional<Integer> numbSession = nbSessionString.isEmpty() ? Optional.empty() : Optional.of(Integer.parseInt(nbSessionString));
-            Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
-                    minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
-                    oneShotOrCampaign, numbSession, sessionLength, findViewById(R.id.description_field).toString(),"");
             Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);

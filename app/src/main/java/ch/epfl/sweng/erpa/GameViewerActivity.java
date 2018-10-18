@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
 import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.activities.DependencyConfigurationAgnosticActivity;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
@@ -29,15 +30,12 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
 
     @Override
-    @Inject
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_viewer);
     }
 
-        //this should get injected
-        RemoteServicesProvider rsp = new DummyRemoteServicesProvider();
     @Override
     protected void onResume()
     {
@@ -49,24 +47,19 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
             optGame = rsp.getGameService().getGame(gameId);
             if (optGame.isPresent())
             {
-            Game game = optGame.get();
-            //very uninteresting code
-            setTextViewText(R.id.titleTextView,game.getName());
-            setTextViewText(R.id.descriptionTextView,game.getDescription());
-            setTextViewText(R.id.gmTextView,game.getGmName());
-            setTextViewText(R.id.universeTextView,game.getUniverse());
-                Log.d(TAG, "Successfully fetched game");
                 Game game = optGame.get();
                 //very uninteresting code
-                setTextViewText(R.id.titleTextView, game.getName());
-                setTextViewText(R.id.descriptionTextView, game.getDescription());
-                setTextViewText(R.id.universeTextView, game.getUniverse());
+                setTextViewText(R.id.titleTextView,game.getName());
+                setTextViewText(R.id.descriptionTextView,game.getDescription());
+                setTextViewText(R.id.gmTextView,game.getGmUniqueID());
+                setTextViewText(R.id.universeTextView,game.getUniverse());
+                Log.d(TAG, "onResume: Successfully fetched game");
 
                 String miscInfo = String.format("Difficulty: %s\n" +
                                 "%s\n" +
                                 "Number of sessions: %s\n" +
                                 "Session length: %s",
-                        game.getDifficulty(), game.getOneshotOrCampaign(), game.getNumberSessions(), game.getSessionLength());
+                        game.getDifficulty(), game.getOneshotOrCampaign(), game.getNumberSessions(), game.getSessionLengthInMinutes());
 
                 setTextViewText(R.id.generalInfoTextView, miscInfo);
 

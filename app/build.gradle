@@ -56,7 +56,6 @@ repositories {
 dependencies {
     def room_version = "1.1.1"
     implementation "android.arch.persistence.room:runtime:$room_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
     implementation "com.google.code.gson:gson:2.8.2"
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
@@ -86,6 +85,10 @@ dependencies {
     testImplementation 'com.github.stephanenicolas.toothpick:toothpick-testing:1.1.3'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.22.0'
+
+
+
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
 }
 
 tasks.withType(Test) {

@@ -121,68 +121,6 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
     public class DummyGameService implements GameService
     {
-        @Entity
-        class GameEntity
-        {
-            @PrimaryKey
-            private String uid;
-
-            @ColumnInfo(name = "game", typeAffinity = ColumnInfo.BLOB)
-            private String game;
-
-            public String getGame() {
-                return game;
-            }
-
-            public void setGame(String game) {
-                this.game = game;
-            }
-
-            public String getUid() {
-                return uid;
-            }
-
-            public void setUid(String uid) {
-                this.uid = uid;
-            }
-        }
-
-        @Database(entities = {GameEntity.class},version = 1)
-        @TypeConverters({Converters.class})
-        public abstract class GameDB extends RoomDatabase
-        {
-            public abstract GameDao gameDao();
-        }
-        static class Converters
-        {
-            @TypeConverter
-            public static Game fromString(String val)
-            {
-                Type gameType = new TypeToken<Game>(){}.getType();
-                Gson gson = new Gson();
-                return gson.fromJson(val, gameType);
-            }
-
-            @TypeConverter
-            public static String fromGame(Game g)
-            {
-                return (new Gson()).toJson(g);
-            }
-        }
-
-        @Dao
-        public interface GameDao
-        {
-            @Query("SELECT * FROM gameentity")
-            List<GameEntity> getAll();
-
-            @Query("SELECT * FROM gameentity WHERE uid IS (:gid)")
-            GameEntity getGame(String gid);
-
-            @Insert(onConflict = OnConflictStrategy.REPLACE)
-            public void insert(GameEntity g);
-        }
-
 
         DummyDatabase d = Room.databaseBuilder(ctx, DummyDatabase.class,"DummyDB").build();
 
