@@ -13,8 +13,6 @@ import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.firebase.FirebaseRemoteServicesProvider;
-import ch.epfl.sweng.erpa.smoothie.FactoryRegistry;
-import ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
@@ -44,9 +42,11 @@ public class ErpaApplication extends Application {
 
     public void initToothpick(Scope appScope) {
         // Initialise Dependency Injection framework
-        Toothpick.setConfiguration(Configuration.forProduction().disableReflection().preventMultipleRootScopes());
-        FactoryRegistryLocator.setRootRegistry(new FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(new MemberInjectorRegistry());
+        Toothpick.setConfiguration(
+                Configuration.forProduction().disableReflection().preventMultipleRootScopes());
+        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
+        MemberInjectorRegistryLocator.setRootRegistry(
+                new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
 
         // Install trivial application modules
         appScope.installModules(new ErpaApplicationModule(this));
@@ -57,9 +57,11 @@ public class ErpaApplication extends Application {
 
         // Publish
         appScope.installModules(new Module() {{
-            bind(Set.class).withName("Remote Service Providers").toInstance(remoteServicesProviders);
+            bind(Set.class).withName("Remote Service Providers").toInstance(
+                    remoteServicesProviders);
             bind(Set.class).withName("Dependency Configurators").toInstance(
-                    Stream.of(dependencyConfiguratorClasses).map(appScope::getInstance).collect(Collectors.toSet()));
+                    Stream.of(dependencyConfiguratorClasses).map(appScope::getInstance).collect(
+                            Collectors.toSet()));
         }});
 
         // Create Remote Service Provider singleton instance proxy
