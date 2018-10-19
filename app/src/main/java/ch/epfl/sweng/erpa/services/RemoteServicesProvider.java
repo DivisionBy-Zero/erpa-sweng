@@ -20,4 +20,5 @@ public interface RemoteServicesProvider {
 
     // Here be LifeCycle management
     void terminate();
+    GameService getGameService();
 }

@@ -1,14 +1,22 @@
 package ch.epfl.sweng.erpa.services.dummy;
 
+import android.content.Context;
+
 import com.annimon.stream.Optional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
+import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
 
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
@@ -80,5 +88,16 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes, password.getBytes(StandardCharsets.UTF_8));
         String str = new String(hashBytes, StandardCharsets.UTF_8);
         return str;
+    }
+
+
+    @Inject public Context ctx;
+    GameService gs = null;
+    @Override
+    public GameService getGameService()
+    {
+        if(gs==null)
+            gs = new DummyGameService(ctx);
+        return gs;
     }
 }

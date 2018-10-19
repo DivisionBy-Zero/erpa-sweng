@@ -36,42 +36,54 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     {
         super.onResume();
         Optional<Game> optGame;
-        String gameId = getIntent().getStringExtra(GameViewerActivity.EXTRA_GAME_KEY);
-        if(gameId != null)
+        String gameId = getGameId();
+        optGame = rsp.getGameService().getGame(gameId);
+
+        if (optGame.isPresent())
         {
-            optGame = rsp.getGameService().getGame(gameId);
-
-            if (optGame.isPresent())
-            {
-                Game game = optGame.get();
-                //very uninteresting code
-                setTextViewText(R.id.titleTextView,game.getName());
-                setTextViewText(R.id.descriptionTextView,game.getDescription());
-                setTextViewText(R.id.gmTextView,game.getGmUid());
-                setTextViewText(R.id.universeTextView,game.getUniverse());
-                Log.d(TAG, "onResume: Successfully fetched game");
-
-                String miscInfo = String.format("Difficulty: %s\n" +
-                                "%s\n" +
-                                "Number of sessions: %s\n" +
-                                "Session length: %s",
-                        game.getDifficulty(), game.getType(), game.getNumSessions(), game.getSessionLength());
-
-                setTextViewText(R.id.generalInfoTextView, miscInfo);
-
-                //String playerInfo = String.format("At least %s players required. At most %s allowed. %s registered", game.getMinPlayer(),game.getMaxPayer(),game.getPlayers().size());
-            }
-            else
-            {
-                Log.d(TAG, "onResume: could not find game in database. Exiting", new NoSuchElementException());
-                finish();
-            }
+            Game game = optGame.get();
+            updateFields(game);
         }
         else
         {
-            Log.d(TAG, "onResume: gameId == null. Exiting", new IllegalAccessError());
+            Log.d(TAG, "onResume: could not find game in database. Exiting", new NoSuchElementException());
             finish();
         }
+    }
+
+
+    private String getGameId()
+    {
+
+       String gameId = getIntent().getStringExtra(GameViewerActivity.EXTRA_GAME_KEY);
+       if(gameId == null)
+       {
+           Exception thrown = new IllegalArgumentException("Game Id not found");
+           Log.d(TAG, "GameViewerActivity: no game id passed with intent", thrown);
+           finish();
+           throw new IllegalArgumentException();
+       }
+       else
+       {
+           return gameId;
+       }
+    }
+    private void updateFields(Game game)
+    {
+        setTextViewText(R.id.titleTextView,game.getName());
+        setTextViewText(R.id.descriptionTextView,game.getDescription());
+        setTextViewText(R.id.gmTextView,game.getGmUid());
+        setTextViewText(R.id.universeTextView,game.getUniverse());
+        Log.d(TAG, "onResume: Successfully fetched game");
+
+        String miscInfo = String.format("Difficulty: %s\n" +
+                        "%s\n" +
+                        "Number of sessions: %s\n" +
+                        "Session length: %s",
+                game.getDifficulty(), game.getType(), game.getNumSessions(), game.getSessionLength());
+
+        setTextViewText(R.id.generalInfoTextView, miscInfo);
+
     }
 
 
