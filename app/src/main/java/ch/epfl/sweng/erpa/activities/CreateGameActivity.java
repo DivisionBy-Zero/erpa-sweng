@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import com.annimon.stream.Optional;
 
+import java.util.HashSet;
+
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.CreateGameFormFragment;
 import ch.epfl.sweng.erpa.R;
@@ -76,23 +78,24 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         } else if (!aRadioButtonIsChecked()) {
             createPopup(getString(R.string.uncheckedCheckboxMessage));
         } else {
-            Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
-            Spinner universesSpinner = findViewById(R.id.universes_spinner);
-            Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
+            EditText numSess = findViewById(R.id.num_session_field);
             RadioButton oneshotRadioButton = findViewById(R.id.oneshot);
+            Spinner difficultySpinner = findViewById(R.id.difficulty_spinner);
+            Spinner sessionLengthSpinner = findViewById(R.id.session_length_spinner);
+            Spinner universesSpinner = findViewById(R.id.universes_spinner);
+
             OneshotOrCampaign oneShotOrCampaign = oneshotRadioButton.isChecked() ? ONESHOT : CAMPAIGN;
+            String gameDescription = findViewById(R.id.description_field).toString();
+            String gameName = findViewById(R.id.create_game_name_field).toString();
             Game.Difficulty difficulty = findDifficulty(
                     difficultySpinner.getSelectedItem().toString());
             Optional<Integer> sessionLength = findSessionLength(
                     sessionLengthSpinner.getSelectedItem().toString());
-            EditText numSess = findViewById(R.id.num_session_field);
-            String nbSessionString = numSess.getText().toString();
-            Optional<Integer> numbSession = nbSessionString.isEmpty() ? Optional.empty() : Optional.of(
-                    Integer.parseInt(nbSessionString));
-            Game newGame = new Game("", findViewById(R.id.create_game_name_field).toString(),
-                    minPlayer, maxPlayer, difficulty, universesSpinner.getSelectedItem().toString(),
-                    oneShotOrCampaign, numbSession, sessionLength,
-                    findViewById(R.id.description_field).toString());
+            Optional<Integer> numbSession = Optional.of(numSess.getText().toString())
+                    .filter(s -> !s.isEmpty()).map(Integer::parseInt);
+            String universe = universesSpinner.getSelectedItem().toString();
+            Game newGame = new Game("", new HashSet<>(), gameName, minPlayer, maxPlayer, difficulty,
+                    universe, oneShotOrCampaign, numbSession, sessionLength, gameDescription);
             Intent intent = new Intent(this, GameListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);

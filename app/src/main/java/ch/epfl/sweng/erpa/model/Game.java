@@ -2,119 +2,45 @@ package ch.epfl.sweng.erpa.model;
 
 import com.annimon.stream.Optional;
 
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
+
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class Game {
-    private String gmUniqueID;
-    private GameParticipants players;
-    private String name;
-    private int minPlayer;
-    private int maxPlayer;
-    private Difficulty difficulty;
-    private String universe;
-    private OneshotOrCampaign oneshotOrCampaign;
-    private Optional<Integer> numberSessions;
-    private Optional<Integer> sessionLengthInMinutes;
-    private String description;
+    public enum Difficulty {NOOB, CHILL, HARD}
 
-    public Game(String gmUniqueID, String name, int minPlayer,
-                int maxPayer, Difficulty difficulty, String universe,
-                OneshotOrCampaign oneshotOrCampaign, Optional<Integer> numberSessions,
-                Optional sessionLengthInMinutes, String description) {
-        this.gmUniqueID = gmUniqueID;
-        this.name = name;
-        this.minPlayer = minPlayer;
-        this.maxPlayer = maxPayer;
-        this.difficulty = difficulty;
-        this.universe = universe;
-        this.oneshotOrCampaign = oneshotOrCampaign;
-        this.numberSessions = numberSessions;
-        this.sessionLengthInMinutes = sessionLengthInMinutes;
-        this.description = description;
+    public enum OneshotOrCampaign {ONESHOT, CAMPAIGN}
+
+    @NonNull private String gameUuid;
+    @NonNull private Set<String> playersUuid;
+    @NonNull private String name;
+    @NonNull private Integer minPlayer;
+    @NonNull private Integer maxPlayer;
+    @NonNull private Difficulty difficulty;
+    @NonNull private String universe;
+    @NonNull private OneshotOrCampaign oneshotOrCampaign;
+    @NonNull private Optional<Integer> numberSessions;
+    @NonNull private Optional<Integer> sessionLengthInMinutes;
+    @NonNull private String description;
+
+    public Game withPlayer(String newPlayerUuid){
+        HashSet<String> newPlayerSet = new HashSet<>(playersUuid);
+        newPlayerSet.add(newPlayerUuid);
+
+        return this.toBuilder().playersUuid(newPlayerSet).build();
     }
 
-    public String getName() {
-        return name;
-    }
+    public Game removePlayer(String playerToRemove){
+        HashSet<String> newPlayerSet = new HashSet<>(playersUuid);
+        newPlayerSet.remove(playerToRemove);
 
-    public int getMinPlayer() {
-        return minPlayer;
-    }
-
-    public int getMaxPlayer() {
-        return maxPlayer;
-    }
-
-    public String getUniverse() {
-        return universe;
-    }
-
-    public Difficulty getDifficulty() {
-        return difficulty;
-    }
-
-    public OneshotOrCampaign getOneshotOrCampaign() {
-        return oneshotOrCampaign;
-    }
-
-    public Optional<Integer> getNumberSessions() {
-        return numberSessions;
-    }
-
-    public Optional<Integer> getSessionLengthInMinutes() {
-        return sessionLengthInMinutes;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String toString() {
-        return "Game{" +
-                "gmUniqueID='" + gmUniqueID + '\'' +
-                ", players=" + players +
-                ", name='" + name + '\'' +
-                ", minPlayer='" + minPlayer + '\'' +
-                ", maxPayer='" + maxPlayer + '\'' +
-                ", difficulty='" + difficulty + '\'' +
-                ", universe='" + universe + '\'' +
-                ", oneshotOrCampaign='" + oneshotOrCampaign + '\'' +
-                ", numberSessions='" + numberSessions + '\'' +
-                ", sessionLength='" + sessionLengthInMinutes + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return Objects.equals(gmUniqueID, game.gmUniqueID) &&
-                Objects.equals(players, game.players) &&
-                Objects.equals(name, game.name) &&
-                Objects.equals(minPlayer, game.minPlayer) &&
-                Objects.equals(maxPlayer, game.maxPlayer) &&
-                Objects.equals(difficulty, game.difficulty) &&
-                Objects.equals(universe, game.universe) &&
-                Objects.equals(oneshotOrCampaign, game.oneshotOrCampaign) &&
-                Objects.equals(numberSessions, game.numberSessions) &&
-                Objects.equals(sessionLengthInMinutes, game.sessionLengthInMinutes) &&
-                Objects.equals(description, game.description);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(gmUniqueID, players, name, minPlayer, maxPlayer, difficulty, universe, oneshotOrCampaign, numberSessions, sessionLengthInMinutes, description);
-    }
-
-    public enum Difficulty {
-        NOOB, CHILL, HARD
-    }
-
-    public enum OneshotOrCampaign {
-        ONESHOT, CAMPAIGN
+        return this.toBuilder().playersUuid(newPlayerSet).build();
     }
 }
