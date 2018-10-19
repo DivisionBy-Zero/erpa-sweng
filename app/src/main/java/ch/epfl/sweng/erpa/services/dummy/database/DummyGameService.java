@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +62,9 @@ public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService
     {
         try
         {
-            FileInputStream gStream = new FileInputStream(gameFile);
-
+            FileReader gReader = new FileReader(gameFile);
             Yaml yaml = new Yaml();
-            return (Game)yaml.load(gStream);
+            return yaml.loadAs(gReader,Game.class);
 
         }
         catch (FileNotFoundException e)
@@ -95,8 +95,9 @@ public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService
 
 
     @Override
-    public void saveGame(String gid)
+    public void saveGame(Game g)
     {
+        String gid = g.getGid();
         try
         {
             File gameFile = new File(gameDir, gid + EXTENSION);
@@ -113,7 +114,7 @@ public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService
 
 
             Yaml yaml = new Yaml();
-            yaml.dump(gid, writer);
+            yaml.dump(g, writer);
         }
         catch (Exception e)
         {

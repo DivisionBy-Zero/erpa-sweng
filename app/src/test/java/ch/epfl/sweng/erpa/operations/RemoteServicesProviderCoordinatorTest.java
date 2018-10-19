@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoRule;
 import java.lang.reflect.Proxy;
 
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
@@ -156,6 +157,12 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public void terminate() {
         fuse.ignite();
+    }
+
+    @Override
+    public GameService getGameService()
+    {
+        return null;
     }
 
     @Override

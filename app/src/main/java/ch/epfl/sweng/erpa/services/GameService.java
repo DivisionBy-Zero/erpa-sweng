@@ -10,5 +10,5 @@ public interface GameService
 {
     Optional<Game> getGame(String gid);
     List<Game> getAll();
-    void saveGame(String gid);
+    void saveGame(Game g);
 }
