@@ -1,6 +1,5 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.support.design.widget.CoordinatorLayout;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
@@ -16,6 +15,7 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -61,9 +61,7 @@ public class CreateGameTest {
 
         onView(withId(R.id.description_field)).perform(
                 typeText("Une petite description de partie")).perform(closeSoftKeyboard());
-        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(
-                R.id.createGameCoordinatorLayout);
-        view.scrollTo(0, 1000);
+        onView(withId(R.id.create_game_form)).perform(swipeUp());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
@@ -91,9 +89,7 @@ public class CreateGameTest {
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.description_field)).perform(
                 typeText("Une petite description de partie")).perform(closeSoftKeyboard());
-        CoordinatorLayout view = intentsTestRule.getActivity().findViewById(
-                R.id.createGameCoordinatorLayout);
-        view.scrollTo(0, 1000);
+        onView(withId(R.id.create_game_form)).perform(swipeUp());
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
