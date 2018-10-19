@@ -55,7 +55,6 @@ public class CreateGameTest {
         onView(withId(R.id.session_length_spinner)).check(
                 matches(withSpinnerText(containsString("5h"))));
 
-        onView(withId(R.id.radio_form)).perform(click());
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.num_session_field)).perform(typeText("2")).perform(closeSoftKeyboard());
 
