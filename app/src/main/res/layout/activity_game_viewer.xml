@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".activities.GameViewerActivity">
+
+<TextView
+    android:id="@+id/titleTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:text="Title"
+    android:textSize="18sp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+<TextView
+    android:id="@+id/gmTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:text="Game Master"
+    android:textSize="12sp"
+    app:layout_constraintStart_toStartOf="@+id/titleTextView"
+    app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
+
+<TextView
+    android:id="@+id/descriptionTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum semper ipsum et lacus congue, porttitor ullamcorper neque auctor. Aenean finibus ut lacus in vehicula. Nullam venenatis ex ultrices tellus maximus pharetra. Cras commodo vel lacus aliquam vehicula. Phasellus ullamcorper ut elit in imperdiet. Proin leo neque, consequat et commodo vitae, molestie eget ipsum. Duis cursus vestibulum consequat. Fusce cursus ligula ut augue gravida, sed hendrerit lacus sollicitudin. Cras pulvinar vulputate velit, ac efficitur odio ultricies at. Donec faucibus vitae quam nec scelerisque. Vestibulum volutpat ut dolor eu aliquam. "
+    android:textAlignment="viewStart"
+    android:textSize="12sp"
+    app:layout_constraintStart_toStartOf="@+id/gmTextView"
+    app:layout_constraintTop_toBottomOf="@+id/gmTextView" />
+
+<Button
+    android:id="@+id/joinGameButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:text="Join Game"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.5"
+    app:layout_constraintStart_toStartOf="parent" />
+
+<TextView
+    android:id="@+id/participatingPlayersTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:text="Participating players info"
+    android:textSize="12sp"
+    app:layout_constraintStart_toStartOf="@+id/generalInfoTextView"
+    app:layout_constraintTop_toBottomOf="@+id/generalInfoTextView" />
+
+<TextView
+    android:id="@+id/generalInfoTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:text="Miscelaneous info"
+    android:textSize="12sp"
+    app:layout_constraintStart_toStartOf="@+id/universeTextView"
+    app:layout_constraintTop_toBottomOf="@+id/universeTextView" />
+
+<TextView
+    android:id="@+id/universeTextView"
+    android:layout_width="wrap_content"
+    android:layout_height="19dp"
+    android:layout_marginTop="8dp"
+    android:text="Universe"
+    android:textSize="12sp"
+    app:layout_constraintStart_toStartOf="@+id/descriptionTextView"
+    app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
+</android.support.constraint.ConstraintLayout>
