@@ -32,9 +32,8 @@ import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class CreateGameTest {
+public class CreateGameActivityTest {
     private Resources systemResources;
-
     @Rule
     public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(
             CreateGameActivity.class);
