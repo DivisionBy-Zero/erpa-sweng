@@ -1,10 +1,15 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.content.res.Resources;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,12 +29,38 @@ import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class CreateGameTest {
+    private Resources systemResources;
+
     @Rule
     public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(
             CreateGameActivity.class);
+
+    @Before
+    public void setSystemResources() {
+        systemResources = intentsTestRule.getActivity().getResources();
+    }
+
+    @Test
+    public void testCanParseAnySessionLength() {
+        boolean q = Stream.of(systemResources.getStringArray(R.array.session_length_array))
+                .filter(sl -> !"Undefined".equals(sl))
+                .map(CreateGameActivity::findSessionLength)
+                .allMatch(Optional::isPresent);
+        assertTrue(q);
+    }
+
+    @Test
+    public void testCanParseAnyDifficulty() {
+        //noinspection Convert2MethodRef -- Objects::nonNull was introduced in API 24
+        boolean q = Stream.of(systemResources.getStringArray(R.array.difficulties_array))
+                .map(CreateGameActivity::findDifficulty)
+                .allMatch(o -> o != null);
+        assertTrue(q);
+    }
 
     @Test
     public void testCanFillFormWithCorrectInputsAndNbSessions() {
