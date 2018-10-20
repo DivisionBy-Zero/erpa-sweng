@@ -49,27 +49,17 @@ tools:context=".activities.GameViewerActivity">
     app:layout_constraintHorizontal_bias="0.5"
     app:layout_constraintStart_toStartOf="parent" />
 
-<TextView
-    android:id="@+id/participatingPlayersTextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:text="Participating players info"
-    android:textSize="12sp"
-    app:layout_constraintStart_toStartOf="@+id/generalInfoTextView"
-    app:layout_constraintTop_toBottomOf="@+id/generalInfoTextView" />
+    <TextView
+        android:id="@+id/participatingPlayersTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Participating players info"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/sessionLengthColonTextView"
+        app:layout_constraintTop_toBottomOf="@+id/sessionLengthColonTextView" />
 
-<TextView
-    android:id="@+id/generalInfoTextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:text="Miscelaneous info"
-    android:textSize="12sp"
-    app:layout_constraintStart_toStartOf="@+id/universeTextView"
-    app:layout_constraintTop_toBottomOf="@+id/universeTextView" />
-
-<TextView
+    <TextView
     android:id="@+id/universeTextView"
     android:layout_width="wrap_content"
     android:layout_height="19dp"
@@ -78,4 +68,74 @@ tools:context=".activities.GameViewerActivity">
     android:textSize="12sp"
     app:layout_constraintStart_toStartOf="@+id/descriptionTextView"
     app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
+
+    <TextView
+        android:id="@+id/difficultyColonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Difficulty:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/universeTextView"
+        app:layout_constraintTop_toBottomOf="@+id/universeTextView" />
+
+    <TextView
+        android:id="@+id/difficultyTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Difficulty"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/difficultyColonTextView"
+        app:layout_constraintTop_toTopOf="@+id/difficultyColonTextView" />
+
+    <TextView
+        android:id="@+id/oneShotOrCampaignTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="OneShot"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/difficultyColonTextView"
+        app:layout_constraintTop_toBottomOf="@+id/difficultyColonTextView" />
+
+    <TextView
+        android:id="@+id/sessionNumberColonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Number of Sessions:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/oneShotOrCampaignTextView"
+        app:layout_constraintTop_toBottomOf="@+id/oneShotOrCampaignTextView" />
+
+    <TextView
+        android:id="@+id/sessionNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="5"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/sessionNumberColonTextView"
+        app:layout_constraintTop_toTopOf="@+id/sessionNumberColonTextView" />
+
+    <TextView
+        android:id="@+id/sessionLengthColonTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="SessionLength:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/sessionNumberColonTextView"
+        app:layout_constraintTop_toBottomOf="@+id/sessionNumberColonTextView" />
+
+    <TextView
+        android:id="@+id/sessionLength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="5 seconds"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/sessionLengthColonTextView"
+        app:layout_constraintTop_toTopOf="@+id/sessionLengthColonTextView" />
 </android.support.constraint.ConstraintLayout>

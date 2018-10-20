@@ -60,7 +60,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     private Optional<UserProfile> getUserFromUsername(String username) {
-        for (UserProfile u: userList) {
+        for (UserProfile u : userList) {
             if (u.getUsername().equals(username))
                 return Optional.of(u);
         }
@@ -68,14 +68,15 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     private Optional<UserProfile> getUserFromUid(String uid) {
-        for (UserProfile u: userList) {
+        for (UserProfile u : userList) {
             if (u.getUid().equals(uid))
                 return Optional.of(u);
         }
         return Optional.empty();
     }
 
-    @Override public void terminate() {
+    @Override
+    public void terminate() {
     }
 
     // This function is temporary and will be removed it is just here so I can test everything
@@ -91,12 +92,13 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     }
 
 
-    @Inject public Context ctx;
+    @Inject
+    public Context ctx;
     GameService gs = null;
+
     @Override
-    public GameService getGameService()
-    {
-        if(gs==null)
+    public GameService getGameService() {
+        if (gs == null)
             gs = new DummyGameService(ctx);
         return gs;
     }

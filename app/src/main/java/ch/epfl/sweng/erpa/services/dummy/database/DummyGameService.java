@@ -1,40 +1,41 @@
 package ch.epfl.sweng.erpa.services.dummy.database;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Set;
 
 import ch.epfl.sweng.erpa.model.Game;
 
-public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService
-{
+import static android.content.ContentValues.TAG;
 
-    private final static String EXTENSION = ".yaml";
-    private final static String GAME_DATA_FOLDER = "game_data";
+public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService {
+
+    private final static String SAVED_GAME_FILE_EXTENSION = ".yaml";
+    private final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
     private final File gameDir;
 
-    public DummyGameService(Context ctx)
-    {
+    public DummyGameService(Context ctx) {
         File rootDir = ctx.getFilesDir();
-        File gameDir = new File(rootDir, GAME_DATA_FOLDER);
+        File gameDir = new File(rootDir, SAVED_GAME_DATA_FOLDER);
         this.gameDir = gameDir;
         //if the directory wasn't created, and no error was thrown, then it means the file/dir already existed
-        if(!gameDir.mkdir())
-        {
+        if (!gameDir.mkdir()) {
             //if it wasn't a directory, abort
-            if(!gameDir.isDirectory())
-            {
+            if (!gameDir.isDirectory()) {
                 throw new IllegalStateException("Game data folder (\"" + gameDir.getAbsolutePath() + "\") exists and is not a folder!");
             }
         }
@@ -42,83 +43,62 @@ public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService
     }
 
     @Override
-    public Optional<Game> getGame(String gid)
-    {
-        File game = new File(gameDir, gid+EXTENSION);
-        if(game.exists() && game.isFile())
-        {
-            return Optional.of(fetchGameExisting(game));
-        }
-        if(!game.isFile())
-        {
-            throw new IllegalStateException("Folder " + game.getAbsolutePath() + " exists!");
-        }
-        else
-        {
-            return Optional.empty();
+    public Optional<Game> getGame(String gid) {
+        File gameFile = new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION);
+        if (gameFile.isDirectory()) {
+            throw new IllegalStateException("Folder " + gameFile.getAbsolutePath() + " exists!");
+        } else {
+            return Optional.of(gameFile)
+                    .filter(File::exists)
+                    .filter(File::isFile)
+                    .map(DummyGameService::fetchExistingGameFromFile);
         }
     }
-    private static Game fetchGameExisting(File gameFile)
-    {
-        try
-        {
+
+    //Note that this method does not check if the
+    private static Game fetchExistingGameFromFile(File gameFile) {
+        try {
             FileReader gReader = new FileReader(gameFile);
-            Yaml yaml = new Yaml();
-            return yaml.loadAs(gReader,Game.class);
+            return (new Yaml()).loadAs(gReader, Game.class);
 
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-            return null;
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("File given as argument does not exist");
         }
     }
 
     @Override
-    public List<Game> getAll()
-    {
-        List<Game> result = new ArrayList<>();
+    public Set<Game> getAll() {
         File[] games = gameDir.listFiles();
-        Yaml yaml = new Yaml();
-        for(File f: games)
-        {
-            String filePath = f.getPath();
+        return Stream.of(games)
+                .filter(file -> file.getPath().endsWith(SAVED_GAME_FILE_EXTENSION))
+                .filter(File::isFile)
+                .map(DummyGameService::fetchExistingGameFromFile)
+                .collect(Collectors.toSet());
 
-            if(f.isFile() && filePath.endsWith(EXTENSION))
-            {
-                result.add(fetchGameExisting(f));
-            }
-        }
-        return result;
+
     }
 
 
-
     @Override
-    public void saveGame(Game g)
-    {
+    public void saveGame(Game g) {
         String gid = g.getGid();
-        try
-        {
-            File gameFile = new File(gameDir, gid + EXTENSION);
-            if (!gameFile.exists())
-            {
+        try {
+            File gameFile = new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION);
+            if (!gameFile.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 gameFile.createNewFile();
-            }
-            else if(gameFile.isDirectory())
-            {
+            } else if (gameFile.isDirectory()) {
                 throw new IllegalStateException("Trying to write to existing folder, as file! " + gameFile.getAbsolutePath());
             }
             FileOutputStream fOut = new FileOutputStream(gameFile, false);
             OutputStreamWriter writer = new OutputStreamWriter(fOut);
 
-
-            Yaml yaml = new Yaml();
-            yaml.dump(g, writer);
-        }
-        catch (Exception e)
+            (new Yaml()).dump(g, writer);
+        } catch (FileNotFoundException ignored) { //we just created the file. it cannot possibly not exist (unless createNewFile threw an error)
+        } catch (Exception e)
         {
-            e.printStackTrace();
+            Log.e(TAG, Arrays.toString(e.getStackTrace()));
+            throw new RuntimeException("Could not save file");
         }
     }
 }
