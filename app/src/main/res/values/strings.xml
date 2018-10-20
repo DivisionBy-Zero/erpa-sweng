@@ -2,13 +2,42 @@
     <string name="app_name">ERPA</string>
     <string name="preference_file_key">erpa_prefs</string>
     <string name="prop_key_remote_provider">remote_services_provider_class_name</string>
+
+    <!--Titles-->
+    <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
+    <string name="title_create_game_activity">Create Game</string>
+    <string name="title_activity_signup">SignupActivity</string>
+
+    <!-- Login error messages-->
     <string name="noNameMessage">No username</string>
     <string name="noPassMessage">No password</string>
     <string name="incorrectLogin">Username or password is incorrect</string>
     <string name="passwords_not_match">The password do not match</string>
     <string name="not_select_GM_or_player">Are you a GM and/or a player</string>
     <string name="username_in_use">Username is already in user. Please change your username</string>
-    <!--Titles-->
-    <string name="title_example_for_toolbar_activity">Example for Toolbar</string>
-    <string name="title_activity_signup">SignupActivity</string>
+
+    <!-- Submit error messages -->
+    <string name="emptyFieldMessage">All the fields with a * should be filled</string>
+    <string name="uncheckedCheckboxMessage">You have to choose either Oneshot or Campaign</string>
+    <string name="invalidPlayerNumber">Invalid number of players: min must be positive and smaller or equal to max</string>
+
+    <!-- CreateGame Form strings-->
+    <string name="diff1">NOOB</string>
+    <string name="diff2">Chill</string>
+    <string name="diff3">Hard</string>
+
+    <string name="univ1">Warhammer</string>
+    <string name="univ2">Lovecraft</string>
+    <string name="univOther">Other</string>
+
+    <string name="time1">Undefined</string>
+    <string name="time2">-1h</string>
+    <string name="time3">1h</string>
+    <string name="time4">2h</string>
+    <string name="time5">3h</string>
+    <string name="time6">4h</string>
+    <string name="time7">5h</string>
+    <string name="time8">6h</string>
+    <string name="time9">+6h</string>
+
 </resources>

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:tag="create_game_fragment"
+    tools:context=".CreateGameFormFragment">
+    <!--android:fontFamily="@font/morrisroman_black"-->
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Game Name -->
+        <LinearLayout
+            android:id="@+id/layout_game_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+
+            <TextView
+                android:id="@+id/create_game_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name*:"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <EditText
+                android:id="@+id/create_game_name_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:ems="35"
+                android:inputType="textPersonName"
+                app:layout_constraintBaseline_toBaselineOf="@id/create_game_name"
+                app:layout_constraintLeft_toRightOf="@id/create_game_name"
+                app:layout_constraintRight_toRightOf="parent" />
+        </LinearLayout>
+
+        <!-- Number of players -->
+        <LinearLayout
+            android:id="@+id/layout_numb_players"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/layout_game_name">
+
+            <TextView
+                android:id="@+id/number_of_players"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of players*:"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                app:layout_constraintBaseline_toBaselineOf="@id/number_of_players"
+                app:layout_constraintLeft_toRightOf="@id/number_of_players">
+
+                <EditText
+                    android:id="@+id/min_num_player_field"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="35"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    app:layout_constraintHorizontal_weight="1" />
+
+                <EditText
+                    android:id="@+id/max_num_player_field"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:ems="35"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    app:layout_constraintBaseline_toBaselineOf="@id/number_of_players"
+                    app:layout_constraintBottom_toBottomOf="@id/number_of_players"
+                    app:layout_constraintHorizontal_weight="1" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Difficulty -->
+        <LinearLayout
+            android:id="@+id/layout_difficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/layout_numb_players">
+
+            <TextView
+                android:id="@+id/difficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Difficulty*:"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <Spinner
+                android:id="@+id/difficulty_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:entries="@array/difficulties_array"
+                app:layout_constraintBaseline_toBaselineOf="@id/difficulty"
+                app:layout_constraintLeft_toRightOf="@+id/difficulty"
+                app:layout_constraintRight_toRightOf="parent" />
+
+        </LinearLayout>
+
+        <!-- Universe -->
+        <LinearLayout
+            android:id="@+id/layout_universe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/layout_difficulty">
+
+            <TextView
+                android:id="@+id/universe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Universe*:"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <Spinner
+                android:id="@+id/universes_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:entries="@array/universes_array"
+                app:layout_constraintBaseline_toBaselineOf="@id/universe"
+                app:layout_constraintLeft_toRightOf="@+id/universe" />
+
+
+            <EditText
+                android:id="@+id/universe_field"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:inputType="textPersonName"
+                android:maxLength="30"
+                app:layout_constraintBaseline_toBaselineOf="@id/universe"
+                app:layout_constraintLeft_toRightOf="@id/universes_spinner"
+                app:layout_constraintRight_toRightOf="parent" />
+        </LinearLayout>
+
+        <!-- OS or Campaign -->
+        <LinearLayout
+            android:id="@+id/layout_oneshot_or_campaign"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            app:layout_constraintTop_toBottomOf="@id/layout_universe">
+
+            <ch.epfl.sweng.erpa.views.FlowLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/radio_form"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="parent">
+
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/oneshot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="onOneShotOrCampaignSelected"
+                            android:text="Oneshot" />
+
+                        <RadioButton
+                            android:id="@+id/campaign"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="onOneShotOrCampaignSelected"
+                            android:text="Campaign" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_num_sessions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/num_sessions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Number of sessions:"
+                        app:layout_constraintLeft_toRightOf="@id/radio" />
+
+                    <EditText
+                        android:id="@+id/num_session_field"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:ems="3"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        app:layout_constraintBaseline_toBaselineOf="@id/num_sessions"
+                        app:layout_constraintLeft_toRightOf="@id/num_sessions" />
+                </LinearLayout>
+            </ch.epfl.sweng.erpa.views.FlowLayout>
+        </LinearLayout>
+
+        <!-- Session Length -->
+        <LinearLayout
+            android:id="@+id/layout_session_length"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            app:layout_constraintTop_toBottomOf="@id/layout_oneshot_or_campaign">
+
+            <TextView
+                android:id="@+id/session_length"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Session(s)\' length:"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <Spinner
+                android:id="@+id/session_length_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:entries="@array/session_length_array"
+                app:layout_constraintBaseline_toBaselineOf="@id/session_length"
+                app:layout_constraintLeft_toRightOf="@id/session_length" />
+        </LinearLayout>
+
+        <!-- Description -->
+        <LinearLayout
+            android:id="@+id/layout_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/layout_session_length">
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Description*: (max.1200 characters)"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+            <EditText
+                android:id="@+id/description_field"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:inputType="textMultiLine"
+                android:maxLength="1200"
+                app:layout_constraintTop_toBottomOf="@id/description" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/submit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:onClick="submitGame"
+            android:text="Submit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_description" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</FrameLayout>

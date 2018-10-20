@@ -1,6 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.CreateGameActivity"></android.support.constraint.ConstraintLayout>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/createGameDrawerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/createGameCoordinatorLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--toolbar-->
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/appBarLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include
+                    layout="@layout/toolbar_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:title="@{@string/title_create_game_activity}" />
+
+            </android.support.design.widget.AppBarLayout>
+
+            <!-- Rest of content for the activity -->
+            <android.support.v4.widget.NestedScrollView
+                android:id="@+id/createGameNestedScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <LinearLayout
+                    android:id="@+id/LinearLayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <fragment
+                        android:id="@+id/create_game_form"
+                        android:name="ch.epfl.sweng.erpa.CreateGameFormFragment"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal" />
+
+                </LinearLayout>
+
+            </android.support.v4.widget.NestedScrollView>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+    </android.support.v4.widget.DrawerLayout>
+</layout>
+
+
+
