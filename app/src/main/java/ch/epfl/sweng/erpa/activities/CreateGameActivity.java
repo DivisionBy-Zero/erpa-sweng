@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import butterknife.BindView;
@@ -43,6 +44,23 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     @BindView(R.id.session_length_spinner) Spinner sessionLengthSpinner;
     @BindView(R.id.universe_field) EditText universeField;
     @BindView(R.id.universes_spinner) Spinner universesSpinner;
+
+    private static final HashMap<String, Integer> sessionLengthTranslationTable = new HashMap<String, Integer>() {{
+        put("Undefined", null);
+        put("-1h", 30);
+        put("1h", 60);
+        put("2h", 120);
+        put("3h", 180);
+        put("4h", 240);
+        put("5h", 300);
+        put("6h", 360);
+        put("+6h", Integer.MAX_VALUE);
+    }};
+
+    private static final HashMap<String, Game.Difficulty> difficultyTranslationTable = new HashMap<String, Game.Difficulty>() {{
+        Stream.of(Game.Difficulty.values())
+                .forEach(difficulty -> put(difficulty.toString().toUpperCase(), difficulty));
+    }};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,40 +170,10 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     }
 
     static Optional<Integer> findSessionLength(String sessionLength) {
-        switch (sessionLength) {
-            case "Undefined":
-                return Optional.empty();
-            case "-1h":
-                return Optional.of(30);
-            case "1h":
-                return Optional.of(60);
-            case "2h":
-                return Optional.of(120);
-            case "3h":
-                return Optional.of(180);
-            case "4h":
-                return Optional.of(240);
-            case "5h":
-                return Optional.of(300);
-            case "6h":
-                return Optional.of(360);
-            case "+6h":
-                return Optional.of(Integer.MAX_VALUE);
-            default:
-                return Optional.empty();
-        }
+        return Optional.ofNullable(sessionLengthTranslationTable.get(sessionLength));
     }
 
-    static Game.Difficulty findDifficulty(String diff) {
-        switch (diff) {
-            case "NOOB":
-                return Game.Difficulty.NOOB;
-            case "Chill":
-                return Game.Difficulty.CHILL;
-            case "Hard":
-                return Game.Difficulty.HARD;
-            default:
-                return null;
-        }
+    static Game.Difficulty findDifficulty(String difficulty) {
+        return difficultyTranslationTable.get(String.valueOf(difficulty).toUpperCase());
     }
 }
