@@ -1,14 +1,22 @@
 package ch.epfl.sweng.erpa.services.dummy;
 
+import android.content.Context;
+
 import com.annimon.stream.Optional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
+import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
 
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
@@ -52,7 +60,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     private Optional<UserProfile> getUserFromUsername(String username) {
-        for (UserProfile u: userList) {
+        for (UserProfile u : userList) {
             if (u.getUsername().equals(username))
                 return Optional.of(u);
         }
@@ -60,14 +68,15 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     private Optional<UserProfile> getUserFromUid(String uid) {
-        for (UserProfile u: userList) {
+        for (UserProfile u : userList) {
             if (u.getUid().equals(uid))
                 return Optional.of(u);
         }
         return Optional.empty();
     }
 
-    @Override public void terminate() {
+    @Override
+    public void terminate() {
     }
 
     // This function is temporary and will be removed it is just here so I can test everything
@@ -75,10 +84,19 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         byte[] uidBytes = uid.getBytes(StandardCharsets.UTF_8);
         int uidBytesLength = uidBytes.length;
         byte[] salt16Bytes = new byte[16];
-        for (int i = 0; i < 16; ++i)
-            salt16Bytes[i] = uidBytes[uidBytesLength - 16 + i];
+        System.arraycopy(uidBytes, uidBytesLength - 16, salt16Bytes, 0, 16);
         byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes, password.getBytes(StandardCharsets.UTF_8));
-        String str = new String(hashBytes, StandardCharsets.UTF_8);
-        return str;
+        return new String(hashBytes, StandardCharsets.UTF_8);
+    }
+
+
+    @Inject public Context ctx;
+    private GameService gs = null;
+
+    @Override
+    public GameService getGameService() {
+        if (gs == null)
+            gs = new DummyGameService(ctx);
+        return gs;
     }
 }

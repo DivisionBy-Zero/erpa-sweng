@@ -25,7 +25,8 @@
         <activity android:name=".activities.SelectRemoteServicesProviderActivity" />
         <activity android:name=".activities.ExampleForToolbarActivity" />
         <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.SignupActivity"></activity>
+        <activity android:name=".activities.SignupActivity" />
+        <activity android:name=".activities.GameViewerActivity"/>
     </application>
 
 </manifest>

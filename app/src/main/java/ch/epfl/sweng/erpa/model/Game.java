@@ -8,10 +8,13 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
 @AllArgsConstructor
 public class Game {
     public enum Difficulty {NOOB, CHILL, HARD}
@@ -19,6 +22,7 @@ public class Game {
     public enum OneshotOrCampaign {ONESHOT, CAMPAIGN}
 
     @NonNull private String gameUuid;
+    @NonNull private String gmUuid;
     @NonNull private Set<String> playersUuid;
     @NonNull private String name;
     @NonNull private Integer minPlayer;
@@ -44,3 +48,4 @@ public class Game {
         return this.toBuilder().playersUuid(newPlayerSet).build();
     }
 }
+

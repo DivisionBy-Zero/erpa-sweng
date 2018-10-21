@@ -6,6 +6,7 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 
 public interface RemoteServicesProvider {
     // Here be data proxy
+    GameService getGameService();
 
     // Here be metadata
     String getFriendlyProviderName();

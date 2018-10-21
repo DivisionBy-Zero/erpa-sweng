@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.services.firebase;
 import com.annimon.stream.Optional;
 
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
@@ -33,7 +34,12 @@ public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
     public void storeNewUser(UserProfile user) {
         return;
     }
-  
+
+    @Override
+    public GameService getGameService() {
+        return null;
+    }
+
     @Override 
     public void terminate() {
 
