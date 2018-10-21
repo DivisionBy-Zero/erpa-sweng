@@ -23,8 +23,10 @@ import static android.content.ContentValues.TAG;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
 
+    //injected rsp
     @Inject RemoteServicesProvider rsp;
 
+    //bound views
     @BindView(R.id.titleTextView) TextView title;
     @BindView(R.id.descriptionTextView) TextView description;
     @BindView(R.id.gmTextView) TextView gmName;
@@ -34,8 +36,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
     @BindView(R.id.sessionLength) TextView sessionLength;
 
-
-
+    //overriden methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +60,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
     }
 
-
+    //other methods
     private String getGameId() {
 
         String gameId = getIntent().getStringExtra(GameService.EXTRA_GAME_KEY);
@@ -73,7 +74,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
     }
 
-    @SuppressLint("SetTextI18n") private void updateFields(Game game) {
+    @SuppressLint("SetTextI18n")
+    private void updateFields(Game game) {
         Log.d(TAG, "onResume: Successfully fetched game");
 
         title.setText(game.getName());

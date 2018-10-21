@@ -19,8 +19,11 @@ import java.util.Set;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
+import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
+import static junit.framework.TestCase.assertTrue;
+
 @RunWith(AndroidJUnit4.class)
-public class DummyGameServiceTests {
+public class DummyGameServiceTest {
     DummyGameService gs;
 
     @Before
@@ -34,11 +37,9 @@ public class DummyGameServiceTests {
         Game g = getGame("addedGame");
         gs.saveGame(g);
         Optional<Game> found = gs.getGame(g.getGameUuid());
-        assert (found.isPresent());
+        assertTrue (found.isPresent());
         Game foundGame = found.get();
-        assert (g.equals(foundGame));
-
-
+        assertTrue (g.equals(foundGame));
     }
 
     @Test
@@ -51,21 +52,8 @@ public class DummyGameServiceTests {
             gs.saveGame(g);
         }
         Set<Game> all = gs.getAll();
-        assert (all.containsAll(games));
+        assertTrue(all.containsAll(games));
     }
-    private Game getGame(String gid) {
-        return new Game(
-                gid,
-                "Sapphie",
-                new HashSet<String>(),
-                "The land of the Sapphie",
-                0,5,
-                Game.Difficulty.CHILL,
-                "Sapphtopia",
-                Game.OneshotOrCampaign.ONESHOT,
-                Optional.<Integer>of(-73),
-                Optional.<Integer>of(Integer.MAX_VALUE),
-                "bepsi is gud"
-        );
-    }
+
+
 }

@@ -28,6 +28,7 @@ import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
+import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
 import static org.hamcrest.core.StringContains.containsString;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -128,19 +129,4 @@ public class GameViewerActivityTest {
         return matches(withText(containsString(String.valueOf(text))));
     }
 
-    private Game getGame(String gid) {
-        return new Game(
-                gid,
-                "Sapphie",
-                new HashSet<String>(),
-                "The land of the Sapphie",
-                0,5,
-                Game.Difficulty.CHILL,
-                "Sapphtopia",
-                Game.OneshotOrCampaign.ONESHOT,
-                Optional.<Integer>of(-73),
-                Optional.<Integer>of(Integer.MAX_VALUE),
-                "bepsi is gud"
-        );
-    }
 }

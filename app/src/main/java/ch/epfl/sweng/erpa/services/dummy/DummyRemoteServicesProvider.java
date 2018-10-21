@@ -84,17 +84,14 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         byte[] uidBytes = uid.getBytes(StandardCharsets.UTF_8);
         int uidBytesLength = uidBytes.length;
         byte[] salt16Bytes = new byte[16];
-        for (int i = 0; i < 16; ++i)
-            salt16Bytes[i] = uidBytes[uidBytesLength - 16 + i];
+        System.arraycopy(uidBytes, uidBytesLength - 16, salt16Bytes, 0, 16);
         byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes, password.getBytes(StandardCharsets.UTF_8));
-        String str = new String(hashBytes, StandardCharsets.UTF_8);
-        return str;
+        return new String(hashBytes, StandardCharsets.UTF_8);
     }
 
 
-    @Inject
-    public Context ctx;
-    GameService gs = null;
+    @Inject public Context ctx;
+    private GameService gs = null;
 
     @Override
     public GameService getGameService() {
