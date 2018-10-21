@@ -16,6 +16,7 @@ import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.listeners.RecyclerViewClickListener;
 import ch.epfl.sweng.erpa.model.Game;
@@ -24,7 +25,7 @@ import ch.epfl.sweng.erpa.services.GameService;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
-    @Inject @Named("List of games") List<Game> games;
+    @Inject @Named(ErpaApplication.RES_LIST_OF_GAMES) List<Game> games;
 
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -32,9 +33,12 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_game_list);
 
         ButterKnife.bind(this);
+        // TODO(@Roos) remove when FIXME is fixed
+        createListData();
 
         mRecyclerView.setHasFixedSize(true);
 
@@ -51,9 +55,11 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         mAdapter = new GameAdapter(games, listener);
         mRecyclerView.setAdapter(mAdapter);
 
-        createListData();
+        // TODO(@Roos) uncomment when FIXME is fixed
+//        createListData();
     }
 
+    // FIXME(@Roos) list doesn't appear correctly the first time it's rendered
     private void createListData() {
         if (games.isEmpty()) {
             Game game = Game.builder()
@@ -71,7 +77,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
                     .description("")
                     .build();
             for (int i = 0; i < new Random().nextInt(20) + 5; i++) games.add(game);
-            mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyDataSetChanged();
         }
     }
 }
