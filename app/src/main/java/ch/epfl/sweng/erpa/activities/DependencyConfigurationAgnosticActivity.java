@@ -12,7 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.operations.DependencyConfigurationHelper;
-import ch.epfl.sweng.erpa.operations.DependencyConfigurator;
+import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import toothpick.Toothpick;
 
 public abstract class DependencyConfigurationAgnosticActivity extends Activity {
@@ -32,7 +32,7 @@ public abstract class DependencyConfigurationAgnosticActivity extends Activity {
                             .getDependencyConfiguratorForClass(depCls)
                             .orElseThrow(() -> new IllegalArgumentException(
                                     "Cannot find Configurator for class " + depCls.getName())))
-                    .map(DependencyConfigurator::dependencyConfigurationIntent)
+                    .map(DependencyCoordinator::dependencyConfigurationIntent)
                     .map(i -> i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME))
                     .collect(Collectors.toList());
 

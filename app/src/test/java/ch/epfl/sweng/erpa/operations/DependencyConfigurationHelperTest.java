@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,10 +31,13 @@ import toothpick.config.Module;
 import toothpick.configuration.Configuration;
 import toothpick.testing.ToothPickRule;
 
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_APPLICATION_SCOPE;
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-@SuppressWarnings("unused") // Workaround over type erasure, fields are used later via Reflection.
+// Workarounds over type erasure, fields are used later via Reflection.
+@SuppressWarnings({"unused", "SuspiciousMethodCalls"})
 @RunWith(MockitoJUnitRunner.class)
 public class DependencyConfigurationHelperTest {
     @Rule public final ToothPickRule toothPickRule = new ToothPickRule(this, "dchTest");
@@ -45,10 +49,10 @@ public class DependencyConfigurationHelperTest {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         scope = toothPickRule.getScope();
         scope.installModules(new Module() {{
-            bind(Scope.class).withName("application").toInstance(scope);
+            bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
             bind(DependencyConfigurationHelper.class).to(DependencyConfigurationHelper.class);
-            bind(Set.class).withName("Dependency Configurators")
-                    .toInstance(new HashSet<DependencyConfigurator>());
+            bind(Set.class).withName(RES_DEPENDENCY_COORDINATORS)
+                    .toInstance(new HashSet<DependencyCoordinator>());
         }});
     }
 
@@ -73,7 +77,7 @@ public class DependencyConfigurationHelperTest {
 
         Stream.of(expectedDependencyClasses)
                 .forEach(cls -> {
-                    Optional<DependencyConfigurator<?>> dc = underTest.getDependencyConfiguratorForClass(cls);
+                    Optional<DependencyCoordinator<?>> dc = underTest.getDependencyConfiguratorForClass(cls);
                     assertTrue(dc.isPresent());
                     assertEquals(testHelper.dependencyConfigurators.get(cls), dc.get());
                 });
@@ -145,16 +149,6 @@ public class DependencyConfigurationHelperTest {
         return pool.getOrDefault(value, new Tree<>(value));
     }
 
-    class Pair {
-        public Pair(Object first, Object second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        public Object first;
-        public Object second;
-    }
-
     // @formatter:off
     public static class D4 { @Inject public D4() {} }
     public static class D3 { @Inject public D4 f; }
@@ -162,9 +156,19 @@ public class DependencyConfigurationHelperTest {
     public static class D1 { @Inject public D2 f; }
     // @formatter:on
 
+    class Pair {
+        public Object first;
+        public Object second;
+
+        public Pair(Object first, Object second) {
+            this.first = first;
+            this.second = second;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     abstract class DchTestHelper {
-        Map<Class, DependencyConfigurator<?>> dependencyConfigurators;
+        Map<Class, DependencyCoordinator<?>> dependencyConfigurators;
 
         DchTestHelper(Object... fieldValues) {
             Map<Object, Class> objectClassMap = new HashMap<>();
@@ -191,15 +195,20 @@ public class DependencyConfigurationHelperTest {
             Stream.of(fieldValues).map(v -> new Pair(v, objectClassMap.get(v))).forEach(ocPair -> {
                 Toothpick.inject(ocPair.first, scope);
                 scope.installModules(new Module() {{
-                    bind((Class)ocPair.second).toInstance(ocPair.first);
+                    bind((Class) ocPair.second).toInstance(ocPair.first);
                 }});
             });
 
-            scope.getInstance(Set.class, "Dependency Configurators").addAll(dependencyConfigurators.values());
+            scope.getInstance(Set.class, RES_DEPENDENCY_COORDINATORS).addAll(dependencyConfigurators.values());
         }
 
-        private DependencyConfigurator<?> mkDependencyConfigurator(Class<?> forClass) {
-            return new DependencyConfigurator<Object>() {
+        private DependencyCoordinator<?> mkDependencyConfigurator(Class<?> forClass) {
+            return new DependencyCoordinator<Object>() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    return null;
+                }
+
                 @Override public boolean dependencyIsConfigured() {
                     return false;
                 }
