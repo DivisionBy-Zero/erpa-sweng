@@ -6,6 +6,8 @@ import android.support.test.espresso.ViewAssertion;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.annimon.stream.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,6 +15,8 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
+
+import java.util.HashSet;
 
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
@@ -65,7 +69,7 @@ public class GameViewerActivityTest {
     @Before
     public void initIntent() throws InterruptedException {
         Intent i = new Intent();
-        i.putExtra(GameService.EXTRA_GAME_KEY, game.getGid());
+        i.putExtra(GameService.EXTRA_GAME_KEY, game.getGameUuid());
         gs.saveGame(game);
         activityTestRule.launchActivity(i);
     }
@@ -84,7 +88,7 @@ public class GameViewerActivityTest {
 
     @Test
     public void testGmName() {
-        onView(withId(R.id.gmTextView)).check(matches(withText(game.getGmUid())));
+        onView(withId(R.id.gmTextView)).check(matches(withText(game.getGmUuid())));
     }
 
     @Test
@@ -99,25 +103,25 @@ public class GameViewerActivityTest {
 
     @Test
     public void testDifficulty() {
-        onView(withId(R.id.difficultyTextView)).check(matches(withText(game.getDifficulty())));
+        onView(withId(R.id.difficultyTextView)).check(matches(withText(game.getDifficulty().toString())));
     }
 
     @Test
     public void testType()
     {
-        onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getType())));
+        onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getOneshotOrCampaign().toString())));
     }
 
     @Test
     public void testSessionLength()
     {
-        onView(withId(R.id.sessionLength)).check(matches(withText(game.getSessionLength().toString())));
+        onView(withId(R.id.sessionLength)).check(matches(withText(game.getSessionLengthInMinutes().toString())));
     }
 
     @Test
     public void testNumSessions()
     {
-        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumSessions().toString())));
+        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberSessions().toString())));
     }
 
     private <T> ViewAssertion containsText(T text) {
@@ -128,13 +132,15 @@ public class GameViewerActivityTest {
         return new Game(
                 gid,
                 "Sapphie",
+                new HashSet<String>(),
                 "The land of the Sapphie",
-                "Bepsi is gud",
+                0,5,
+                Game.Difficulty.CHILL,
                 "Sapphtopia",
-                "E X T R E M E",
-                "Campaign",
-                -73,
-                Integer.MAX_VALUE
+                Game.OneshotOrCampaign.ONESHOT,
+                Optional.<Integer>of(-73),
+                Optional.<Integer>of(Integer.MAX_VALUE),
+                "bepsi is gud"
         );
     }
 }

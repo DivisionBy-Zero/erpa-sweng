@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class DummyGameServiceTests {
     public void addedGamePersists() {
         Game g = getGame("addedGame");
         gs.saveGame(g);
-        Optional<Game> found = gs.getGame(g.getGid());
+        Optional<Game> found = gs.getGame(g.getGameUuid());
         assert (found.isPresent());
         Game foundGame = found.get();
         assert (g.equals(foundGame));
@@ -52,19 +53,19 @@ public class DummyGameServiceTests {
         Set<Game> all = gs.getAll();
         assert (all.containsAll(games));
     }
-
-    @NonNull
     private Game getGame(String gid) {
         return new Game(
                 gid,
                 "Sapphie",
+                new HashSet<String>(),
                 "The land of the Sapphie",
-                "Bepsi is gud",
+                0,5,
+                Game.Difficulty.CHILL,
                 "Sapphtopia",
-                "E X T R E M E",
-                "Campaign",
-                -73,
-                Integer.MAX_VALUE
+                Game.OneshotOrCampaign.ONESHOT,
+                Optional.<Integer>of(-73),
+                Optional.<Integer>of(Integer.MAX_VALUE),
+                "bepsi is gud"
         );
     }
 }

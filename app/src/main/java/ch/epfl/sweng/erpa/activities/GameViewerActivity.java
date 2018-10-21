@@ -78,11 +78,11 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
         title.setText(game.getName());
         description.setText(game.getDescription());
-        gmName.setText(game.getGmUid());
+        gmName.setText(game.getGmUuid());
         universe.setText(game.getUniverse());
-        difficulty.setText(game.getDifficulty());
-        type.setText(game.getType());
-        numSessions.setText(game.getNumSessions().toString());
-        sessionLength.setText(game.getSessionLength().toString());
+        difficulty.setText(game.getDifficulty().toString());
+        type.setText(game.getOneshotOrCampaign().toString());
+        numSessions.setText(game.getNumberSessions().toString());
+        sessionLength.setText(game.getSessionLengthInMinutes().toString());
     }
 }

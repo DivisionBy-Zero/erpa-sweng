@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -126,9 +127,12 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
 
         String gameUUID = "";
 
-        Game newGame = new Game(gameUUID, new HashSet<>(), gameName.toString(),
+        String gmUUID = "";
+
+        Game newGame = new Game(gameUUID,gmUUID, new HashSet<>(), gameName.toString(),
                 minPlayers, maxPlayers, difficulty, universe, oneShotOrCampaign, numbSession,
                 sessionLength, gameDescription.toString());
+
         // TODO(@Roos): Generate a valid gameUUID and send the new game to the gameService.
     }
 

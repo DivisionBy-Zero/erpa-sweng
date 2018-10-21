@@ -81,7 +81,7 @@ public class DummyGameService implements ch.epfl.sweng.erpa.services.GameService
 
     @Override
     public void saveGame(Game g) {
-        String gid = g.getGid();
+        String gid = g.getGameUuid();
         try {
             File gameFile = new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION);
             if (!gameFile.exists()) {
