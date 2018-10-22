@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -71,15 +72,15 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
                         R.string.profileText), ProfileActivity.class, true, true)
         );
         myDrawablesList = Arrays.asList(
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp),
-                this.getApplicationContext().getDrawable(R.drawable.drawable_temp)
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
+                this.getApplicationContext().getDrawable(R.drawable.ic_action_name)
         );
     }
 
