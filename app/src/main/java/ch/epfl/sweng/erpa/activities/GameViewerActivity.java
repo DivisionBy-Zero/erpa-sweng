@@ -16,7 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
-import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.DataService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 import static android.content.ContentValues.TAG;
@@ -49,7 +49,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         super.onResume();
         Optional<Game> optGame;
         String gameId = getGameId();
-        optGame = rsp.getGameService().getGame(gameId);
+        optGame = rsp.getGameService().getOne(gameId);
 
         if (optGame.isPresent()) {
             Game game = optGame.get();
@@ -63,7 +63,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     //other methods
     private String getGameId() {
 
-        String gameId = getIntent().getStringExtra(GameService.EXTRA_GAME_KEY);
+        String gameId = getIntent().getStringExtra(DataService.EXTRA_GAME_KEY);
         if (gameId == null) {
             Exception thrown = new IllegalArgumentException("Game Id not found");
             Log.d(TAG, "GameViewerActivity: no game id passed with intent", thrown);

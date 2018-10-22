@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -25,19 +26,17 @@ import static android.content.ContentValues.TAG;
 
 public abstract class DummyDataService<T extends UuidObject> implements DataService<T> {
     private final static String SAVED_DATA_FILE_EXTENSION = ".yaml";
-    private final Function<File,T> fileFetcher;
+    private final Function<File, T> fileFetcher;
 
     private final File dataDir;
     private final Class<T> tClass;
 
     DummyDataService(Context ctx, Class<T> tClass) {
-        this.tClass=tClass;
-        this.dataDir = new File(ctx.getFilesDir(),dataFolder());
-        this.fileFetcher = file -> fetchExistingDataFromFile(file,tClass);
-        if(!dataDir.mkdir())
-        {
-            if(!dataDir.isDirectory())
-            {
+        this.tClass = tClass;
+        this.dataDir = new File(ctx.getFilesDir(), dataFolder());
+        this.fileFetcher = file -> fetchExistingDataFromFile(file, tClass);
+        if (!dataDir.mkdir()) {
+            if (!dataDir.isDirectory()) {
                 throw new IllegalStateException(tClass.getName() + " data folder (\"" + dataDir.getAbsolutePath() + "\") exists and is not a folder!");
             }
         }
@@ -73,10 +72,9 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
             FileOutputStream fOut = new FileOutputStream(gameFile, false);
             OutputStreamWriter writer = new OutputStreamWriter(fOut);
 
-            (new Yaml()).dump(t, writer);
+            new Yaml().dump(t, writer);
         } catch (FileNotFoundException ignored) { //we just created the file. it cannot possibly not exist (unless createNewFile threw an error)
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e(TAG, Arrays.toString(e.getStackTrace()));
             throw new RuntimeException("Could not save file");
         }
@@ -104,7 +102,6 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
 
 
     }
-
 
 
 }

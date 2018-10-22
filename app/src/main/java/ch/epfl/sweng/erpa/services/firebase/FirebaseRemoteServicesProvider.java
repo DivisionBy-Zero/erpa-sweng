@@ -2,8 +2,9 @@ package ch.epfl.sweng.erpa.services.firebase;
 
 import com.annimon.stream.Optional;
 
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.DataService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
@@ -36,7 +37,7 @@ public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     @Override
-    public GameService getGameService() {
+    public DataService<Game> getGameService() {
         return null;
     }
 

@@ -6,7 +6,6 @@ import com.annimon.stream.Optional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -14,7 +13,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.DataService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
@@ -91,10 +90,10 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
 
     @Inject public Context ctx;
-    private GameService gs = null;
+    private DataService<Game> gs = null;
 
     @Override
-    public GameService getGameService() {
+    public DataService<Game> getGameService() {
         if (gs == null)
             gs = new DummyGameService(ctx);
         return gs;

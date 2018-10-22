@@ -2,12 +2,13 @@ package ch.epfl.sweng.erpa.services;
 
 import com.annimon.stream.Optional;
 
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.operations.annotations.Service;
 
 public interface RemoteServicesProvider {
     // Here be data proxies
-    @Service GameService getGameService();
+    @Service DataService<Game> getGameService();
 
     // Here be metadata
     String getFriendlyProviderName();
