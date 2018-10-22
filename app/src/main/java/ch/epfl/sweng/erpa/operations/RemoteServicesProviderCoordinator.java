@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.activities.SelectRemoteServicesProviderActivity;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
@@ -32,8 +33,7 @@ import toothpick.Toothpick;
  * This class implements the Proxy Pattern for RemoteServicesProvider.class.
  */
 @Singleton
-public class RemoteServicesProviderCoordinator implements InvocationHandler,
-        DependencyConfigurator<RemoteServicesProvider> {
+public class RemoteServicesProviderCoordinator implements DependencyCoordinator<RemoteServicesProvider> {
     /*
      * A word or wary: This singleton may be called prior to an activity creation and may start
      * SelectRemoteServicesProviderActivity. Be conservative about injecting stuff here since it
@@ -41,13 +41,13 @@ public class RemoteServicesProviderCoordinator implements InvocationHandler,
      */
     private final String REMOTE_PROVIDER_KEY;
     private final Context applicationContext;
-    @Inject @Named("application") Scope applicationScope;
+    @Inject @Named(ErpaApplication.RES_APPLICATION_SCOPE) Scope applicationScope;
     @Inject SharedPreferences sharedPreferences;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RemoteServicesProvider> currentProvider = Optional.empty();
 
     @Inject
-    public RemoteServicesProviderCoordinator(@Named("application") Scope scope, Context appCtx) {
+    public RemoteServicesProviderCoordinator(@Named(ErpaApplication.RES_APPLICATION_SCOPE) Scope scope, Context appCtx) {
         this.applicationContext = appCtx;
         Toothpick.inject(this, scope);
         REMOTE_PROVIDER_KEY = appCtx.getString(R.string.prop_key_remote_provider);

@@ -19,14 +19,17 @@ import javax.inject.Named;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_REMOTE_SERVICES_PROVIDERS;
+
 public class SelectRemoteServicesProviderActivity extends Activity {
-    @Inject @Named("Remote Service Providers") Set<Class<? extends RemoteServicesProvider>> rsps;
+    @Inject @Named(RES_REMOTE_SERVICES_PROVIDERS) Set<Class<? extends RemoteServicesProvider>> rsps;
     @Inject RemoteServicesProviderCoordinator rspCoordinator;
 
     @BindView(R.id.rspSelectionRadioGroup) RadioGroup rspSelectionRadioGroup;

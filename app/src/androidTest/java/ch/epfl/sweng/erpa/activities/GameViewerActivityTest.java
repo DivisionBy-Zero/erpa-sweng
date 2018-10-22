@@ -6,8 +6,6 @@ import android.support.test.espresso.ViewAssertion;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.annimon.stream.Optional;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,8 +13,6 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-
-import java.util.HashSet;
 
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
@@ -61,7 +57,7 @@ public class GameViewerActivityTest {
                 @Override
                 protected void after() {
                     Toothpick.reset(scope);
-                    app.initToothpick(scope);
+                    app.installModules(scope);
                 }
             }
 

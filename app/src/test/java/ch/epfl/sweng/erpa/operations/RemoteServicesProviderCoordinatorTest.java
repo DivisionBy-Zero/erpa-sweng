@@ -25,6 +25,7 @@ import toothpick.Scope;
 import toothpick.config.Module;
 import toothpick.testing.ToothPickRule;
 
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_APPLICATION_SCOPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -52,7 +53,7 @@ public class RemoteServicesProviderCoordinatorTest {
 
         scope = toothPickRule.getScope();
         scope.installModules(new Module() {{
-            bind(Scope.class).withName("application").toInstance(scope);
+            bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
         }});
         toothPickRule.inject(this);
     }
@@ -160,8 +161,7 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     @Override
-    public GameService getGameService()
-    {
+    public GameService getGameService() {
         return null;
     }
 

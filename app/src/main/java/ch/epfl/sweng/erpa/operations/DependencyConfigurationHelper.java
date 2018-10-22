@@ -1,10 +1,8 @@
 package ch.epfl.sweng.erpa.operations;
 
 import com.annimon.stream.Collectors;
-import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Function;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,12 +24,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import toothpick.Scope;
 
-import static com.annimon.stream.function.Function.Util.safe;
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_APPLICATION_SCOPE;
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 
 @Singleton
 public class DependencyConfigurationHelper {
-    @Inject @Named("Dependency Configurators") Set<DependencyConfigurator<?>> coordinators;
-    @Inject @Named("application") Scope scope;
+    @Inject @Named(RES_DEPENDENCY_COORDINATORS) Set<DependencyCoordinator<?>> coordinators;
+    @Inject @Named(RES_APPLICATION_SCOPE) Scope scope;
 
     @Inject public DependencyConfigurationHelper() {
     }
@@ -56,14 +55,14 @@ public class DependencyConfigurationHelper {
         return sortedNotConfiguredDependencies;
     }
 
-    public Optional<DependencyConfigurator<?>> getDependencyConfiguratorForClass(Class<?> cls) {
+    public Optional<DependencyCoordinator<?>> getDependencyConfiguratorForClass(Class<?> cls) {
         return Stream.of(coordinators)
                 .filter(coordinator -> coordinator.configuredDependencyClass().isAssignableFrom(cls))
                 .findFirst();
     }
 
     @SuppressWarnings("unchecked") // Horrible casts due to Java Generics partial support for type variance.
-    private <T> Optional<Tree<Class<T>>> makeInstanceDependencyTree(Class<? extends T> type, T rootInstance, Map<Class, Tree> treeCache ) {
+    private <T> Optional<Tree<Class<T>>> makeInstanceDependencyTree(Class<? extends T> type, T rootInstance, Map<Class, Tree> treeCache) {
         if (treeCache.containsKey(type))
             return Optional.of(Objects.requireNonNull(treeCache.get(type)));
 
@@ -82,8 +81,8 @@ public class DependencyConfigurationHelper {
         Set<Tree> instanceDependencies = Stream.of(coordinators)
                 .filter(cc -> instanceInjectedTypes.contains(cc.configuredDependencyClass()))
                 // Coordinators with non-configured dependencies
-                .filterNot(DependencyConfigurator::dependencyIsConfigured)
-                .map(DependencyConfigurator::configuredDependencyClass)
+                .filterNot(DependencyCoordinator::dependencyIsConfigured)
+                .map(DependencyCoordinator::configuredDependencyClass)
                 // Examine dependency
                 .map(embeddedDependencyClass -> {
                     Object instance = scope.getInstance(embeddedDependencyClass);
@@ -107,9 +106,11 @@ class Tree<T> {
     @NonNull T value;
     @NonNull Set<Tree> children;
     Mark mark = Mark.NONE;
+
     public Tree(T value) {
         this(value.getClass(), value);
     }
+
     public Tree(Class supportingType, T value) {
         this(supportingType, value, new HashSet<>());
     }

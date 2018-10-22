@@ -5,10 +5,11 @@ import android.app.Application;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
-import java.lang.reflect.Proxy;
+import java.util.HashSet;
 import java.util.Set;
 
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
+import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
@@ -20,59 +21,43 @@ import toothpick.configuration.Configuration;
 import toothpick.registries.FactoryRegistryLocator;
 import toothpick.registries.MemberInjectorRegistryLocator;
 
+@SuppressWarnings("unchecked")
 public class ErpaApplication extends Application {
+    public static final String RES_APPLICATION_SCOPE = "Application Scope";
+    public static final String RES_DEPENDENCY_COORDINATORS = "Dependency Coordinators";
+    public static final String RES_REMOTE_SERVICES_PROVIDERS = "Remote Service Providers";
+
     // Remote Service Providers
-    @SuppressWarnings("unchecked")
     private final Set<Class<? extends RemoteServicesProvider>> remoteServicesProviders = Stream.of(
             DummyRemoteServicesProvider.class,
             FirebaseRemoteServicesProvider.class
     ).collect(Collectors.toSet());
 
-    // Dependency Configurators
-    @SuppressWarnings("unchecked")
-    private final Set<Class<? extends RemoteServicesProviderCoordinator>> dependencyConfiguratorClasses = Stream.of(
-            RemoteServicesProviderCoordinator.class
-    ).collect(Collectors.toSet());
-
     @Override
     public void onCreate() {
         super.onCreate();
-        initToothpick(Toothpick.openScope(this));
+
+        // Initialise Dependency Injection framework
+        Toothpick.setConfiguration(Configuration.forProduction().disableReflection().preventMultipleRootScopes());
+        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
+        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
+
+        installModules(Toothpick.openScope(this));
     }
 
-    public void initToothpick(Scope appScope) {
-        // Initialise Dependency Injection framework
-        Toothpick.setConfiguration(
-                Configuration.forProduction().disableReflection().preventMultipleRootScopes());
-        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(
-                new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-
+    public void installModules(Scope appScope) {
         // Install trivial application modules
-        appScope.installModules(new ErpaApplicationModule(this));
-        // Publish the general application scope
+        appScope.installModules(new ErpaApplicationModule(this, appScope));
+
+        // Publish collection instances
         appScope.installModules(new Module() {{
-            bind(Scope.class).withName("application").toInstance(appScope);
+            bind(Set.class).withName(RES_REMOTE_SERVICES_PROVIDERS).toInstance(remoteServicesProviders);
+            bind(Set.class).withName(RES_DEPENDENCY_COORDINATORS).toInstance(new HashSet());
         }});
 
-        // Publish
-        appScope.installModules(new Module() {{
-            bind(Set.class).withName("Remote Service Providers").toInstance(
-                    remoteServicesProviders);
-            bind(Set.class).withName("Dependency Configurators").toInstance(
-                    Stream.of(dependencyConfiguratorClasses).map(appScope::getInstance).collect(
-                            Collectors.toSet()));
-        }});
-
-        // Create Remote Service Provider singleton instance proxy
-        RemoteServicesProvider proxifiedRspInstance = (RemoteServicesProvider)
-                Proxy.newProxyInstance(RemoteServicesProvider.class.getClassLoader(),
-                        new Class[]{RemoteServicesProvider.class},
-                        appScope.getInstance(RemoteServicesProviderCoordinator.class));
-
-        // Publish
-        appScope.installModules(new Module() {{
-            bind(RemoteServicesProvider.class).toInstance(proxifiedRspInstance);
-        }});
+        // Service coordinators
+        appScope.installModules(new TrivialProxifiedModules(appScope,
+                RemoteServicesProviderCoordinator.class
+        ));
     }
 }
