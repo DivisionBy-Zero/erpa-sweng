@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.DataService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 import lombok.Getter;
@@ -88,5 +89,15 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes,
                 password.getBytes(StandardCharsets.UTF_8));
         return new String(hashBytes, StandardCharsets.UTF_8);
+    }
+
+    @Inject public Context ctx;
+    private DataService<Game> gs = null;
+
+    @Override
+    public DataService<Game> getGameService() {
+        if (gs == null)
+            gs = new DummyGameService(ctx);
+        return gs;
     }
 }

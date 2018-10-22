@@ -1,7 +1,6 @@
 package ch.epfl.sweng.erpa.services.dummy.database;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Exceptional;
@@ -24,8 +23,6 @@ import javax.inject.Singleton;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
 import lombok.Getter;
-
-import static android.content.ContentValues.TAG;
 
 @Singleton
 public class DummyGameService extends  DummyDataService<Game> implements GameService {
