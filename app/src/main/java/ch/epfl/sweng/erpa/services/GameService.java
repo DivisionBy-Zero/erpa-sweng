@@ -12,17 +12,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-public interface GameService {
-    String GAME_UUID_PREFIX = "game|";
-    String PROP_INTENT_GAMEUUID = "game uuid";
-
-    Optional<Game> getGame(String gid);
-
-    Set<Game> getAll();
-
+public interface GameService extends DataService<Game> {
+	Optional<Game> getGame(String gameId);
     void saveGame(Game g);
-
-    boolean removeGames();
+    Set<Game> getAllGames();
 
     @NoArgsConstructor
     @Getter
@@ -88,4 +81,5 @@ public interface GameService {
             return result;
         }
     }
+
 }
