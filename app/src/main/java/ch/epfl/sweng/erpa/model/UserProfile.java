@@ -4,8 +4,13 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class UserProfile {
-    public enum Experience {Noob, Casual, Expert}
+public class UserProfile implements UuidObject {
+    @Override
+    public String getUuid() {
+        return getUid();
+    }
+
+    public enum Experience {Noob, Casual, Expert};
 
     @NonNull private final String uid;
     @NonNull private String username;

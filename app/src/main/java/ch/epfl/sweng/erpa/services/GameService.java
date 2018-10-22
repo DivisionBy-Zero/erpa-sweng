@@ -6,13 +6,11 @@ import java.util.Set;
 
 import ch.epfl.sweng.erpa.model.Game;
 
-public interface GameService
+public interface GameService extends DataService<Game>
 {
-    //constants
     String EXTRA_GAME_KEY = "game|";
 
-    //methods
-    Optional<Game> getGame(String gid);
-    Set<Game> getAll();
+    Optional<Game> getGame(String gameId);
     void saveGame(Game g);
+    Set<Game> getAllGames();
 }

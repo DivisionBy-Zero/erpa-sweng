@@ -42,7 +42,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public Optional<String> getUidFromUsername(String username) {
         Optional<UserProfile> u = getUserFromUsername(username);
-        return u.map(UserProfile::getUid);
+        return u.map(UserProfile::getUuid);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
     private Optional<UserProfile> getUserFromUid(String uid) {
         for (UserProfile u : userList) {
-            if (u.getUid().equals(uid))
+            if (u.getUuid().equals(uid))
                 return Optional.of(u);
         }
         return Optional.empty();
