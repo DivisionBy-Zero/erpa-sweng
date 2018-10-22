@@ -6,4 +6,33 @@
     android:layout_height="match_parent"
     tools:context=".activities.UserProfileActivity">
 
+    <TextView
+        android:id="@+id/usernameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Username"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/experienceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Experience"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/usernameTextView"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
+
+    <TextView
+        android:id="@+id/playerOrGMTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Player or GM"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/experienceTextView"
+        app:layout_constraintTop_toBottomOf="@+id/experienceTextView" />
 </android.support.constraint.ConstraintLayout>

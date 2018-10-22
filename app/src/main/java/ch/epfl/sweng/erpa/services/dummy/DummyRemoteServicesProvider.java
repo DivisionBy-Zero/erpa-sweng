@@ -11,10 +11,7 @@ import javax.inject.Singleton;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.DataService;
-<<<<<<< HEAD
 import ch.epfl.sweng.erpa.services.GameService;
-=======
->>>>>>> 2d044a6... Fix minor issues
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
@@ -98,10 +95,10 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     @Inject public Context ctx;
-    private DataService<Game> gs = null;
+    private GameService gs = null;
 
     @Override
-    public DataService<Game> getGameService() {
+    public GameService getGameService() {
         if (gs == null)
             gs = new DummyGameService(ctx);
         return gs;

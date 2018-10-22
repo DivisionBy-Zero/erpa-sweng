@@ -15,6 +15,7 @@ import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
 import toothpick.Toothpick;

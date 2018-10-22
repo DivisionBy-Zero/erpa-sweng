@@ -4,9 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.annimon.stream.Collectors;
-import com.annimon.stream.Exceptional;
-import com.annimon.stream.Exceptional;
-import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;

@@ -10,7 +10,6 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
 public class DummyUserService extends DummyDataService<UserProfile> implements UserProfileService {
-import ch.epfl.sweng.erpa.model.UserProfile;
 
     private static final String USER_PROFILE_DATA_FOLDER = "user_profiles_data";
 
