@@ -5,9 +5,14 @@ import com.annimon.stream.Optional;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
+import ch.epfl.sweng.erpa.services.UserAuthProvider;
 
 public class FirebaseRemoteServicesProvider implements RemoteServicesProvider {
     public FirebaseRemoteServicesProvider() {
+    }
+
+    @Override public UserAuthProvider getUserAuthProvider() {
+        return null;
     }
 
     @Override

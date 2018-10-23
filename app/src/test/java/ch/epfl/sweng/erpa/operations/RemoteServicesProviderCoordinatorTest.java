@@ -3,8 +3,6 @@ package ch.epfl.sweng.erpa.operations;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.annimon.stream.Optional;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,10 +15,11 @@ import org.mockito.junit.MockitoRule;
 
 import java.lang.reflect.Proxy;
 
-import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
+import ch.epfl.sweng.erpa.services.UserAuthProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
+import lombok.Getter;
 import toothpick.Scope;
 import toothpick.config.Module;
 import toothpick.testing.ToothPickRule;
@@ -142,41 +141,13 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     final static String mlp = "My little pony";
     public final Fuse fuse = new Fuse();
 
-    public SyntheticRemoteServicesProvider() {
-    }
-
-    @Override
-    public String getFriendlyProviderName() {
-        return mlp;
-    }
-
-    @Override
-    public String getFriendlyProviderDescription() {
-        return null;
-    }
+    @Getter GameService gameService;
+    @Getter String friendlyProviderDescription;
+    @Getter String friendlyProviderName = mlp;
+    @Getter UserAuthProvider userAuthProvider;
 
     @Override
     public void terminate() {
         fuse.ignite();
-    }
-
-    @Override
-    public GameService getGameService() {
-        return null;
-    }
-
-    @Override
-    public Optional<String> getUidFromUsername(String username) {
-        return null;
-    }
-
-    @Override
-    public boolean verifyAccessToken(String uid, String accessToken) {
-        return false;
-    }
-
-    @Override
-    public void storeNewUser(UserProfile user) {
-        return;
     }
 }
