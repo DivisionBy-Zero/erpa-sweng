@@ -77,6 +77,7 @@ dependencies {
     implementation 'com.kosprov.jargon2:jargon2-api:1.1.1'
     implementation 'com.kosprov.jargon2:jargon2-native-ri-backend:1.1.1'
     implementation 'com.kosprov.jargon2:jargon2-native-ri-backend:1.1.1'
+    implementation 'com.linkedin.dexmaker:dexmaker:2.19.1'
     implementation 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
     implementation 'me.tatarka:gradle-retrolambda:3.2.5'
     implementation 'org.yaml:snakeyaml:1.23'

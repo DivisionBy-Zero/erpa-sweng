@@ -5,7 +5,7 @@ import lombok.NonNull;
 
 @Data
 public class UserProfile {
-    public enum Experience {Noob, Casual, Expert};
+    public enum Experience {Noob, Casual, Expert}
 
     @NonNull private final String uid;
     @NonNull private String username;

@@ -29,7 +29,7 @@ import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 
 @Singleton
 public class DependencyConfigurationHelper {
-    @Inject @Named(RES_DEPENDENCY_COORDINATORS) Set<DependencyCoordinator<?>> coordinators;
+    @Inject @Named(RES_DEPENDENCY_COORDINATORS) Map<Class, DependencyCoordinator<?>> coordinators;
     @Inject @Named(RES_APPLICATION_SCOPE) Scope scope;
 
     @Inject public DependencyConfigurationHelper() {
@@ -56,7 +56,7 @@ public class DependencyConfigurationHelper {
     }
 
     public Optional<DependencyCoordinator<?>> getDependencyConfiguratorForClass(Class<?> cls) {
-        return Stream.of(coordinators)
+        return Stream.of(coordinators.values())
                 .filter(coordinator -> coordinator.configuredDependencyClass().isAssignableFrom(cls))
                 .findFirst();
     }
@@ -78,7 +78,7 @@ public class DependencyConfigurationHelper {
         if (instanceInjectedTypes.isEmpty())
             return Optional.empty();
 
-        Set<Tree> instanceDependencies = Stream.of(coordinators)
+        Set<Tree> instanceDependencies = Stream.of(coordinators.values())
                 .filter(cc -> instanceInjectedTypes.contains(cc.configuredDependencyClass()))
                 // Coordinators with non-configured dependencies
                 .filterNot(DependencyCoordinator::dependencyIsConfigured)

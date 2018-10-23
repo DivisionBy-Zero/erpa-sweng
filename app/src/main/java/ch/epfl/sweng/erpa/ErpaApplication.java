@@ -5,7 +5,8 @@ import android.app.Application;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
@@ -52,7 +53,7 @@ public class ErpaApplication extends Application {
         // Publish collection instances
         appScope.installModules(new Module() {{
             bind(Set.class).withName(RES_REMOTE_SERVICES_PROVIDERS).toInstance(remoteServicesProviders);
-            bind(Set.class).withName(RES_DEPENDENCY_COORDINATORS).toInstance(new HashSet());
+            bind(Map.class).withName(RES_DEPENDENCY_COORDINATORS).toInstance(new HashMap());
         }});
 
         // Service coordinators
