@@ -6,6 +6,7 @@
     tools:context=".activities.PastHostedGamesActivity">
 
     <TextView
+        android:id="@+id/pastHostedGamesTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/pastHostedGamesText" />
