@@ -7,6 +7,7 @@ import java.util.Set;
 import ch.epfl.sweng.erpa.model.UuidObject;
 
 public interface DataService<T extends UuidObject> {
+
     String EXTRA_GAME_KEY = "game|";
 
     Optional<T> getOne(String uid);

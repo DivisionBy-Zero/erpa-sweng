@@ -8,7 +8,8 @@ import ch.epfl.sweng.erpa.operations.annotations.Service;
 
 public interface RemoteServicesProvider {
     // Here be data proxies
-    @Service DataService<Game> getGameService();
+    @Service GameService getGameService();
+    @Service UserProfileService getUserProfileService();
 
     // Here be metadata
     String getFriendlyProviderName();

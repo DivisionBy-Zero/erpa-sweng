@@ -22,7 +22,8 @@ import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
-import lombok.Getter;
+import com.annimon.stream.Optional;
+>>>>>>> dde0bff... Refactor to add a GameService and a UserProfileService interface
 
 @Singleton
 public class DummyGameService extends  DummyDataService<Game> implements GameService {
@@ -47,15 +48,18 @@ public class DummyGameService extends  DummyDataService<Game> implements GameSer
         return SAVED_GAME_DATA_FOLDER;
     }
 
-    @Override public Optional<Game> getGame(String gameId) {
-        return getOne(gameId);
+   @Override
+    public Optional<Game> getGame(String gameUuid) {
+        return getOne(gameUuid);
     }
 
-    @Override public void saveGame(Game g) {
+    @Override
+    public void saveGame(Game g) {
         saveOne(g);
     }
 
-    @Override public Set<Game> getAllGames() {
+    @Override
+    public Set<Game> getAllGames() {
         return getAll();
     }
 }

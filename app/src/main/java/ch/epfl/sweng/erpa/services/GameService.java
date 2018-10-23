@@ -81,5 +81,4 @@ public interface GameService extends DataService<Game> {
             return result;
         }
     }
-
 }

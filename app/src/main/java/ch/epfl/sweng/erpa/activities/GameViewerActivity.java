@@ -16,6 +16,7 @@ import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.DataService;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 import static android.content.ContentValues.TAG;

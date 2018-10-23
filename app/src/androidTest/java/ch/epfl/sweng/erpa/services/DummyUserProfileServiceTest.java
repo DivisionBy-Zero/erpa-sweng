@@ -23,7 +23,7 @@ import static junit.framework.TestCase.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class DummyUserProfileServiceTest {
 
-    DataService<UserProfile> ups;
+    UserProfileService ups;
 
     @Before
     public void initDB() {
@@ -35,8 +35,8 @@ public class DummyUserProfileServiceTest {
     public void testAddedPersists() {
         String uid = "-1";
         UserProfile up = getUserProfile(uid);
-        ups.saveOne(up);
-        Optional<UserProfile> optUp = ups.getOne(uid);
+        ups.saveUserProfile(up);
+        Optional<UserProfile> optUp = ups.getUserProfile(uid);
         assertTrue(optUp.isPresent());
         assertEquals(up, optUp.get());
     }
@@ -46,10 +46,11 @@ public class DummyUserProfileServiceTest {
         int numTests = 500;
         List<UserProfile> userProfiles = new ArrayList<>(numTests);
         for (int i = 0; i < numTests; i++) {
-            userProfiles.add(getUserProfile(String.valueOf(i)));
+            UserProfile up = getUserProfile(String.valueOf(i));
+            userProfiles.add(up);
+            ups.saveUserProfile(up);
         }
-        userProfiles.forEach(p -> ups.saveOne(p));
 
-        assertTrue("Contains all added elements", ups.getAll().containsAll(userProfiles));
+        assertTrue("Contains all added elements", ups.getAllUserProfiles().containsAll(userProfiles));
     }
 }

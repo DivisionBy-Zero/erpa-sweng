@@ -1,9 +1,13 @@
 package ch.epfl.sweng.erpa.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserProfile implements UuidObject {
     @Override
     public String getUuid() {
@@ -12,7 +16,7 @@ public class UserProfile implements UuidObject {
 
     public enum Experience {Noob, Casual, Expert};
 
-    @NonNull private final String uid;
+    @NonNull private String uid;
     @NonNull private String username;
     @NonNull private String accessToken;
     @NonNull private Experience xp;
