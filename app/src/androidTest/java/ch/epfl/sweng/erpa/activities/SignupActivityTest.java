@@ -47,7 +47,7 @@ public class SignupActivityTest {
         onView(ViewMatchers.withId(R.id.passText)).perform(typeText("lol")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.signupButton)).perform(ViewActions.click());
         // Check if the popup is displayed
-        onView(ViewMatchers.withText(R.string.passwords_not_match)).check(matches(isDisplayed()));
+        onView(ViewMatchers.withText(R.string.passwordsNotMatch)).check(matches(isDisplayed()));
     }
 
     @Test
@@ -82,6 +82,6 @@ public class SignupActivityTest {
         onView(ViewMatchers.withId(R.id.passTextConfirm)).perform(typeText("lol")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.signupButton)).perform(ViewActions.click());
         // Check if the activity is closed
-        onView(ViewMatchers.withText(R.string.not_select_GM_or_player)).check(matches(isDisplayed()));
+        onView(ViewMatchers.withText(R.string.notSelectGmOrPlayer)).check(matches(isDisplayed()));
     }
 }
