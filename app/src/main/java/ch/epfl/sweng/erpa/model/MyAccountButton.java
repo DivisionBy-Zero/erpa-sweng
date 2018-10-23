@@ -8,7 +8,7 @@ public class MyAccountButton {
 
     @NonNull private String text;
     @NonNull private Class activityClass;
-    @NonNull private boolean activeForPlayer;
-    @NonNull private boolean activeForGM;
+    @NonNull private Boolean activeForPlayer;
+    @NonNull private Boolean activeForGM;
 
 }

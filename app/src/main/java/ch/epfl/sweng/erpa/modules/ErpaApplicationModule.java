@@ -46,6 +46,6 @@ public class ErpaApplicationModule extends Module {
         // Dummy Remote Services Provider-related binds
         this.bind(DummyGameService.class).to(DummyGameService.class);
         // TODO(@Roos) replace injection by UserProviderService
-        this.bind(UserProfile.class).toInstance(new UserProfile("user|" + UUID.randomUUID().toString(), "kevinLeBeauGoss", "myAccesTocken", UserProfile.Experience.Noob, true, true));
+        this.bind(UserProfile.class).toInstance(new UserProfile("user|" + UUID.randomUUID().toString(), "kevinLeBeauGoss", "myAccesTocken", UserProfile.Experience.Noob, false, true));
     }
 }

@@ -11,23 +11,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import ch.epfl.sweng.erpa.activities.MyAccountActivity.Pair;
 import ch.epfl.sweng.erpa.R;
 
-public class MyAccountButtonAdapter extends ArrayAdapter<MyAccountButton> {
+public class MyAccountButtonAdapter extends ArrayAdapter<Pair<MyAccountButton, Drawable>> {
 
     private Context context;
-    private List<MyAccountButton> myButtonArrayList;
-    private List<Drawable> myDrawables;
+    private List<Pair<MyAccountButton, Drawable>> myButtonDrawablesList;
 
-    public MyAccountButtonAdapter(Context context, List<MyAccountButton> buttonList,
-                                  List<Drawable> drawables) {
-        super(context, -1, buttonList);
+    public MyAccountButtonAdapter(Context context,
+                                  List<Pair<MyAccountButton, Drawable>> myButtonDrawablesList) {
+        super(context, -1, myButtonDrawablesList);
         this.context = context;
-        this.myButtonArrayList = new ArrayList<>(buttonList);
-        this.myDrawables = drawables;
+        this.myButtonDrawablesList = myButtonDrawablesList;
     }
 
     @NonNull @Override
@@ -38,8 +36,8 @@ public class MyAccountButtonAdapter extends ArrayAdapter<MyAccountButton> {
 
         MyAccountButtonHolder myAccountButtonHolder = new MyAccountButtonHolder(convertView,
                 position);
-        myAccountButtonHolder.setDetails(myButtonArrayList.get(position),
-                myDrawables.get(position));
+        myAccountButtonHolder.setDetails(myButtonDrawablesList.get(position).getFirst(),
+                myButtonDrawablesList.get(position).getSecond());
 
         convertView.setTag(myAccountButtonHolder);
 

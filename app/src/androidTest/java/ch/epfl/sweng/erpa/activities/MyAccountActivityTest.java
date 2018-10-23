@@ -52,41 +52,32 @@ public class MyAccountActivityTest {
     @Test
     public void testButtonsNamesInTheList() {
         if (userProfile.getIsPlayer()) {
-            assertThat(((MyAccountButton) listView.getItemAtPosition(0)).getText(),
-                    is(systemResources.getString(R.string.pendingRequestText)));
-            assertThat(((MyAccountButton) listView.getItemAtPosition(1)).getText(),
-                    is(systemResources.getString(R.string.confirmedGamesText)));
-            assertThat(((MyAccountButton) listView.getItemAtPosition(2)).getText(),
-                    is(systemResources.getString(R.string.pastGamesText)));
+            checkCorrectName(0, R.string.pendingRequestText);
+            checkCorrectName(1, R.string.confirmedGamesText);
+            checkCorrectName(2, R.string.pastGamesText);
             if (userProfile.getIsGm()) {
-                assertThat(((MyAccountButton) listView.getItemAtPosition(3)).getText(),
-                        is(systemResources.getString(R.string.hostedGamesText)));
-                assertThat(((MyAccountButton) listView.getItemAtPosition(4)).getText(),
-                        is(systemResources.getString(R.string.pastHostedGamesText)));
-                assertThat(((MyAccountButton) listView.getItemAtPosition(5)).getText(),
-                        is(systemResources.getString(R.string.profileText)));
+                checkCorrectName(3, R.string.hostedGamesText);
+                checkCorrectName(4, R.string.pastHostedGamesText);
+                checkCorrectName(5, R.string.profileText);
             } else
-                assertThat(((MyAccountButton) listView.getItemAtPosition(3)).getText(),
-                        is(systemResources.getString(R.string.profileText)));
+                checkCorrectName(3, R.string.profileText);
         } else {
-            assertThat(((MyAccountButton) listView.getItemAtPosition(0)).getText(),
-                    is(systemResources.getString(R.string.hostedGamesText)));
-            assertThat(((MyAccountButton) listView.getItemAtPosition(1)).getText(),
-                    is(systemResources.getString(R.string.pastHostedGamesText)));
-            assertThat(((MyAccountButton) listView.getItemAtPosition(2)).getText(),
-                    is(systemResources.getString(R.string.profileText)));
+            checkCorrectName(0, R.string.hostedGamesText);
+            checkCorrectName(1, R.string.pastHostedGamesText);
+            checkCorrectName(2, R.string.profileText);
         }
+    }
+
+    public void checkCorrectName(int position, int ressourceID) {
+        MyAccountActivity.Pair pair = (MyAccountActivity.Pair) listView.getItemAtPosition(position);
+        assertThat(((MyAccountButton) pair.getFirst()).getText(),
+                is(systemResources.getString(ressourceID)));
     }
 
     @Test
     public void testShouldShowPendingRequestOrHostedGamesWhenFirstButtonClicked() {
 
-        instrumentation.runOnMainSync(() -> {
-            int position = 0;
-            listView.performItemClick(listView.getChildAt(position), position,
-                    listView.getAdapter().getItemId(position));
-        });
-
+        performClickOnListviewButton(0);
         if (userProfile.getIsPlayer())
             intended(hasComponent(PendingRequestActivity.class.getName()));
         else
@@ -96,12 +87,7 @@ public class MyAccountActivityTest {
     @Test
     public void testShouldShowConfirmedGamesOrPastHostedGamesWhenSecondButtonClicked() {
 
-        instrumentation.runOnMainSync(() -> {
-            int position = 1;
-            listView.performItemClick(listView.getChildAt(position), position,
-                    listView.getAdapter().getItemId(position));
-        });
-
+        performClickOnListviewButton(1);
         if (userProfile.getIsPlayer())
             intended(hasComponent(ConfirmedGamesActivity.class.getName()));
         else
@@ -111,12 +97,7 @@ public class MyAccountActivityTest {
     @Test
     public void testShouldShowPastGamesOrProfileWhenThirdButtonClicked() {
 
-        instrumentation.runOnMainSync(() -> {
-            int position = 2;
-            listView.performItemClick(listView.getChildAt(position), position,
-                    listView.getAdapter().getItemId(position));
-        });
-
+        performClickOnListviewButton(2);
         if (userProfile.getIsPlayer())
             intended(hasComponent(PastGamesActivity.class.getName()));
         else
@@ -126,12 +107,15 @@ public class MyAccountActivityTest {
     @Test
     public void testShouldShowProfileWhenLastButtonClicked() {
 
+        performClickOnListviewButton(listView.getChildCount() - 1);
+        intended(hasComponent(ProfileActivity.class.getName()));
+    }
+
+    public void performClickOnListviewButton(int myPosition) {
         instrumentation.runOnMainSync(() -> {
-            int position = listView.getChildCount() - 1;
+            int position = myPosition;
             listView.performItemClick(listView.getChildAt(position), position,
                     listView.getAdapter().getItemId(position));
         });
-
-        intended(hasComponent(ProfileActivity.class.getName()));
     }
 }

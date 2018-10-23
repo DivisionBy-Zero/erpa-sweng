@@ -1,13 +1,16 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.annimon.stream.function.Predicate;
+import com.annimon.stream.Collector;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +22,8 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import lombok.Data;
+import lombok.NonNull;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     @Inject UserProfile userProfile;
@@ -26,6 +31,9 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     // TODO: (Anne) add Butterknife for better readability
     private ListView myListView;
     private ArrayAdapter myAdapter;
+
+    private Context context;
+    private Resources resources;
 
     private List<MyAccountButton> myAccountButtonList;
     private List<Drawable> myDrawablesList;
@@ -44,61 +52,47 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         myListView = findViewById(R.id.myAccountLayout);
         initializeArrays();
 
-        ArrayList<MyAccountButton> myFilteredAccountButtons = filterButtonList(
-                myAccountButtonList, (b -> (b.isActiveForPlayer() == userProfile.getIsPlayer() ||
-                        b.isActiveForGM() == userProfile.getIsGm())));
-        List<Drawable> myFilteredDrawables = cutDownImagesList();
+        Stream<MyAccountButton> buttonStream = Stream.of(myAccountButtonList).filter(
+                b -> (b.getActiveForPlayer() == userProfile.getIsPlayer() ||
+                        b.getActiveForGM() == userProfile.getIsGm()));
+        Stream<Drawable> drawableStream = Stream.of(myDrawablesList);
 
-        myAdapter = new MyAccountButtonAdapter(this, myFilteredAccountButtons, myFilteredDrawables);
+        List<Pair<MyAccountButton, Drawable>> collect = Stream.zip(buttonStream, drawableStream,
+                Pair::new).collect(Collectors.toList());
+
+        collect.add(new Pair<>(new MyAccountButton(resources.getString(R.string.profileText),
+                ProfileActivity.class, true, true),
+                context.getDrawable(R.drawable.ic_action_name)));
+
+        myAdapter = new MyAccountButtonAdapter(this, collect);
         myListView.setAdapter(myAdapter);
         myListView.setOnItemClickListener((l, v, position, id) -> startActivity(
-                new Intent(this, myFilteredAccountButtons.get(position).getActivityClass())));
+                new Intent(this, collect.get(position).getFirst().getActivityClass())));
 
     }
 
     private void initializeArrays() {
+        context = this.getApplicationContext();
+        resources = context.getResources();
         myAccountButtonList = Arrays.asList(
-                new MyAccountButton(this.getApplicationContext().getResources().getString(
-                        R.string.pendingRequestText), PendingRequestActivity.class, true, false),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(
-                        R.string.confirmedGamesText), ConfirmedGamesActivity.class, true, false),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(
-                        R.string.pastGamesText), PastGamesActivity.class, true, false),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(
-                        R.string.hostedGamesText), HostedGamesActivity.class, false, true),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(
-                        R.string.pastHostedGamesText), PastHostedGamesActivity.class, false, true),
-                new MyAccountButton(this.getApplicationContext().getResources().getString(
-                        R.string.profileText), ProfileActivity.class, true, true)
+                new MyAccountButton(resources.getString(R.string.pendingRequestText),
+                        PendingRequestActivity.class, true, false),
+                new MyAccountButton(resources.getString(R.string.confirmedGamesText),
+                        ConfirmedGamesActivity.class, true, false),
+                new MyAccountButton(resources.getString(R.string.pastGamesText),
+                        PastGamesActivity.class, true, false),
+                new MyAccountButton(resources.getString(R.string.hostedGamesText),
+                        HostedGamesActivity.class, false, true),
+                new MyAccountButton(resources.getString(R.string.pastHostedGamesText),
+                        PastHostedGamesActivity.class, false, true)
         );
-        myDrawablesList = Arrays.asList(
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name),
-                this.getApplicationContext().getDrawable(R.drawable.ic_action_name)
-        );
+        myDrawablesList = Stream.rangeClosed(1, 8).map(i -> context.getDrawable(R.drawable.ic_action_name)).collect(
+                Collectors.toList());
     }
 
-    private List<Drawable> cutDownImagesList() {
-        ArrayList<Drawable> myFilterDrawableList = new ArrayList<>(myDrawablesList);
-        for (int i = myDrawablesList.size() - 2; i >= myAccountButtonList.size() - 1; --i) {
-            myFilterDrawableList.remove(i);
-        }
-        return myFilterDrawableList;
-    }
-
-    private ArrayList<MyAccountButton> filterButtonList(List<MyAccountButton> l,
-                                                        Predicate<MyAccountButton> predicate) {
-        ArrayList<MyAccountButton> newL = new ArrayList<>();
-        for (int i = 0; i < l.size(); ++i) {
-            if (predicate.test(l.get(i)))
-                newL.add(l.get(i));
-        }
-        return newL;
+    @Data
+    public class Pair<T1, T2> {
+        @NonNull T1 first;
+        @NonNull T2 second;
     }
 }
