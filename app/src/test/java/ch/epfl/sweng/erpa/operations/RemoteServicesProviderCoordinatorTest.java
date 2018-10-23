@@ -17,10 +17,10 @@ import org.mockito.junit.MockitoRule;
 
 import java.lang.reflect.Proxy;
 
-import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.DataService;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
 import toothpick.config.Module;
@@ -162,7 +162,12 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     @Override
-    public DataService<Game> getGameService() {
+    public GameService getGameService() {
+        return null;
+    }
+
+    @Override
+    public UserProfileService getUserProfileService() {
         return null;
     }
 

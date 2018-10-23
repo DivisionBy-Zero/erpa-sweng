@@ -29,10 +29,8 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
     private final Function<File, T> fileFetcher;
 
     private final File dataDir;
-    private final Class<T> tClass;
 
     DummyDataService(Context ctx, Class<T> tClass) {
-        this.tClass = tClass;
         this.dataDir = new File(ctx.getFilesDir(), dataFolder());
         this.fileFetcher = file -> fetchExistingDataFromFile(file, tClass);
         if (!dataDir.mkdir()) {
