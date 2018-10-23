@@ -46,9 +46,10 @@ public class DummyUserProfileServiceTest {
         int numTests = 500;
         List<UserProfile> userProfiles = new ArrayList<>(numTests);
         for (int i = 0; i < numTests; i++) {
-            userProfiles.add(getUserProfile(String.valueOf(i)));
+            UserProfile up = getUserProfile(String.valueOf(i));
+            userProfiles.add(up);
+            ups.saveUserProfile(up);
         }
-        userProfiles.forEach(ups::saveUserProfile);
 
         assertTrue("Contains all added elements", ups.getAllUserProfiles().containsAll(userProfiles));
     }
