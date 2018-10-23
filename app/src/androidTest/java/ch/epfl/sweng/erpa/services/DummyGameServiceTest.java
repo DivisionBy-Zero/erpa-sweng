@@ -45,6 +45,7 @@ public class DummyGameServiceTest {
         gs.saveGame(g);
         Optional<Game> found = gs.getGame(g.getGameUuid());
         assertTrue(found.isPresent());
+
         Game foundGame = found.get();
         assertEquals(g, foundGame);
     }
@@ -56,7 +57,7 @@ public class DummyGameServiceTest {
         for (int i = 0; i < numTests; i++) {
             Game g = getGame(String.valueOf(i));
             games.add(g);
-            gs.saveGame(g);
+            gs.saveOne(g);
         }
         Set<Game> all = gs.getAll();
         assertTrue(all.containsAll(games));
