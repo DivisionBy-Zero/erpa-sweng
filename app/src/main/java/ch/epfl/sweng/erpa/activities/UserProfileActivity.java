@@ -1,7 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -16,16 +15,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.DataService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static android.content.ContentValues.TAG;
 
-public class UserProfileActivity extends Activity {
+public class UserProfileActivity extends DependencyConfigurationAgnosticActivity {
 
     @Inject RemoteServicesProvider rsp;
 
-    @BindView(R.id.usernameTextView) TextView userName;
+    @BindView(R.id.usernameTextView) TextView username;
     @BindView(R.id.experienceTextView) TextView experience;
     @BindView(R.id.playerOrGMTextView) TextView playerOrGm;
 
@@ -56,9 +55,9 @@ public class UserProfileActivity extends Activity {
     }
 
     @SuppressLint("SetTextI18n") private void updateFields(UserProfile userProfile) {
-        userName.setText(userProfile.getUsername());
+        username.setText(userProfile.getUsername());
         experience.setText(userProfile.getXp().toString());
-        if(userProfile.getIsGm()&&userProfile.getIsPlayer())
+        if(userProfile.getIsGm() && userProfile.getIsPlayer())
             playerOrGm.setText("Player and Game master");
         else if(userProfile.getIsPlayer())
             playerOrGm.setText("Player");
@@ -69,14 +68,14 @@ public class UserProfileActivity extends Activity {
     }
 
     private String getUuidFromIntent() {
-        String uuid = getIntent().getStringExtra(DataService.EXTRA_USER_PROFILE_KEY);
+        String uuid = getIntent().getStringExtra(UserProfileService.PROP_INTENT_USER_UUID);
         if (uuid != null)
             return uuid;
         else {
             Exception thrown = new IllegalArgumentException("User Id not found");
-            Log.d(TAG, "GameViewerActivity: no user id passed with intent", thrown);
+            Log.d(UserProfileActivity.class.getName(), "no user id passed with intent", thrown);
             finish();
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No user uuid passed");
         }
     }
 }

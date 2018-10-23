@@ -6,6 +6,8 @@ import com.annimon.stream.Optional;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
@@ -13,7 +15,7 @@ public class DummyUserService extends DummyDataService<UserProfile> implements U
 
     private static final String USER_PROFILE_DATA_FOLDER = "user_profiles_data";
 
-    public DummyUserService(Context ctx) {
+    @Inject public DummyUserService(Context ctx) {
         super(ctx, UserProfile.class);
     }
 

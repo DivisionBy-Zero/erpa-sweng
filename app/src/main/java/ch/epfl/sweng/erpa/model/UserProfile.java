@@ -11,12 +11,12 @@ import lombok.NonNull;
 public class UserProfile implements UuidObject {
     @Override
     public String getUuid() {
-        return getUid();
+        return getUserUuid();
     }
 
     public enum Experience {Noob, Casual, Expert};
 
-    @NonNull private String uid;
+    @NonNull private String userUuid;
     @NonNull private String username;
     @NonNull private String accessToken;
     @NonNull private Experience xp;

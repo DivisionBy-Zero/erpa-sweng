@@ -53,13 +53,13 @@ public class GameViewerActivityTest {
         scope.getInstance(GameService.class).saveGame(game);
 
         Intent i = new Intent();
-        i.putExtra(GameService.PROP_INTENT_GAMEUUID, game.getGameUuid());
+        i.putExtra(GameService.PROP_INTENT_GAME_UUID, game.getGameUuid());
         activityTestRule.launchActivity(i);
     }
 
     @Test
     public void testHasIntent() {
-        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.PROP_INTENT_GAMEUUID));
+        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.PROP_INTENT_GAME_UUID));
     }
 
     @Test

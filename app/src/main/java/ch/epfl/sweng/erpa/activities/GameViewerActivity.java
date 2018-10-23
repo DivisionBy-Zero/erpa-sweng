@@ -58,7 +58,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
     private String getGameId() {
 
-        String gameId = getIntent().getStringExtra(DataService.EXTRA_GAME_KEY);
+        String gameId = getIntent().getStringExtra(GameService.PROP_INTENT_GAME_UUID);
         if (gameId == null) {
             Exception thrown = new IllegalArgumentException("Game Id not found");
             Log.d(TAG, "GameViewerActivity: no game id passed with intent", thrown);

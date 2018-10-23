@@ -57,14 +57,12 @@ public class GameListActivityTest {
     public final IntentsTestRule<GameListActivity> intentsTestRule = new IntentsTestRule<>(
             GameListActivity.class);
 
-    Scope scope;
-
     @Before
     public void prepare() {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
         MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
+        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
         ErpaApplication application = scope.getInstance(ErpaApplication.class);
 
         Toothpick.reset(scope);

@@ -74,7 +74,7 @@ public class RemoteServicesProviderCoordinator implements DependencyCoordinator<
         sharedPreferences.edit().putString(REMOTE_PROVIDER_KEY, rspClassName).apply();
     }
 
-    private Optional<Class<? extends RemoteServicesProvider>> rspClassFromApplicationPreferences() {
+    Optional<Class<? extends RemoteServicesProvider>> rspClassFromApplicationPreferences() {
         String remoteServicesProviderClassName = sharedPreferences.getString(REMOTE_PROVIDER_KEY, null);
         return rspClassFromFullyQualifiedName(remoteServicesProviderClassName);
     }

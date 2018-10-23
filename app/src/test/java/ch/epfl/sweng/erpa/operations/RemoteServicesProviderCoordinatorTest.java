@@ -23,7 +23,10 @@ import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
+import toothpick.Toothpick;
 import toothpick.config.Module;
+import toothpick.configuration.Configuration;
+import toothpick.registries.MemberInjectorRegistryLocator;
 import toothpick.testing.ToothPickRule;
 
 import static ch.epfl.sweng.erpa.ErpaApplication.RES_APPLICATION_SCOPE;
@@ -43,6 +46,8 @@ public class RemoteServicesProviderCoordinatorTest {
     @Mock Context androidApplicationContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) // Methods calls return mocks (e.g. builders).
             SharedPreferences sharedPreferences;
+    @Mock GameService gameService;
+    @Mock UserProfileService userProfileService;
 
     private Scope scope;
 
@@ -51,11 +56,16 @@ public class RemoteServicesProviderCoordinatorTest {
         when(androidApplicationContext.getString(anyInt())).thenReturn("test");
         // Have a _the_ dummy implementation by default
         when(sharedPreferences.getString(anyString(), any())).thenReturn(DummyRemoteServicesProvider.class.getName());
+        Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
+        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
 
         scope = toothPickRule.getScope();
         scope.installModules(new Module() {{
             bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
         }});
+        scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
+                DummyRemoteServicesProvider.class
+        );
         toothPickRule.inject(this);
     }
 
@@ -67,16 +77,20 @@ public class RemoteServicesProviderCoordinatorTest {
 
     @Test
     public void testNoSelfConfiguringWhenSharedPreferencesIsEmpty() {
-        when(sharedPreferences.getString(anyString(), any())).thenReturn(null);
         RemoteServicesProviderCoordinator underTest = scope.getInstance(RemoteServicesProviderCoordinator.class);
+        underTest.bindRemoteServicesProvider(null);
+        when(sharedPreferences.getString(anyString(), any())).thenReturn(null);
+        underTest.rspClassFromApplicationPreferences().ifPresent(underTest::bindRemoteServicesProvider);
         assertFalse(underTest.dependencyIsConfigured());
     }
 
     @Test
     public void testNoSelfConfiguringWhenSharedPreferencesIsInvalid() {
+        RemoteServicesProviderCoordinator underTest = scope.getInstance(RemoteServicesProviderCoordinator.class);
+        underTest.bindRemoteServicesProvider(null);
         when(sharedPreferences.getString(anyString(), any()))
                 .thenReturn(this.getClass().getName());
-        RemoteServicesProviderCoordinator underTest = scope.getInstance(RemoteServicesProviderCoordinator.class);
+        underTest.rspClassFromApplicationPreferences().ifPresent(underTest::bindRemoteServicesProvider);
         assertFalse(underTest.dependencyIsConfigured());
     }
 

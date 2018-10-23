@@ -15,15 +15,17 @@ import java.util.List;
 
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
+import ch.epfl.sweng.erpa.util.TestUtils;
 
 import static ch.epfl.sweng.erpa.util.TestUtils.getUserProfile;
+import static ch.epfl.sweng.erpa.util.TestUtils.unnecessaryCodeClimateMethod;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class DummyUserProfileServiceTest {
 
-    UserProfileService ups;
+    DummyUserService ups;
 
     @Before
     public void initDB() {
@@ -45,12 +47,8 @@ public class DummyUserProfileServiceTest {
     public void testAllAdded() {
         int numTests = 500;
         List<UserProfile> userProfiles = new ArrayList<>(numTests);
-        for (int i = 0; i < numTests; i++) {
-            UserProfile up = getUserProfile(String.valueOf(i));
-            userProfiles.add(up);
-            ups.saveUserProfile(up);
-        }
 
+        unnecessaryCodeClimateMethod(userProfiles,ups, TestUtils::getUserProfile, numTests);
         assertTrue("Contains all added elements", ups.getAllUserProfiles().containsAll(userProfiles));
     }
 }

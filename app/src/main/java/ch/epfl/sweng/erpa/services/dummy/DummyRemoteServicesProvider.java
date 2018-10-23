@@ -10,18 +10,17 @@ import javax.inject.Singleton;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.DataService;
-import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
-import lombok.Getter;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
+import lombok.Getter;
 
 
 @Singleton
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     @Inject @Getter DummyGameService gameService;
+    @Inject @Getter DummyUserService userProfileService;
 
     private ArrayList<UserProfile> userList;
 
@@ -92,23 +91,5 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes,
                 password.getBytes(StandardCharsets.UTF_8));
         return new String(hashBytes, StandardCharsets.UTF_8);
-    }
-
-    @Inject public Context ctx;
-    private GameService gs = null;
-
-    @Override
-    public GameService getGameService() {
-        if (gs == null)
-            gs = new DummyGameService(ctx);
-        return gs;
-    }
-
-    private UserProfileService ups = null;
-    @Override
-    public UserProfileService getUserProfileService() {
-        if(ups == null)
-            ups = new DummyUserService(ctx);
-        return ups;
     }
 }
