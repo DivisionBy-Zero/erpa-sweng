@@ -20,6 +20,7 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -35,11 +36,11 @@ public class DummyGameServiceTest {
     @Test
     public void addedGamePersists() {
         Game g = getGame("addedGame");
-        gs.saveGame(g);
-        Optional<Game> found = gs.getGame(g.getGameUuid());
+        gs.saveOne(g);
+        Optional<Game> found = gs.getOne(g.getGameUuid());
         assertTrue (found.isPresent());
         Game foundGame = found.get();
-        assertTrue (g.equals(foundGame));
+        assertEquals(g, foundGame);
     }
 
     @Test
@@ -49,7 +50,7 @@ public class DummyGameServiceTest {
         for (int i = 0; i < numTests; i++) {
             Game g = getGame(String.valueOf(i));
             games.add(g);
-            gs.saveGame(g);
+            gs.saveOne(g);
         }
         Set<Game> all = gs.getAll();
         assertTrue(all.containsAll(games));
