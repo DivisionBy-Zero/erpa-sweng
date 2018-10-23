@@ -13,10 +13,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
+import java.util.function.Supplier;
 
-import javax.inject.Provider;
-
-import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import ch.epfl.sweng.erpa.operations.annotations.Service;
 import toothpick.Scope;
@@ -31,10 +29,20 @@ public class TrivialProxifiedModules extends Module {
 
     public TrivialProxifiedModules(Scope scope, Class<? extends DependencyCoordinator>... dependencyConfigurators) {
         this.scope = scope;
-        registeredCoordinators = scope.getInstance(Map.class, RES_DEPENDENCY_COORDINATORS); Stream.of(dependencyConfigurators)
-                .map(scope::getInstance)
+        registeredCoordinators = scope.getInstance(Map.class, RES_DEPENDENCY_COORDINATORS);
+        Stream.of(dependencyConfigurators)
+                // Get an instance for this dependencyConfigurator
+                .map(dcClass -> {
+                    DependencyCoordinator instance = registeredCoordinators.get(dcClass);
+                    if (instance == null) instance = scope.getInstance(dcClass);
+                    return instance;
+                })
+                // Put it in the registeredCoordinators map
                 .peek(dc -> registeredCoordinators.put(dc.configuredDependencyClass(), dc))
-                .forEach(this::bindProxyfiedInstance);
+                // Make a proxy instance of its configured class and publish it in the scope
+                .peek(this::bindProxyfiedInstance)
+                // Scan the configured class for services -- Cast needed by compiler
+                .forEach(dc -> registerCoordinatorDependencyServices((DependencyCoordinator) dc));
     }
 
     private <T> void bindProxyfiedInstance(DependencyCoordinator<T> dependencyCoordinator) {
@@ -43,13 +51,11 @@ public class TrivialProxifiedModules extends Module {
                 .recover((e) -> getClassProxifiedInstance(dependencyCoordinator, cls))
                 .getOrThrowRuntimeException();
         this.bind(cls).toInstance(proxifiedInstance);
-        registerDependentServices(cls);
     }
 
     @NonNull
     private <T> T getInterfaceProxifiedInstance(DependencyCoordinator<T> dependencyCoordinator, Class<T> cls) {
-        return (T) Proxy.newProxyInstance(cls.getClassLoader(), new Class[]{cls},
-                        scope.getInstance(dependencyCoordinator.getClass()));
+        return (T) Proxy.newProxyInstance(cls.getClassLoader(), new Class[]{cls}, registeredCoordinators.get(cls));
     }
 
     private <T> T getClassProxifiedInstance(DependencyCoordinator<T> dependencyCoordinator, Class<T> cls) throws IOException {
@@ -59,7 +65,8 @@ public class TrivialProxifiedModules extends Module {
                 .build();
     }
 
-    private <T> void registerDependentServices(Class<T> cls) {
+    private <T> void registerCoordinatorDependencyServices(DependencyCoordinator<T> dependencyCoordinator) {
+        Class<T> cls = dependencyCoordinator.configuredDependencyClass();
         Stream.of(cls.getMethods())
                 .filter(m -> m.isAnnotationPresent(Service.class))
                 .map(m -> new AutomaticDependentServiceCoordinator(m.getReturnType(), cls))
@@ -70,9 +77,6 @@ public class TrivialProxifiedModules extends Module {
         private Class<T> serviceClass;
         private Class serviceProviderClass;
         private Method serviceInstanceGetter;
-        private Provider<T> getServiceInstance = () -> (T) Exceptional.of(() -> {
-            return serviceInstanceGetter.invoke(getServiceProviderInstance());
-        }).getOptional().get();
 
         AutomaticDependentServiceCoordinator(Class<T> serviceClass, Class serviceProviderClass) {
             this.serviceClass = serviceClass;
@@ -85,16 +89,21 @@ public class TrivialProxifiedModules extends Module {
                             "Couldn't find service instance getter for service %s on class %s",
                             serviceClass.getName(), serviceProviderClass.getName())
                     ));
-            bind(serviceClass).toProviderInstance(getServiceInstance);
+            registeredCoordinators.put(serviceClass, this);
+        }
+
+        private T getServiceInstanceFromProvider() {
+            return (T) Exceptional.of(() ->
+                    getServiceProviderInstance().invoke(null, serviceInstanceGetter, new Object[0])).get();
         }
 
         private DependencyCoordinator getServiceProviderInstance() {
-            return (DependencyCoordinator) scope.getInstance(serviceProviderClass);
+            return registeredCoordinators.get(serviceProviderClass);
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return method.invoke(scope.getInstance(serviceClass), args);
+            return method.invoke(getServiceInstanceFromProvider(), args);
         }
 
         @Override public boolean dependencyIsConfigured() {
