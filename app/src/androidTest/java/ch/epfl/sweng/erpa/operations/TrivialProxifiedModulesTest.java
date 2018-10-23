@@ -147,7 +147,6 @@ public class TrivialProxifiedModulesTest {
     public static class MyTestCoordinator implements DependencyCoordinator<TestDependencyClass> {
         TestDependencyClass.TestServiceInterface ret;
 
-        // MyTestCoordinator(TestDependencyClass.TestServiceInterface ret) { this.ret = ret; }
         @Override public boolean dependencyIsConfigured() { return false; }
         @Override public Intent dependencyConfigurationIntent() { return null; }
         @Override public Class<TestDependencyClass> configuredDependencyClass() { return TestDependencyClass.class; }
@@ -157,7 +156,6 @@ public class TrivialProxifiedModulesTest {
     public static class AbstractTestCoordinator implements DependencyCoordinator<TestDependencyAbstractClass> {
         TestDependencyClass.TestServiceInterface ret;
 
-        // MyTestCoordinator(TestDependencyClass.TestServiceInterface ret) { this.ret = ret; }
         @Override public boolean dependencyIsConfigured() { return false; }
         @Override public Intent dependencyConfigurationIntent() { return null; }
         @Override public Class<TestDependencyAbstractClass> configuredDependencyClass() { return TestDependencyAbstractClass.class; }
