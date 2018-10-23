@@ -51,8 +51,8 @@ public class DependencyConfigurationHelperTest {
         scope.installModules(new Module() {{
             bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
             bind(DependencyConfigurationHelper.class).to(DependencyConfigurationHelper.class);
-            bind(Set.class).withName(RES_DEPENDENCY_COORDINATORS)
-                    .toInstance(new HashSet<DependencyCoordinator>());
+            bind(Map.class).withName(RES_DEPENDENCY_COORDINATORS)
+                    .toInstance(new HashMap<Class, DependencyCoordinator>());
         }});
     }
 
@@ -199,7 +199,7 @@ public class DependencyConfigurationHelperTest {
                 }});
             });
 
-            scope.getInstance(Set.class, RES_DEPENDENCY_COORDINATORS).addAll(dependencyConfigurators.values());
+            scope.getInstance(Map.class, RES_DEPENDENCY_COORDINATORS).putAll(dependencyConfigurators);
         }
 
         private DependencyCoordinator<?> mkDependencyConfigurator(Class<?> forClass) {

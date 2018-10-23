@@ -3,12 +3,13 @@ package ch.epfl.sweng.erpa.modules;
 import com.annimon.stream.Stream;
 
 import java.lang.reflect.Proxy;
-import java.util.Set;
+import java.util.Map;
 
-import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import toothpick.Scope;
 import toothpick.config.Module;
+
+import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 
 @SuppressWarnings("unchecked")
 public class TrivialProxifiedModules extends Module {
@@ -16,11 +17,11 @@ public class TrivialProxifiedModules extends Module {
 
     public TrivialProxifiedModules(Scope scope, Class<? extends DependencyCoordinator>... dependencyConfigurators) {
         this.scope = scope;
-        Set<DependencyCoordinator> registeredCoordinators =
-                scope.getInstance(Set.class, ErpaApplication.RES_DEPENDENCY_COORDINATORS);
+        Map<Class, DependencyCoordinator> registeredCoordinators =
+                scope.getInstance(Map.class, RES_DEPENDENCY_COORDINATORS);
         Stream.of(dependencyConfigurators)
                 .map(scope::getInstance)
-                .peek(registeredCoordinators::add)
+                .peek(dc -> registeredCoordinators.put(dc.configuredDependencyClass(), dc))
                 .forEach(this::bindProxyfiedInstance);
     }
 
