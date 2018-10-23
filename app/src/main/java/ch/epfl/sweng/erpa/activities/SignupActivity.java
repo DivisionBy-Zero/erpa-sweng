@@ -15,54 +15,45 @@ import com.annimon.stream.Optional;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.services.UserAuthService;
 import toothpick.Scope;
-import toothpick.Toothpick;
 
 public class SignupActivity extends DependencyConfigurationAgnosticActivity {
-
     @Inject Scope scope;
     @Inject UserAuthService uap;
+
+    @BindView(R.id.nameText) EditText usernameField;
+    @BindView(R.id.passText) EditText passwordField;
+    @BindView(R.id.passTextConfirm) EditText passwordConfirmField;
+    @BindView(R.id.levelSelect) Spinner levelSpinner;
+    @BindView(R.id.isGM) CheckBox gmCheckBox;
+    @BindView(R.id.isPlayer) CheckBox playerCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-        Toothpick.inject(this, scope);
+        ButterKnife.bind(this);
     }
 
     @OnClick(R.id.signupButton)
     public void signUp(View view) {
-        String usernameText = ((EditText) findViewById(R.id.nameText)).getText().toString();
-        String passwordText = ((EditText) findViewById(R.id.passText)).getText().toString();
-        String confirmText = ((EditText) findViewById(R.id.passTextConfirm)).getText().toString();
-        String levelText = ((Spinner) findViewById(R.id.levelSelect)).getSelectedItem().toString();
-        boolean isGm = ((CheckBox) findViewById(R.id.isGM)).isChecked();
-        boolean isPlayer = ((CheckBox) findViewById(R.id.isPlayer)).isChecked();
+        String username = usernameField.getText().toString();
+        String password = passwordField.getText().toString();
 
-        if (usernameText.isEmpty()) {
-            createPopup(getString(R.string.noNameMessage));
+        if (new VerifyConditionAndPrintMessageIfFailed()
+                .and(username.isEmpty(), R.string.noNameMessage)
+                .and(password.isEmpty(), R.string.noPassMessage)
+                .and(!passwordConfirmField.getText().toString().equals(password), R.string.passwordsNotMatch)
+                .and(!gmCheckBox.isChecked() && !playerCheckBox.isChecked(), R.string.notSelectGmOrPlayer)
+                .coalesce())
             return;
-        }
 
-        if (passwordText.isEmpty()) {
-            createPopup(getString(R.string.noPassMessage));
-            return;
-        }
-
-        if (!passwordText.equals(confirmText)) {
-            createPopup(getString(R.string.passwords_not_match));
-            return;
-        }
-
-        if (!isGm && !isPlayer) {
-            createPopup(getString(R.string.not_select_GM_or_player));
-            return;
-        }
-
-        Exceptional.of(() -> uap.signUpUser(usernameText, passwordText))
+        Exceptional.of(() -> uap.signUpUser(username, password))
                 .ifException(e -> createPopup(e.getMessage()))
                 .getOrElse(Optional.empty())
                 .ifPresent(u -> finish());
@@ -89,5 +80,19 @@ public class SignupActivity extends DependencyConfigurationAgnosticActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         // show it
         alertDialog.show();
+    }
+
+    private class VerifyConditionAndPrintMessageIfFailed {
+        String errorMessage;
+
+        VerifyConditionAndPrintMessageIfFailed and(Boolean condition, int resId) {
+            if (errorMessage == null && condition) errorMessage = getString(resId);
+            return this;
+        }
+
+        boolean coalesce() {
+            if (errorMessage != null) createPopup(errorMessage);
+            return errorMessage != null;
+        }
     }
 }
