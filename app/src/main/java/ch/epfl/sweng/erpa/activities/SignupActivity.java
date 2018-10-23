@@ -10,23 +10,21 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import butterknife.OnClick;
-
-import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.UserSignupService;
-
+import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 
 import javax.inject.Inject;
 
+import butterknife.OnClick;
+import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.services.UserAuthService;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
 public class SignupActivity extends DependencyConfigurationAgnosticActivity {
 
     @Inject Scope scope;
-    @Inject UserSignupService uss;
+    @Inject UserAuthService uap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +62,10 @@ public class SignupActivity extends DependencyConfigurationAgnosticActivity {
             return;
         }
 
-        Optional<UserProfile> newUser = uss.storeNewUser(usernameText, passwordText, levelText, isGm, isPlayer);
-        newUser.ifPresent(u -> finish());
-
-        createPopup(getString(R.string.username_in_use));
+        Exceptional.of(() -> uap.signUpUser(usernameText, passwordText))
+                .ifException(e -> createPopup(e.getMessage()))
+                .getOrElse(Optional.empty())
+                .ifPresent(u -> finish());
     }
 
     private void createPopup(String text) {
