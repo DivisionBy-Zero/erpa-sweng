@@ -8,16 +8,15 @@ import android.support.v7.widget.RecyclerView;
 
 import com.annimon.stream.Optional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.listeners.RecyclerViewClickListener;
 import ch.epfl.sweng.erpa.model.Game;
@@ -26,10 +25,9 @@ import ch.epfl.sweng.erpa.services.GameService;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
-    @Inject @Named(ErpaApplication.RES_LIST_OF_GAMES) List<Game> games;
-
+    @Inject GameService gameService;
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private List<Game> games;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +36,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         DataBindingUtil.setContentView(this, R.layout.activity_game_list);
 
         ButterKnife.bind(this);
+        games = new ArrayList<>(gameService.getAll());
         // TODO(@Roos) remove when FIXME is fixed
         createListData();
 
@@ -53,7 +52,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
             startActivity(intent);
         };
 
-        mAdapter = new GameAdapter(games, listener);
+        RecyclerView.Adapter mAdapter = new GameAdapter(games, listener);
         mRecyclerView.setAdapter(mAdapter);
 
         // TODO(@Roos) uncomment when FIXME is fixed
@@ -63,21 +62,23 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     // FIXME(@Roos) list doesn't appear correctly the first time it's rendered
     private void createListData() {
         if (games.isEmpty()) {
-            Game game = Game.builder()
-                    .gameUuid("")
-                    .gmUuid("")
-                    .playersUuid(new HashSet<>())
-                    .name("test")
-                    .minPlayer(1)
-                    .maxPlayer(3)
-                    .difficulty(Game.Difficulty.NOOB)
-                    .universe("DnD")
-                    .oneshotOrCampaign(Game.OneshotOrCampaign.ONESHOT)
-                    .numberSessions(Optional.empty())
-                    .sessionLengthInMinutes(Optional.empty())
+            Game.GameBuilder gb = Game.builder()
                     .description("")
-                    .build();
-            for (int i = 0; i < new Random().nextInt(20) + 5; i++) games.add(game);
+                    .gmUuid("")
+                    .minPlayer(1)
+                    .name("test")
+                    .numberSessions(Optional.empty())
+                    .oneshotOrCampaign(Game.OneshotOrCampaign.ONESHOT)
+                    .playersUuid(new HashSet<>())
+                    .sessionLengthInMinutes(Optional.empty())
+                    .universe("DnD");
+            for (int i = 0; i < new Random().nextInt(20) + 5; i++) {
+                gb.difficulty(Game.Difficulty.values()[new Random().nextInt(3)])
+                        .gameUuid(Integer.toString(i))
+                        .maxPlayer(new Random().nextInt(6) + 1);
+                games.add(gb.build());
+                gameService.saveGame(gb.build());
+            }
 //            mAdapter.notifyDataSetChanged();
         }
     }
