@@ -5,10 +5,13 @@ import android.app.Application;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
@@ -27,12 +30,15 @@ public class ErpaApplication extends Application {
     public static final String RES_APPLICATION_SCOPE = "Application Scope";
     public static final String RES_DEPENDENCY_COORDINATORS = "Dependency Coordinators";
     public static final String RES_REMOTE_SERVICES_PROVIDERS = "Remote Service Providers";
+    public static final String RES_LIST_OF_GAMES = "List of games";
 
     // Remote Service Providers
     private final Set<Class<? extends RemoteServicesProvider>> remoteServicesProviders = Stream.of(
             DummyRemoteServicesProvider.class,
             FirebaseRemoteServicesProvider.class
     ).collect(Collectors.toSet());
+
+    List<Game> sampleListOfGames = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -54,6 +60,7 @@ public class ErpaApplication extends Application {
         appScope.installModules(new Module() {{
             bind(Set.class).withName(RES_REMOTE_SERVICES_PROVIDERS).toInstance(remoteServicesProviders);
             bind(Map.class).withName(RES_DEPENDENCY_COORDINATORS).toInstance(new HashMap());
+            bind(List.class).withName(RES_LIST_OF_GAMES).toInstance(sampleListOfGames);
         }});
 
         // Service coordinators

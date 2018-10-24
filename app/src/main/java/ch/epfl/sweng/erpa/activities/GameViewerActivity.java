@@ -1,6 +1,5 @@
 package ch.epfl.sweng.erpa.activities;
 
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
