@@ -22,11 +22,8 @@ import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import static android.content.ContentValues.TAG;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
-
-    //injected rsp
     @Inject RemoteServicesProvider rsp;
 
-    //bound views
     @BindView(R.id.titleTextView) TextView title;
     @BindView(R.id.descriptionTextView) TextView description;
     @BindView(R.id.gmTextView) TextView gmName;
@@ -36,7 +33,6 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
     @BindView(R.id.sessionLength) TextView sessionLength;
 
-    //overriden methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,10 +56,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
     }
 
-    //other methods
     private String getGameId() {
-
-        String gameId = getIntent().getStringExtra(GameService.EXTRA_GAME_KEY);
+        String gameId = getIntent().getStringExtra(GameService.PROP_INTENT_GAMEUUID);
         if (gameId == null) {
             Exception thrown = new IllegalArgumentException("Game Id not found");
             Log.d(TAG, "GameViewerActivity: no game id passed with intent", thrown);
