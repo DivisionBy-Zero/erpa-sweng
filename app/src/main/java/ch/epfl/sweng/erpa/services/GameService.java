@@ -6,12 +6,10 @@ import java.util.Set;
 
 import ch.epfl.sweng.erpa.model.Game;
 
-public interface GameService
-{
-    //constants
-    String EXTRA_GAME_KEY = "game|";
+public interface GameService {
+    String GAME_UUID_PREFIX = "game|";
+    String PROP_INTENT_GAMEUUID = "game uuid";
 
-    //methods
     Optional<Game> getGame(String gid);
     Set<Game> getAll();
     void saveGame(Game g);

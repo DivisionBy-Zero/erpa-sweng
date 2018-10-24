@@ -9,9 +9,6 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import ch.epfl.sweng.erpa.ErpaApplication;
@@ -20,61 +17,49 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
-import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 import toothpick.Scope;
 import toothpick.Toothpick;
+import toothpick.configuration.Configuration;
+import toothpick.registries.FactoryRegistryLocator;
+import toothpick.registries.MemberInjectorRegistryLocator;
 
-import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
-import static org.hamcrest.core.StringContains.containsString;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
+import static org.hamcrest.core.StringContains.containsString;
 
 @RunWith(AndroidJUnit4.class)
 public class GameViewerActivityTest {
-
-    private final ActivityTestRule<GameViewerActivity> activityTestRule = new ActivityTestRule<>(GameViewerActivity.class, false, false);
+    @Rule public final ActivityTestRule<GameViewerActivity> activityTestRule = new ActivityTestRule<>(GameViewerActivity.class, false, false);
     private Scope scope;
-    private ErpaApplication app;
     private Game game = getGame("hewwo");
-    private DummyGameService gs;
-
-    @Rule public final TestRule chain = RuleChain.outerRule(
-            new ExternalResource() {
-                @Override
-                protected void before() throws Throwable {
-                    app = (ErpaApplication) InstrumentationRegistry.getTargetContext().getApplicationContext();
-                    scope = Toothpick.openScope(app);
-                    RemoteServicesProviderCoordinator rsp = scope.getInstance(RemoteServicesProviderCoordinator.class);
-                    rsp.rspClassFromFullyQualifiedName(DummyRemoteServicesProvider.class.getName()).ifPresentOrElse(
-                            rsp::bindRemoteServicesProvider, () -> {
-                                throw new RuntimeException("Couldn't find RSP");
-                            });
-                    gs = new DummyGameService(InstrumentationRegistry.getTargetContext().getApplicationContext());
-                }
-
-                @Override
-                protected void after() {
-                    Toothpick.reset(scope);
-                    app.installModules(scope);
-                }
-            }
-
-    ).around(activityTestRule);
 
     @Before
-    public void initIntent() throws InterruptedException {
+    public void prepare() {
+        Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
+        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
+        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
+        scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
+        ErpaApplication application = scope.getInstance(ErpaApplication.class);
+
+        Toothpick.reset(scope);
+        application.installModules(scope);
+        scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
+                DummyRemoteServicesProvider.class
+        );
+
+        scope.getInstance(GameService.class).saveGame(game);
+
         Intent i = new Intent();
-        i.putExtra(GameService.EXTRA_GAME_KEY, game.getGameUuid());
-        gs.saveGame(game);
+        i.putExtra(GameService.PROP_INTENT_GAMEUUID, game.getGameUuid());
         activityTestRule.launchActivity(i);
     }
 
-
     @Test
     public void testHasIntent() {
-        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.EXTRA_GAME_KEY));
+        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.PROP_INTENT_GAMEUUID));
     }
 
     @Test
@@ -104,20 +89,17 @@ public class GameViewerActivityTest {
     }
 
     @Test
-    public void testType()
-    {
+    public void testType() {
         onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getOneshotOrCampaign().toString())));
     }
 
     @Test
-    public void testSessionLength()
-    {
+    public void testSessionLength() {
         onView(withId(R.id.sessionLength)).check(matches(withText(game.getSessionLengthInMinutes().toString())));
     }
 
     @Test
-    public void testNumSessions()
-    {
+    public void testNumSessions() {
         onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberSessions().toString())));
     }
 
