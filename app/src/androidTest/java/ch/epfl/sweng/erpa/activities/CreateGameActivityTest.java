@@ -5,6 +5,7 @@ import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
@@ -20,7 +21,6 @@ import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -90,7 +90,8 @@ public class CreateGameActivityTest {
 
         onView(withId(R.id.description_field)).perform(
                 typeText("Une petite description de partie")).perform(closeSoftKeyboard());
-        onView(withId(R.id.create_game_form)).perform(swipeUp());
+        View gameForm = intentsTestRule.getActivity().findViewById(R.id.create_game_form);
+        gameForm.scrollBy(0, 500);
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 
@@ -118,7 +119,8 @@ public class CreateGameActivityTest {
         onView(withId(R.id.campaign)).perform(click());
         onView(withId(R.id.description_field)).perform(
                 typeText("Une petite description de partie")).perform(closeSoftKeyboard());
-        onView(withId(R.id.create_game_form)).perform(swipeUp());
+        View gameForm = intentsTestRule.getActivity().findViewById(R.id.create_game_form);
+        gameForm.scrollBy(0, 500);
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
     }
 

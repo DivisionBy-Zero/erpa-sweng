@@ -26,6 +26,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/launch_my_account_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:onClick="launchMyAccount"
+        android:text="My Account"
+        app:layout_constraintStart_toStartOf="@id/launch_create_game_button"
+        app:layout_constraintTop_toBottomOf="@id/launch_create_game_button" />
+
+    <Button
         android:id="@+id/launch_storage_provider_greet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

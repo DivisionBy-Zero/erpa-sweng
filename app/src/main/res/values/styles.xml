@@ -16,6 +16,7 @@
         <item name="android:colorControlHighlight">@color/primaryDarkColor</item>
         <!--title and menu police-->
         <item name="android:fontFamily">@font/yatraone_regular</item>
+        <!-- TODO(@Ryker): Maybe use these fonts for your preview cards -->
         <!--preview card police-->
         <!--<item name="android:fontFamily">@font/italianno_regular</item>-->
         <!--Noob/chill/hard police-->
@@ -32,5 +33,4 @@
     <style name="ERPAStyle.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="ERPAStyle.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
 </resources>

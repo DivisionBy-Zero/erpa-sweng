@@ -32,4 +32,8 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         startActivity(new Intent(this, CreateGameActivity.class));
     }
 
+    @OnClick(R.id.launch_my_account_button)
+    public void launchMyAccount(View view) {
+        startActivity(new Intent(this, MyAccountActivity.class));
+    }
 }

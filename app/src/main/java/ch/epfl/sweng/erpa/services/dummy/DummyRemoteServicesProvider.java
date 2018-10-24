@@ -85,7 +85,8 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         int uidBytesLength = uidBytes.length;
         byte[] salt16Bytes = new byte[16];
         System.arraycopy(uidBytes, uidBytesLength - 16, salt16Bytes, 0, 16);
-        byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes, password.getBytes(StandardCharsets.UTF_8));
+        byte[] hashBytes = BCrypt.withDefaults().hash(6, salt16Bytes,
+                password.getBytes(StandardCharsets.UTF_8));
         return new String(hashBytes, StandardCharsets.UTF_8);
     }
 }
