@@ -24,7 +24,7 @@ before_script:
   - adb shell settings put global animator_duration_scale 0
   - adb shell input keyevent 82
 script:
-  - ./gradlew build connectedCheck jacocoTestReport
+  - ./gradlew build connectedCheck jacocoTestReport --info
 after_script:
   # Report test coverage to Code Climate
   - export JACOCO_SOURCE_PATH=app/src/main/java/
