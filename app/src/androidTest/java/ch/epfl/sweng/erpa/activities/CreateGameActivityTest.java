@@ -1,6 +1,7 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.content.res.Resources;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
@@ -15,7 +16,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
+import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
+import toothpick.Scope;
+import toothpick.Toothpick;
+import toothpick.configuration.Configuration;
+import toothpick.registries.FactoryRegistryLocator;
+import toothpick.registries.MemberInjectorRegistryLocator;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -33,14 +42,29 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class CreateGameActivityTest {
-    private Resources systemResources;
     @Rule
     public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(
             CreateGameActivity.class);
+    private Resources systemResources;
 
     @Before
     public void setSystemResources() {
         systemResources = intentsTestRule.getActivity().getResources();
+    }
+
+    @Before
+    public void prepare() {
+        Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
+        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
+        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
+        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
+        ErpaApplication application = scope.getInstance(ErpaApplication.class);
+
+        Toothpick.reset(scope);
+        application.installModules(scope);
+        scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
+                DummyRemoteServicesProvider.class
+        );
     }
 
     @Test
