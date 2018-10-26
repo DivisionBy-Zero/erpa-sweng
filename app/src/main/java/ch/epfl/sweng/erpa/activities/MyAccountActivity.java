@@ -22,6 +22,7 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.util.Pair;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -89,10 +90,5 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         myDrawablesList = Stream.rangeClosed(1, 8).map(i -> context.getDrawable(R.drawable.ic_action_name)).collect(
                 Collectors.toList());
     }
-
-    @Data
-    public class Pair<T1, T2> {
-        @NonNull T1 first;
-        @NonNull T2 second;
-    }
 }
+

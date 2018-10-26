@@ -13,6 +13,7 @@ import org.junit.Test;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.util.Pair;
 
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
@@ -69,7 +70,7 @@ public class MyAccountActivityTest {
     }
 
     public void checkCorrectName(int position, int ressourceID) {
-        MyAccountActivity.Pair pair = (MyAccountActivity.Pair) listView.getItemAtPosition(position);
+        Pair pair = (Pair) listView.getItemAtPosition(position);
         assertThat(((MyAccountButton) pair.getFirst()).getText(),
                 is(systemResources.getString(ressourceID)));
     }

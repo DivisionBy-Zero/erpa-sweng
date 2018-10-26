@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import ch.epfl.sweng.erpa.activities.MyAccountActivity.Pair;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.util.Pair;
 
 public class MyAccountButtonAdapter extends ArrayAdapter<Pair<MyAccountButton, Drawable>> {
 
