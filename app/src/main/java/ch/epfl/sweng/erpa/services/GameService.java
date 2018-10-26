@@ -45,17 +45,39 @@ public interface GameService {
     class StreamRefinerBuilder {
         private StreamRefiner result = new StreamRefiner();
 
+        /**
+         * Add a {@code SortCriteria} and its associated {@code Ordering} to the map of existing criteria.
+         * If a criteria is already present, only the {@code Ordering} will be changed and the criteria will
+         * keep it's previous priority.
+         *
+         * @param criteria the criteria to sort by
+         * @param ordering the ordering associated to the {@code criteria}
+         * @return a {@link StreamRefinerBuilder}
+         */
         public StreamRefinerBuilder sortBy(@NonNull StreamRefiner.SortCriteria criteria,
                                            StreamRefiner.Ordering ordering) {
             result.getSortCriterias().put(criteria, ordering);
             return this;
         }
 
+        /**
+         * Remove a {@code SortCriteria} and its associated {@code Ordering} from the map of existing
+         * criteria if it exists.
+         *
+         * @param criteria the criteria to sort by
+         * @return a {@link StreamRefinerBuilder}
+         */
         public StreamRefinerBuilder removeOneCriteria(@NonNull StreamRefiner.SortCriteria criteria) {
             result.getSortCriterias().remove(criteria);
             return this;
         }
 
+        /**
+         * Remove all {@code SortCriteria} and their associated {@code Ordering} from the map of existing
+         * criteria.
+         *
+         * @return a {@link StreamRefinerBuilder}
+         */
         public StreamRefinerBuilder clearCriteria() {
             if (result.getSortCriterias() != null)
                 result.getSortCriterias().clear();
