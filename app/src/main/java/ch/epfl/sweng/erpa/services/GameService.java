@@ -13,4 +13,5 @@ public interface GameService {
     Optional<Game> getGame(String gid);
     Set<Game> getAll();
     void saveGame(Game g);
+    boolean removeGames();
 }

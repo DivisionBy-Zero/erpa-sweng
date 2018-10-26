@@ -53,7 +53,8 @@ public class DummyGameService implements GameService {
 
     @Override
     public Optional<Game> getGame(String gid) {
-        return Exceptional.of(() -> new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION)).getOptional()
+        return Exceptional.of(
+                () -> new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION)).getOptional()
                 .filter(File::exists)
                 .filter(File::isFile)
                 .flatMap(DummyGameService::fetchExistingGameFromFile);
@@ -92,5 +93,14 @@ public class DummyGameService implements GameService {
             Log.e(TAG, Arrays.toString(e.getStackTrace()));
             throw new RuntimeException("Could not save file");
         }
+    }
+
+    @Override
+    public boolean removeGames() {
+        File[] files = gameDir.listFiles();
+        boolean res = true;
+        for (File f : files)
+            res &= f.delete();
+        return res;
     }
 }
