@@ -1,18 +1,17 @@
 package ch.epfl.sweng.erpa.services;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.annimon.stream.Optional;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,14 +31,19 @@ public class DummyGameServiceTest {
         gs = new DummyGameService(ctx);
     }
 
+    @After
+    public void cleanUp() {
+        gs.removeGames();
+    }
+
     @Test
     public void addedGamePersists() {
         Game g = getGame("addedGame");
         gs.saveGame(g);
         Optional<Game> found = gs.getGame(g.getGameUuid());
-        assertTrue (found.isPresent());
+        assertTrue(found.isPresent());
         Game foundGame = found.get();
-        assertTrue (g.equals(foundGame));
+        assertTrue(g.equals(foundGame));
     }
 
     @Test
@@ -55,5 +59,8 @@ public class DummyGameServiceTest {
         assertTrue(all.containsAll(games));
     }
 
-
+    @Test
+    public void removeSaveFile() {
+        assertTrue(gs.removeGames());
+    }
 }
