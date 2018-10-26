@@ -80,9 +80,9 @@ public class MyAccountActivityTest {
 
         performClickOnListviewButton(0);
         if (userProfile.getIsPlayer())
-            intended(hasComponent(PendingRequestActivity.class.getName()));
+            intended(hasComponent(GameListActivity.class.getName()));
         else
-            intended(hasComponent(HostedGamesActivity.class.getName()));
+            intended(hasComponent(GameListActivity.class.getName()));
     }
 
     @Test
@@ -90,9 +90,9 @@ public class MyAccountActivityTest {
 
         performClickOnListviewButton(1);
         if (userProfile.getIsPlayer())
-            intended(hasComponent(ConfirmedGamesActivity.class.getName()));
+            intended(hasComponent(GameListActivity.class.getName()));
         else
-            intended(hasComponent(PastHostedGamesActivity.class.getName()));
+            intended(hasComponent(GameListActivity.class.getName()));
     }
 
     @Test
@@ -100,9 +100,9 @@ public class MyAccountActivityTest {
 
         performClickOnListviewButton(2);
         if (userProfile.getIsPlayer())
-            intended(hasComponent(PastGamesActivity.class.getName()));
+            intended(hasComponent(GameListActivity.class.getName()));
         else
-            intended(hasComponent(ProfileActivity.class.getName()));
+            intended(hasComponent(GameListActivity.class.getName()));
     }
 
     @Test
