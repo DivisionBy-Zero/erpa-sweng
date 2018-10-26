@@ -135,12 +135,9 @@ public class GameListActivityTest {
     public void testClick() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         RecyclerView view = intentsTestRule.getActivity().findViewById(R.id.recyclerView);
-        int position = new Random().nextInt(getItemCount(view));
-        CardView card = (CardView) view.getLayoutManager().getChildAt(position);
 
         instrumentation.runOnMainSync(() -> {
-            view.scrollToPosition(new Random().nextInt(getItemCount(view)));
-            card.performClick();
+            view.getLayoutManager().getChildAt(0).performClick();
         });
         intended(hasComponent(GameViewerActivity.class.getName()));
     }
