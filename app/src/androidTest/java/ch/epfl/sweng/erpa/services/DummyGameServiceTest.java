@@ -61,22 +61,21 @@ public class DummyGameServiceTest {
         Set<Game> all = gs.getAll();
         assertTrue(all.containsAll(games));
     }
+
     @Test(expected = IllegalStateException.class)
-    public void testExceptionOnIllegalSave()
-    {
+    public void testExceptionOnIllegalSave() {
         Game evilGame = getGame("folder");
-        File newFolder = new File(gs.getGameDir(), evilGame.getGameUuid()+DummyGameService.SAVED_GAME_FILE_EXTENSION);
+        File newFolder = new File(gs.getGameDir(), evilGame.getGameUuid() + DummyGameService.SAVED_GAME_FILE_EXTENSION);
         newFolder.delete();
         newFolder.mkdir();
         gs.saveGame(evilGame);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testExceptionOnGet()
-    {
+    public void testExceptionOnGet() {
         File evilFile = new File(gs.getGameDir(), "Evil");
         evilFile.delete();
-        Log.d("Test:", DummyGameService.fetchExistingGameFromFile(evilFile).toString());
+        DummyGameService.fetchExistingGameFromFile(evilFile);
     }
 
     @Test

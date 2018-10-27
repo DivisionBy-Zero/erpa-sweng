@@ -32,9 +32,11 @@ import static android.content.ContentValues.TAG;
 public class DummyGameService implements GameService {
     public final static String SAVED_GAME_FILE_EXTENSION = ".yaml";
     public final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
-    @Getter private final File gameDir;
+    @Getter
+    private final File gameDir;
 
-    @Inject public DummyGameService(Context ctx) {
+    @Inject
+    public DummyGameService(Context ctx) {
         File rootDir = ctx.getFilesDir();
         File gameDir = new File(rootDir, SAVED_GAME_DATA_FOLDER);
         this.gameDir = gameDir;
@@ -50,12 +52,12 @@ public class DummyGameService implements GameService {
 
     /**
      * Fetches files that is guaranteed to exist
+     *
      * @param gameFile the file (is assumed to exist)
      * @return the game contained in the file
      */
     public static Game fetchExistingGameFromFile(File gameFile) {
-        if(!gameFile.exists()) Log.d("fetchGame", "am here");
-        FileReader fr = Exceptional.of(() ->new FileReader(gameFile))
+        FileReader fr = Exceptional.of(() -> new FileReader(gameFile))
                 .getOrThrow(new IllegalArgumentException("Game did not exist!"));
         return new Yaml().load(fr);
     }
@@ -88,7 +90,6 @@ public class DummyGameService implements GameService {
                 //noinspection ResultOfMethodCallIgnored
                 gameFile.createNewFile();
             } else if (gameFile.isDirectory()) {
-                Log.d("saveGame", "I am here, throwing exception");
                 throw new IllegalStateException("Trying to write to existing folder, as file! " + gameFile.getAbsolutePath());
             }
             FileOutputStream fOut = new FileOutputStream(gameFile, false);
