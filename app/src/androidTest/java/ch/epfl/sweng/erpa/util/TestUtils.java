@@ -37,7 +37,7 @@ public class TestUtils {
                 true);
     }
 
-    public static <T extends UuidObject> void unnecessaryCodeClimateMethod(List<T> list, DataService<T> ds, Function<String, T> genfct, int numIter) {
+    public static <T extends UuidObject> void populateUUIDObjectListAndDataService(List<T> list, DataService<T> ds, Function<String, T> genfct, int numIter) {
         for (int i = 0; i < numIter; i++) {
 
             T el = genfct.apply(String.valueOf(i));

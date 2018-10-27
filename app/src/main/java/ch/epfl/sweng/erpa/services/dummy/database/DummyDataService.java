@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Function;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Set;
@@ -77,13 +79,18 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
     }
 
     private static <U> U fetchExistingDataFromFile(File dataFile, Class<U> uClass) {
-        try {
-            FileReader gReader = new FileReader(dataFile);
-            return (new Yaml()).loadAs(gReader, uClass);
-
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("File given as argument does not exist");
-        }
+        FileReader fileReader = Exceptional.of(() -> new FileReader(dataFile))
+                .ifExceptionIs(FileNotFoundException.class,
+                        (FileNotFoundException e) -> {
+                            throw new IllegalArgumentException("File given as argument does not exist!");
+                        })
+                .ifExceptionIs(IOException.class,
+                        (IOException e) -> {
+                            Log.e("FetchData", Arrays.toString(e.getStackTrace()));
+                            throw new RuntimeException();
+                        })
+                .getOrThrowRuntimeException();
+        return new Yaml().loadAs(fileReader, uClass);
     }
 
     @Override

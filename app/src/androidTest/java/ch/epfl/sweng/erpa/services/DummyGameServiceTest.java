@@ -22,7 +22,7 @@ import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 import ch.epfl.sweng.erpa.util.TestUtils;
 
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
-import static ch.epfl.sweng.erpa.util.TestUtils.unnecessaryCodeClimateMethod;
+import static ch.epfl.sweng.erpa.util.TestUtils.populateUUIDObjectListAndDataService;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
@@ -56,7 +56,7 @@ public class DummyGameServiceTest {
     public void testAddedAll() {
         int numTests = 500;
         List<Game> games = new ArrayList<>(numTests);
-        unnecessaryCodeClimateMethod(games,gs, TestUtils::getGame,numTests);
+        populateUUIDObjectListAndDataService(games,gs, TestUtils::getGame,numTests);
         Set<Game> all = gs.getAll();
         assertTrue(all.containsAll(games));
     }

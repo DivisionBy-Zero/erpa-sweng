@@ -6,7 +6,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.annimon.stream.Optional;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,7 +17,7 @@ import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
 import ch.epfl.sweng.erpa.util.TestUtils;
 
 import static ch.epfl.sweng.erpa.util.TestUtils.getUserProfile;
-import static ch.epfl.sweng.erpa.util.TestUtils.unnecessaryCodeClimateMethod;
+import static ch.epfl.sweng.erpa.util.TestUtils.populateUUIDObjectListAndDataService;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
@@ -48,7 +47,7 @@ public class DummyUserProfileServiceTest {
         int numTests = 500;
         List<UserProfile> userProfiles = new ArrayList<>(numTests);
 
-        unnecessaryCodeClimateMethod(userProfiles,ups, TestUtils::getUserProfile, numTests);
+        populateUUIDObjectListAndDataService(userProfiles,ups, TestUtils::getUserProfile, numTests);
         assertTrue("Contains all added elements", ups.getAllUserProfiles().containsAll(userProfiles));
     }
 }

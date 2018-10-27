@@ -22,11 +22,12 @@ import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
+
 import com.annimon.stream.Optional;
 >>>>>>> dde0bff... Refactor to add a GameService and a UserProfileService interface
 
 @Singleton
-public class DummyGameService extends  DummyDataService<Game> implements GameService {
+public class DummyGameService extends DummyDataService<Game> implements GameService {
 
     @Override
     public boolean removeGames() {
@@ -39,12 +40,14 @@ public class DummyGameService extends  DummyDataService<Game> implements GameSer
 
     private final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
 
-    @Inject public DummyGameService(Context ctx) {
+    @Inject
+    public DummyGameService(Context ctx) {
         super(ctx, Game.class);
     }
 
 
-    @Override String dataFolder() {
+    @Override
+    String dataFolder() {
         return SAVED_GAME_DATA_FOLDER;
     }
 

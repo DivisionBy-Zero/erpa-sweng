@@ -1,5 +1,7 @@
 package ch.epfl.sweng.erpa.services.dummy;
 
+import android.content.Context;
+
 import com.annimon.stream.Optional;
 
 import java.nio.charset.StandardCharsets;
@@ -31,7 +33,6 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         userList = new ArrayList<>();
         userList.add(defaultUser);
     }
-
     @Override
     public String getFriendlyProviderName() {
         return "Dummy Remote Provider";
