@@ -1,4 +1,4 @@
-package ch.epfl.sweng.erpa.services;
+package ch.epfl.sweng.erpa.services.dummy.database;
 
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
@@ -17,7 +17,7 @@ import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
 import ch.epfl.sweng.erpa.util.TestUtils;
 
 import static ch.epfl.sweng.erpa.util.TestUtils.getUserProfile;
-import static ch.epfl.sweng.erpa.util.TestUtils.populateUUIDObjectListAndDataService;
+import static ch.epfl.sweng.erpa.util.TestUtils.populateUUIDObjects;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
@@ -47,7 +47,7 @@ public class DummyUserProfileServiceTest {
         int numTests = 500;
         List<UserProfile> userProfiles = new ArrayList<>(numTests);
 
-        populateUUIDObjectListAndDataService(userProfiles,ups, TestUtils::getUserProfile, numTests);
+        populateUUIDObjects(userProfiles,ups, TestUtils::getUserProfile);
         assertTrue("Contains all added elements", ups.getAllUserProfiles().containsAll(userProfiles));
     }
 }

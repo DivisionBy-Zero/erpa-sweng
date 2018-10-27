@@ -24,21 +24,16 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
 
 import com.annimon.stream.Optional;
->>>>>>> dde0bff... Refactor to add a GameService and a UserProfileService interface
 
 @Singleton
 public class DummyGameService extends DummyDataService<Game> implements GameService {
 
     @Override
     public boolean removeGames() {
-        File[] files = gameDir.listFiles();
-        boolean res = true;
-        for (File f : files)
-            res &= f.delete();
-        return res;
+        return removeAll();
     }
 
-    private final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
+    final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
 
     @Inject
     public DummyGameService(Context ctx) {

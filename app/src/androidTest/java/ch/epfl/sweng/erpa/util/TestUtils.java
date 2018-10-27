@@ -12,6 +12,7 @@ import ch.epfl.sweng.erpa.model.UuidObject;
 import ch.epfl.sweng.erpa.services.DataService;
 
 public class TestUtils {
+    public static final int numTests = 500;
     public static Game getGame(String gid) {
         return new Game(
                 gid,
@@ -37,8 +38,8 @@ public class TestUtils {
                 true);
     }
 
-    public static <T extends UuidObject> void populateUUIDObjectListAndDataService(List<T> list, DataService<T> ds, Function<String, T> genfct, int numIter) {
-        for (int i = 0; i < numIter; i++) {
+    public static <T extends UuidObject> void populateUUIDObjects(List<T> list, DataService<T> ds, Function<String, T> genfct) {
+        for (int i = 0; i < numTests; i++) {
 
             T el = genfct.apply(String.valueOf(i));
             list.add(el);

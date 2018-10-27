@@ -22,26 +22,41 @@ import java.util.Set;
 
 import ch.epfl.sweng.erpa.model.UuidObject;
 import ch.epfl.sweng.erpa.services.DataService;
+import lombok.Getter;
 
 import static android.content.ContentValues.TAG;
 
 public abstract class DummyDataService<T extends UuidObject> implements DataService<T> {
-    private final static String SAVED_DATA_FILE_EXTENSION = ".yaml";
-    private final Function<File, T> fileFetcher;
+    public final static String SAVED_DATA_FILE_EXTENSION = ".yaml";
+    @Getter private final Function<File, T> fileFetcher;
 
-    private final File dataDir;
+    @Getter private final File dataDir;
 
     DummyDataService(Context ctx, Class<T> tClass) {
         this.dataDir = new File(ctx.getFilesDir(), dataFolder());
         this.fileFetcher = file -> fetchExistingDataFromFile(file, tClass);
         if (!dataDir.mkdir()) {
             if (!dataDir.isDirectory()) {
-                throw new IllegalStateException(tClass.getName() + " data folder (\"" + dataDir.getAbsolutePath() + "\") exists and is not a folder!");
+                throw new IllegalStateException(tClass.getName() +
+                        " data folder (\"" +
+                        dataDir.getAbsolutePath() +
+                        "\") exists and is not a folder!");
             }
         }
     }
 
     abstract String dataFolder();
+
+
+    @Override
+    public boolean removeAll() {
+        File[] files = dataDir.listFiles();
+        boolean res = true;
+        for (File f : files) {
+            res = f.delete() && res;
+        }
+        return res;
+    }
 
     @Override
     public Optional<T> getOne(String gid) {
@@ -72,7 +87,7 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
 
             new Yaml().dump(t, writer);
         } catch (FileNotFoundException ignored) { //we just created the file. it cannot possibly not exist (unless createNewFile threw an error)
-        } catch (Exception e) {
+        } catch (IOException e) {
             Log.e(TAG, Arrays.toString(e.getStackTrace()));
             throw new RuntimeException("Could not save file");
         }

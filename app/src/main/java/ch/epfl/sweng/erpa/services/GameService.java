@@ -16,10 +16,9 @@ public interface GameService extends DataService<Game> {
     String PROP_INTENT_GAME_UUID = "game|";
 
     Optional<Game> getGame(String gameUuid);
-
     void saveGame(Game g);
-
     Set<Game> getAllGames();
+    boolean removeGames();
 
     @NoArgsConstructor
     @Getter
