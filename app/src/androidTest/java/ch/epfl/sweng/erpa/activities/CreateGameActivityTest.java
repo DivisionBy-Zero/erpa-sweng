@@ -16,8 +16,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
@@ -38,6 +42,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -46,18 +51,26 @@ public class CreateGameActivityTest {
     public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(
             CreateGameActivity.class);
     private Resources systemResources;
+    private Game game;
+    private String uuid;
 
     @Before
-    public void setSystemResources() {
+    public void setVariables() {
         systemResources = intentsTestRule.getActivity().getResources();
+        Set<String> set = new HashSet<>();
+        game = new Game("111", "222", set, "Name", 1, 2, Game.Difficulty.NOOB, "Universe",
+                Game.OneshotOrCampaign.ONESHOT, Optional.empty(), Optional.of(30), "Description");
+
     }
 
     @Before
     public void prepare() {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
+        MemberInjectorRegistryLocator.setRootRegistry(
+                new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
+        Scope scope = Toothpick.openScope(
+                InstrumentationRegistry.getTargetContext().getApplicationContext());
         ErpaApplication application = scope.getInstance(ErpaApplication.class);
 
         Toothpick.reset(scope);
@@ -83,6 +96,19 @@ public class CreateGameActivityTest {
                 .map(CreateGameActivity::findDifficulty)
                 .allMatch(o -> o != null);
         assertTrue(q);
+    }
+
+    @Test
+    public void testGameWithPlayer() {
+        uuid = "newUuid";
+        assertTrue(game.withPlayer(uuid).getPlayersUuid().contains(uuid));
+    }
+
+    @Test
+    public void testRemovePlayer() {
+        uuid = "newUuid2";
+        game.withPlayer(uuid);
+        assertFalse(game.removePlayer(uuid).getPlayersUuid().contains(uuid));
     }
 
     @Test
