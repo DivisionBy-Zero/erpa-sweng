@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.Set;
 
 import ch.epfl.sweng.erpa.model.UuidObject;
+import lombok.Data;
 
 import static ch.epfl.sweng.erpa.util.TestUtils.populateUUIDObjects;
 import static junit.framework.TestCase.assertEquals;
@@ -79,6 +80,7 @@ public class DummyDataServiceTest {
         assertTrue(dts.removeAll());
     }
 
+    @Data
     static class TestData implements UuidObject {
         private Integer x;
         private Integer y;
@@ -92,21 +94,6 @@ public class DummyDataServiceTest {
         @Override
         public String getUuid() {
             return String.valueOf(hashCode());
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            TestData testData = (TestData) o;
-            return Objects.equals(x, testData.x) &&
-                    Objects.equals(y, testData.y);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return Objects.hash(x, y);
         }
     }
 
