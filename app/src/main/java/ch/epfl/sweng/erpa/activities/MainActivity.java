@@ -8,6 +8,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
 
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+
 public class MainActivity extends DependencyConfigurationAgnosticActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +26,11 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
 
     @OnClick(R.id.launch_game_list_button)
     public void launchGameList(View view) {
-        startActivity(new Intent(this, GameListActivity.class));
+        Intent intent = new Intent(this, GameListActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @OnClick(R.id.launch_create_game_button)

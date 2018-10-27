@@ -1,6 +1,8 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.app.Instrumentation;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
@@ -37,6 +39,7 @@ import toothpick.registries.MemberInjectorRegistryLocator;
 
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -62,6 +65,10 @@ public class GameListActivityTest {
         scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
                 DummyRemoteServicesProvider.class
         );
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        intentsTestRule.getActivity().getIntent().putExtras(bundle);
     }
 
     private int getItemCount(@NonNull RecyclerView view) {

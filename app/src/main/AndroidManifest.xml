@@ -12,12 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/ERPAStyle"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.ConfirmedGamesActivity" />
         <activity android:name=".activities.CreateGameActivity" />
         <activity android:name=".activities.ExampleForToolbarActivity" />
         <activity android:name=".activities.GameListActivity" />
         <activity android:name=".activities.GameViewerActivity" />
-        <activity android:name=".activities.HostedGamesActivity" />
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.MainActivity">
             <intent-filter>
@@ -27,10 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.MyAccountActivity" />
-        <activity android:name=".activities.PastGamesActivity" />
-        <activity android:name=".activities.PastHostedGamesActivity" />
-        <activity android:name=".activities.PendingRequestActivity" />
-        <activity android:name=".activities.ProfileActivity"/>
+        <activity android:name=".activities.ProfileActivity" />
         <activity android:name=".activities.RemoteServiceGreeterActivity" />
         <activity android:name=".activities.SelectRemoteServicesProviderActivity" />
         <activity android:name=".activities.SignupActivity" />

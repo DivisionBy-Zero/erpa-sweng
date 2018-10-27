@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -29,6 +28,7 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign;
 
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
 
@@ -106,6 +106,9 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             createAndPublishGame();
 
             Intent intent = new Intent(this, GameListActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+            intent.putExtras(bundle);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
             startActivity(intent);
         }
@@ -129,7 +132,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
 
         String gmUUID = "";
 
-        Game newGame = new Game(gameUUID,gmUUID, new HashSet<>(), gameName.toString(),
+        Game newGame = new Game(gameUUID, gmUUID, new HashSet<>(), gameName.toString(),
                 minPlayers, maxPlayers, difficulty, universe, oneShotOrCampaign, numbSession,
                 sessionLength, gameDescription.toString());
 
