@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Set;
@@ -23,16 +24,19 @@ import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
+import lombok.Getter;
 
 import static android.content.ContentValues.TAG;
 
 @Singleton
 public class DummyGameService implements GameService {
-    private final static String SAVED_GAME_FILE_EXTENSION = ".yaml";
-    private final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
+    public final static String SAVED_GAME_FILE_EXTENSION = ".yaml";
+    public final static String SAVED_GAME_DATA_FOLDER = "saved_games_data";
+    @Getter
     private final File gameDir;
 
-    @Inject public DummyGameService(Context ctx) {
+    @Inject
+    public DummyGameService(Context ctx) {
         File rootDir = ctx.getFilesDir();
         File gameDir = new File(rootDir, SAVED_GAME_DATA_FOLDER);
         this.gameDir = gameDir;
@@ -46,18 +50,25 @@ public class DummyGameService implements GameService {
         }
     }
 
-    private static Optional<Game> fetchExistingGameFromFile(File gameFile) {
-        return Exceptional.of(() -> new Yaml().loadAs(new FileReader(gameFile), Game.class))
-                .getOptional();
+    /**
+     * Fetches files that is guaranteed to exist
+     *
+     * @param gameFile the file (is assumed to exist)
+     * @return the game contained in the file
+     */
+    public static Game fetchExistingGameFromFile(File gameFile) {
+        FileReader fr = Exceptional.of(() -> new FileReader(gameFile))
+                .getOrThrow(new IllegalArgumentException("Game did not exist!"));
+        return new Yaml().load(fr);
     }
 
     @Override
     public Optional<Game> getGame(String gid) {
-        return Exceptional.of(
-                () -> new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION)).getOptional()
+        return Optional.of(
+                new File(gameDir, gid + SAVED_GAME_FILE_EXTENSION))
                 .filter(File::exists)
                 .filter(File::isFile)
-                .flatMap(DummyGameService::fetchExistingGameFromFile);
+                .map(DummyGameService::fetchExistingGameFromFile);
     }
 
     @Override
@@ -67,8 +78,6 @@ public class DummyGameService implements GameService {
                 .filter(file -> file.getPath().endsWith(SAVED_GAME_FILE_EXTENSION))
                 .filter(File::isFile)
                 .map(DummyGameService::fetchExistingGameFromFile)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 
@@ -89,7 +98,7 @@ public class DummyGameService implements GameService {
             new Yaml().dump(g, writer);
         } catch (FileNotFoundException ignored) {
             // We just created the file. it cannot possibly not exist (unless createNewFile threw an error)
-        } catch (Exception e) {
+        } catch (IOException e) {
             Log.e(TAG, Arrays.toString(e.getStackTrace()));
             throw new RuntimeException("Could not save file");
         }
