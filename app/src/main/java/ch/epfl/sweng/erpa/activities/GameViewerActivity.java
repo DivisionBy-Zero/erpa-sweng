@@ -102,7 +102,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         String gameLength = game.getSessionLengthInMinutes().map(Object::toString).orElse("Unspecified");
         sessionLength.setText(gameLength);
 
-        String playerInfo = Stream.of(game.getPlayersUuid()).reduce("", (elem, acc)->acc + "\n" + elem);
+        String playerInfo = Stream.of(game.getPlayersUuid()).reduce("", (elem, acc)->acc + ", " + elem);
         playersInGame.setText(playerInfo);
 
     }

@@ -25,6 +25,9 @@
         <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
     </style>
 
+    <style name="ERPAStyle.smallprint" parent="ERPAStyle">
+        <item name="android:textSize">12sp</item>
+    </style>
     <style name="ERPAStyle.title" parent="ERPAStyle">
         <item name="android:textSize">40sp</item>
     </style>
