@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.services.dummy.database;
 import android.content.Context;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class DummyGameService extends DummyDataService<Game> implements GameServ
     }
 
     @Override
-    public Set<Game> getAllGames() {
-        return getAll();
+    public Stream<Game> getAllGames(StreamRefiner streamRefiner) {
+        return Stream.of(getAll());
     }
 }

@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.util;
 import com.annimon.stream.Optional;
 import com.annimon.stream.function.Function;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class TestUtils {
                 true);
     }
 
-    public static <T extends UuidObject> void populateUUIDObjects(List<T> list, DataService<T> ds, Function<String, T> genfct) {
+    public static <T extends UuidObject> void populateUUIDObjects(Collection<T> list, DataService<T> ds, Function<String, T> genfct) {
         for (int i = 0; i < numTests; i++) {
 
             T el = genfct.apply(String.valueOf(i));

@@ -1,14 +1,13 @@
 package ch.epfl.sweng.erpa.services;
 
 import com.annimon.stream.Optional;
-
-import java.util.Set;
+import com.annimon.stream.Stream;
 
 import ch.epfl.sweng.erpa.model.UuidObject;
 
 public interface DataService<T extends UuidObject> {
     Optional<T> getOne(String uuid);
-    Set<T> getAll();
+    Stream<T> getAll();
     void saveOne(T t);
     void removeAll();
 }

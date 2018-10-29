@@ -18,7 +18,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.Set;
 
 import ch.epfl.sweng.erpa.model.UuidObject;
 import ch.epfl.sweng.erpa.services.DataService;
@@ -109,7 +108,7 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
     }
 
     @Override
-    public Set<T> getAll() {
+    public Stream<T> getAll() {
         File[] games = dataDir.listFiles();
         return Stream.of(games)
                 .filter(file -> file.getPath().endsWith(SAVED_DATA_FILE_EXTENSION))

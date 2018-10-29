@@ -1,8 +1,8 @@
 package ch.epfl.sweng.erpa.services;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -18,7 +18,7 @@ public interface GameService extends DataService<Game> {
 
     Optional<Game> getGame(String gameUuid);
     void saveGame(Game g);
-    Set<Game> getAllGames();
+    Stream<Game> getAllGames(StreamRefiner streamRefiner);
     void removeGames();
 
     @NoArgsConstructor
