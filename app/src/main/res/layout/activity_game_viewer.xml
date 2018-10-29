@@ -27,15 +27,15 @@ tools:context=".activities.GameViewerActivity">
     app:layout_constraintStart_toStartOf="@+id/titleTextView"
     app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
-<TextView
-    android:id="@+id/descriptionTextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum semper ipsum et lacus congue, porttitor ullamcorper neque auctor. Aenean finibus ut lacus in vehicula. Nullam venenatis ex ultrices tellus maximus pharetra. Cras commodo vel lacus aliquam vehicula. Phasellus ullamcorper ut elit in imperdiet. Proin leo neque, consequat et commodo vitae, molestie eget ipsum. Duis cursus vestibulum consequat. Fusce cursus ligula ut augue gravida, sed hendrerit lacus sollicitudin. Cras pulvinar vulputate velit, ac efficitur odio ultricies at. Donec faucibus vitae quam nec scelerisque. Vestibulum volutpat ut dolor eu aliquam. "
-    android:textAlignment="viewStart"
-    app:layout_constraintStart_toStartOf="@+id/gmTextView"
-    app:layout_constraintTop_toBottomOf="@+id/gmTextView" />
+    <TextView
+        android:id="@+id/descriptionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Description "
+        android:textAlignment="viewStart"
+        app:layout_constraintStart_toStartOf="@+id/gmTextView"
+        app:layout_constraintTop_toBottomOf="@+id/gmTextView" />
 
 <Button
     android:id="@+id/joinGameButton"
@@ -64,7 +64,7 @@ tools:context=".activities.GameViewerActivity">
         android:layout_marginTop="8dp"
         android:text="Universe"
         app:layout_constraintStart_toStartOf="@+id/descriptionTextView"
-        app:layout_constraintTop_toBottomOf="@+id/gmTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
 
     <TextView
         android:id="@+id/difficultyColonTextView"
