@@ -30,7 +30,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.difficultyTextView) TextView difficulty;
     @BindView(R.id.oneShotOrCampaignTextView) TextView type;
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
-    @BindView(R.id.sessionLength) TextView sessionLength;
+    @BindView(R.id.sessionLengthTextView) TextView sessionLength;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,9 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         universe.setText(game.getUniverse());
         difficulty.setText(game.getDifficulty().toString());
         type.setText(game.getOneshotOrCampaign().toString());
-        numSessions.setText(game.getNumberSessions().toString());
-        sessionLength.setText(game.getSessionLengthInMinutes().toString());
+        String numSessionsString = game.getNumberSessions().map(Object::toString).orElse("Unspecified");
+        numSessions.setText(numSessionsString);
+        String gameLength = game.getSessionLengthInMinutes().map(Object::toString).orElse("Unspecified");
+        sessionLength.setText(gameLength);
     }
 }

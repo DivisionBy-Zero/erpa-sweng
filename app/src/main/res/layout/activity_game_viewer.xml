@@ -121,7 +121,7 @@ tools:context=".activities.GameViewerActivity">
         app:layout_constraintTop_toBottomOf="@+id/sessionNumberColonTextView" />
 
     <TextView
-        android:id="@+id/sessionLength"
+        android:id="@+id/sessionLengthTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

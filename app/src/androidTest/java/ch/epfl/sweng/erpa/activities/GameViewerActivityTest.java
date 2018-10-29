@@ -6,6 +6,8 @@ import android.support.test.espresso.ViewAssertion;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.annimon.stream.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,15 +35,15 @@ import static org.hamcrest.core.StringContains.containsString;
 @RunWith(AndroidJUnit4.class)
 public class GameViewerActivityTest {
     @Rule public final ActivityTestRule<GameViewerActivity> activityTestRule = new ActivityTestRule<>(GameViewerActivity.class, false, false);
-    private Scope scope;
     private Game game = getGame("hewwo");
+    private Game emptyOptGame = getGame("empty");
 
     @Before
     public void prepare() {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
         MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
+        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
         ErpaApplication application = scope.getInstance(ErpaApplication.class);
 
         Toothpick.reset(scope);
@@ -49,12 +51,15 @@ public class GameViewerActivityTest {
         scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
                 DummyRemoteServicesProvider.class
         );
-
+        emptyOptGame.setNumberSessions(Optional.empty());
+        emptyOptGame.setSessionLengthInMinutes(Optional.empty());
         scope.getInstance(GameService.class).saveGame(game);
+        scope.getInstance(GameService.class).saveGame(emptyOptGame);
 
         Intent i = new Intent();
         i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
         activityTestRule.launchActivity(i);
+
     }
 
     @Test
@@ -95,16 +100,24 @@ public class GameViewerActivityTest {
 
     @Test
     public void testSessionLength() {
-        onView(withId(R.id.sessionLength)).check(matches(withText(game.getSessionLengthInMinutes().toString())));
+        onView(withId(R.id.sessionLengthTextView)).check(matches(withText(game.getSessionLengthInMinutes().get().toString())));
     }
 
     @Test
     public void testNumSessions() {
-        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberSessions().toString())));
+        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberSessions().get().toString())));
     }
 
-    private <T> ViewAssertion containsText(T text) {
-        return matches(withText(containsString(String.valueOf(text))));
+    @Test
+    public void testEmptyNumSessions() {
+        Intent iOld = activityTestRule.getActivity().getIntent();
+        activityTestRule.finishActivity();
+        Intent i = new Intent();
+        i.putExtra(GameService.PROP_INTENT_GAME, emptyOptGame.getGameUuid());
+        activityTestRule.launchActivity(i);
+        onView(withId(R.id.sessionNumberTextView)).check(matches(withText("Unspecified")));
+        onView(withId(R.id.sessionLengthTextView)).check(matches(withText("Unspecified")));
+        activityTestRule.finishActivity();
+        activityTestRule.launchActivity(iOld);
     }
-
 }
