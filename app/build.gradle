@@ -67,6 +67,8 @@ repositories {
 }
 
 dependencies {
+    androidTestAnnotationProcessor 'org.projectlombok:lombok:1.18.2'
+    androidTestCompileOnly 'org.projectlombok:lombok:1.18.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'

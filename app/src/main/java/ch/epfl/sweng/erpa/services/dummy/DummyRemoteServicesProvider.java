@@ -12,12 +12,14 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
+import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
 import lombok.Getter;
 
 
 @Singleton
 public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     @Inject @Getter DummyGameService gameService;
+    @Inject @Getter DummyUserService userProfileService;
 
     private ArrayList<UserProfile> userList;
 
@@ -28,7 +30,6 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
         userList = new ArrayList<>();
         userList.add(defaultUser);
     }
-
     @Override
     public String getFriendlyProviderName() {
         return "Dummy Remote Provider";
@@ -42,7 +43,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public Optional<String> getUidFromUsername(String username) {
         Optional<UserProfile> u = getUserFromUsername(username);
-        return u.map(UserProfile::getUid);
+        return u.map(UserProfile::getUuid);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
 
     private Optional<UserProfile> getUserFromUid(String uid) {
         for (UserProfile u : userList) {
-            if (u.getUid().equals(uid))
+            if (u.getUuid().equals(uid))
                 return Optional.of(u);
         }
         return Optional.empty();

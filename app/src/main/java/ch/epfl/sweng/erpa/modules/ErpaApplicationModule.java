@@ -14,6 +14,7 @@ import ch.epfl.sweng.erpa.operations.UserProfileCoordinator;
 import ch.epfl.sweng.erpa.services.UserAuthService;
 import ch.epfl.sweng.erpa.services.UserSignupService;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
+import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
 import toothpick.Scope;
 import toothpick.config.Module;
 import toothpick.smoothie.provider.SharedPreferencesProvider;
@@ -45,6 +46,7 @@ public class ErpaApplicationModule extends Module {
 
         // Dummy Remote Services Provider-related binds
         this.bind(DummyGameService.class).to(DummyGameService.class);
+        this.bind(DummyUserService.class).to(DummyUserService.class);
         // TODO(@Roos) replace injection by UserProviderService
         this.bind(UserProfile.class).toInstance(new UserProfile("user|" + UUID.randomUUID().toString(), "kevinLeBeauGoss", "myAccesTocken", UserProfile.Experience.Noob, false, true));
     }

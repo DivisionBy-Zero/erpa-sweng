@@ -15,7 +15,11 @@ import lombok.NonNull;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Game {
+public class Game implements UuidObject {
+    @Override public String getUuid() {
+        return getGameUuid();
+    }
+
     public enum Difficulty {NOOB, CHILL, HARD}
 
     public enum OneshotOrCampaign {ONESHOT, CAMPAIGN}

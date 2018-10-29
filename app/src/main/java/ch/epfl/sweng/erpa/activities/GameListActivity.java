@@ -68,7 +68,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
         RecyclerViewClickListener listener = (view, position) -> {
             Intent intent = new Intent(this, GameViewerActivity.class);
-            intent.putExtra(GameService.PROP_INTENT_GAMEUUID, games.get(position).getGameUuid());
+            intent.putExtra(GameService.PROP_INTENT_GAME, games.get(position).getGameUuid());
             startActivity(intent);
         };
 
