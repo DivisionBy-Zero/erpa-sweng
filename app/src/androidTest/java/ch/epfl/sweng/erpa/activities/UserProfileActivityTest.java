@@ -10,8 +10,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
-
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.UserProfile;
@@ -57,14 +55,14 @@ public class UserProfileActivityTest {
         ups = scope.getInstance(UserProfileService.class);
 
         Intent i = new Intent();
-        i.putExtra(UserProfileService.PROP_INTENT_USER_UUID, userProfile.getUuid());
+        i.putExtra(UserProfileService.PROP_INTENT_USER, userProfile.getUuid());
         ups.saveUserProfile(userProfile);
         activityTestRule.launchActivity(i);
     }
 
     @Test
     public void testIntent() {
-        assertTrue(activityTestRule.getActivity().getIntent().hasExtra(UserProfileService.PROP_INTENT_USER_UUID));
+        assertTrue(activityTestRule.getActivity().getIntent().hasExtra(UserProfileService.PROP_INTENT_USER));
     }
 
     @Test
@@ -112,6 +110,6 @@ public class UserProfileActivityTest {
         activityTestRule.finishActivity();
         UserProfile gmProfile = new UserProfile(id, "Sapphie", "", UserProfile.Experience.Casual, isGm, isPlayer);
         ups.saveUserProfile(gmProfile);
-        activityTestRule.launchActivity((new Intent()).putExtra(UserProfileService.PROP_INTENT_USER_UUID, id));
+        activityTestRule.launchActivity((new Intent()).putExtra(UserProfileService.PROP_INTENT_USER, id));
     }
 }

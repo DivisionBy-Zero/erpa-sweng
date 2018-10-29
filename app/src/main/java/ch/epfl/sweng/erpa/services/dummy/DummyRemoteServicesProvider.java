@@ -1,7 +1,5 @@
 package ch.epfl.sweng.erpa.services.dummy;
 
-import android.content.Context;
-
 import com.annimon.stream.Optional;
 
 import java.nio.charset.StandardCharsets;
@@ -13,7 +11,6 @@ import javax.inject.Singleton;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
-import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
 import lombok.Getter;

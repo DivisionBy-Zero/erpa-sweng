@@ -77,7 +77,9 @@ public class DummyDataServiceTest {
 
     @Test
     public void testDeletion() {
-        assertTrue(dts.removeAll());
+        dts.removeAll();
+        File[] files = dts.getDataDir().listFiles();
+        assertEquals(0, files.length);
     }
 
     @Data

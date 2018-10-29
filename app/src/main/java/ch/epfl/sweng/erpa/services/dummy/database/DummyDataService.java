@@ -27,7 +27,7 @@ import lombok.Getter;
 import static android.content.ContentValues.TAG;
 
 public abstract class DummyDataService<T extends UuidObject> implements DataService<T> {
-    public final static String SAVED_DATA_FILE_EXTENSION = ".yaml";
+    final static String SAVED_DATA_FILE_EXTENSION = ".yaml";
     @Getter private final Function<File, T> fileFetcher;
 
     @Getter private final File dataDir;
@@ -49,13 +49,13 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
 
 
     @Override
-    public boolean removeAll() {
+    public void removeAll() {
         File[] files = dataDir.listFiles();
         boolean res = true;
         for (File f : files) {
             res = f.delete() && res;
         }
-        return res;
+        if(!res) throw new RuntimeException("Unable to remove all save files!");
     }
 
     @Override

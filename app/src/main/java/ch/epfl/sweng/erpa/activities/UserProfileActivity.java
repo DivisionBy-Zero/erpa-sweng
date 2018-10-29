@@ -15,14 +15,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static android.content.ContentValues.TAG;
 
 public class UserProfileActivity extends DependencyConfigurationAgnosticActivity {
 
-    @Inject RemoteServicesProvider rsp;
+    @Inject UserProfileService ups;
 
     @BindView(R.id.usernameTextView) TextView username;
     @BindView(R.id.experienceTextView) TextView experience;
@@ -41,13 +40,10 @@ public class UserProfileActivity extends DependencyConfigurationAgnosticActivity
         super.onResume();
 
         String uuid = getUuidFromIntent();
-        Optional<UserProfile> optUserProfile = rsp.getUserProfileService().getUserProfile(uuid);
-        if(optUserProfile.isPresent())
-        {
+        Optional<UserProfile> optUserProfile = ups.getUserProfile(uuid);
+        if (optUserProfile.isPresent()) {
             updateFields(optUserProfile.get());
-        }
-        else
-        {
+        } else {
             Log.d(TAG, "onResume: could not find UserProfile in database. Exiting", new NoSuchElementException());
             finish();
         }
@@ -57,25 +53,25 @@ public class UserProfileActivity extends DependencyConfigurationAgnosticActivity
     @SuppressLint("SetTextI18n") private void updateFields(UserProfile userProfile) {
         username.setText(userProfile.getUsername());
         experience.setText(userProfile.getXp().toString());
-        if(userProfile.getIsGm() && userProfile.getIsPlayer())
+        if (userProfile.getIsGm() && userProfile.getIsPlayer())
             playerOrGm.setText("Player and Game master");
-        else if(userProfile.getIsPlayer())
+        else if (userProfile.getIsPlayer())
             playerOrGm.setText("Player");
-        else if(userProfile.getIsGm())
+        else if (userProfile.getIsGm())
             playerOrGm.setText("Game master");
         else
             playerOrGm.setText("");
     }
 
     private String getUuidFromIntent() {
-        String uuid = getIntent().getStringExtra(UserProfileService.PROP_INTENT_USER_UUID);
+        String uuid = getIntent().getStringExtra(UserProfileService.PROP_INTENT_USER);
         if (uuid != null)
             return uuid;
         else {
-            Exception thrown = new IllegalArgumentException("User Id not found");
+            RuntimeException thrown = new IllegalArgumentException("User Id not found");
             Log.d(UserProfileActivity.class.getName(), "no user id passed with intent", thrown);
             finish();
-            throw new IllegalArgumentException("No user uuid passed");
+            throw thrown;
         }
     }
 }

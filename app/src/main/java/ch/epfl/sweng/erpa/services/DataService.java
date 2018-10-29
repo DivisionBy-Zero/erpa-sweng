@@ -10,5 +10,5 @@ public interface DataService<T extends UuidObject> {
     Optional<T> getOne(String uuid);
     Set<T> getAll();
     void saveOne(T t);
-    boolean removeAll();
+    void removeAll();
 }

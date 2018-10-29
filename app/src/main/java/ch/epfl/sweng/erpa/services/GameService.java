@@ -13,12 +13,13 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 public interface GameService extends DataService<Game> {
-    String PROP_INTENT_GAME_UUID = "game|";
+    String PROP_INTENT_GAME = "game_key";
+    String UUID_PREFIX = "game|";
 
     Optional<Game> getGame(String gameUuid);
     void saveGame(Game g);
     Set<Game> getAllGames();
-    boolean removeGames();
+    void removeGames();
 
     @NoArgsConstructor
     @Getter
