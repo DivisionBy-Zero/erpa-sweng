@@ -20,12 +20,16 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.UserAuthService;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.util.Pair;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     @Inject UserProfile userProfile;
+    @Inject UserProfileService ups;
 
     // TODO: (Anne) add Butterknife for better readability
     private ListView myListView;
@@ -59,18 +63,20 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         List<Pair<MyAccountButton, Drawable>> collect = Stream.zip(buttonStream, drawableStream,
                 Pair::new).collect(Collectors.toList());
 
+        Bundle profileBundle = new Bundle();
+        profileBundle.putString(UserProfileService.PROP_INTENT_USER, userProfile.getUuid());
         collect.add(new Pair<>(new MyAccountButton(resources.getString(R.string.profileText),
-                ProfileActivity.class, Optional.empty(), true, true),
+                UserProfileActivity.class, profileBundle, true, true),
                 context.getDrawable(R.drawable.ic_action_name)));
+        // TODO (@Anne) remove when proper authentication is implemented
+        ups.saveUserProfile(userProfile);
 
         myAdapter = new MyAccountButtonAdapter(this, collect);
         myListView.setAdapter(myAdapter);
         myListView.setOnItemClickListener((l, v, position, id) -> {
             Intent intent = new Intent(this, collect.get(position).getFirst().getActivityClass());
-            Optional<Bundle> bundleOptional = collect.get(position).getFirst().getBundle();
-            if (bundleOptional.isPresent())
-                intent.putExtra(GAME_LIST_ACTIVTIY_CLASS_KEY,
-                        bundleOptional.get().getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY));
+            Bundle bundle = collect.get(position).getFirst().getBundle();
+            intent.putExtras(bundle);
             startActivity(intent);
         });
     }
@@ -79,7 +85,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         context = this.getApplicationContext();
         resources = context.getResources();
         Class activity = GameListActivity.class;
-        Optional<Bundle> empty = Optional.empty();
+        Bundle empty = new Bundle();
         myAccountButtonList = Stream.of(
                 new MyAccountButton(resources.getString(R.string.pendingRequestText), activity,
                         empty, true, false),
@@ -97,7 +103,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
                     targetList = findTargetGameListType(b);
                     bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, targetList);
                     return new MyAccountButton(b.getText(), b.getActivityClass(),
-                            Optional.of(bundle),
+                            bundle,
                             b.getActiveForPlayer(), b.getActiveForGM());
                 })
                 .collect(Collectors.toList());
