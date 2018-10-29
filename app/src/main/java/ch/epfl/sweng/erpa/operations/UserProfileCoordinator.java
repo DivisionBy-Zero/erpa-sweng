@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static ch.epfl.sweng.erpa.services.UserSignupService.createAccessToken;
 
