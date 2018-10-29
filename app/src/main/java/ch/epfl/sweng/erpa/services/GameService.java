@@ -1,7 +1,10 @@
 package ch.epfl.sweng.erpa.services;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.function.Function;
+import com.annimon.stream.function.FunctionalInterface;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -25,6 +28,7 @@ public interface GameService extends DataService<Game> {
     @Getter
     class StreamRefiner {
         @NonNull SortedMap<SortCriteria, Ordering> sortCriterias = new TreeMap<>();
+        @NonNull Set<GameFilter> gameFilters = new HashSet<>();
 
         public static StreamRefinerBuilder builder() {
             return new StreamRefinerBuilder();
@@ -35,6 +39,10 @@ public interface GameService extends DataService<Game> {
         public enum Ordering {ASCENDING, DESCENDING}
 
         public enum SortCriteria {DIFFICULTY, MAX_NUMBER_OF_PLAYERS, DISTANCE, DATE}
+
+        @FunctionalInterface
+        public interface GameFilter extends Function<Game, Boolean> {
+        }
     }
 
     @AllArgsConstructor
@@ -57,6 +65,11 @@ public interface GameService extends DataService<Game> {
             return this;
         }
 
+        public StreamRefinerBuilder filterBy(@NonNull StreamRefiner.GameFilter gameFilter) {
+            result.getGameFilters().add(gameFilter);
+           return this;
+        }
+
         /**
          * Remove a {@code SortCriteria} and its associated {@code Ordering} from the map of existing
          * criteria if it exists.
@@ -69,6 +82,11 @@ public interface GameService extends DataService<Game> {
             return this;
         }
 
+        public StreamRefinerBuilder removeOneFilter(@NonNull StreamRefiner.GameFilter gameFilter) {
+            result.getGameFilters().remove(gameFilter);
+            return this;
+        }
+
         /**
          * Remove all {@code SortCriteria} and their associated {@code Ordering} from the map of existing
          * criteria.
@@ -78,6 +96,18 @@ public interface GameService extends DataService<Game> {
         public StreamRefinerBuilder clearCriteria() {
             if (result.getSortCriterias() != null)
                 result.getSortCriterias().clear();
+            return this;
+        }
+
+        public StreamRefinerBuilder clearFilters() {
+            if (result.getGameFilters() != null)
+                result.getGameFilters().clear();
+            return  this;
+        }
+
+        public StreamRefinerBuilder clearRefinements() {
+            clearCriteria();
+            clearFilters();
             return this;
         }
 
