@@ -6,3 +6,9 @@
 /build
 /captures
 .externalNativeBuild
+
+# Python caches
+.mypy_cache
+.pytest_cache
+__pycache__
+venv
