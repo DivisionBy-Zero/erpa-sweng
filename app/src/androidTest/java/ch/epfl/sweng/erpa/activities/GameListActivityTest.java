@@ -61,8 +61,10 @@ public class GameListActivityTest {
     public void prepare() {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
+        MemberInjectorRegistryLocator.setRootRegistry(
+                new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
+        Scope scope = Toothpick.openScope(
+                InstrumentationRegistry.getTargetContext().getApplicationContext());
         ErpaApplication application = scope.getInstance(ErpaApplication.class);
 
         Toothpick.reset(scope);
@@ -155,6 +157,27 @@ public class GameListActivityTest {
     }
 
     @Test
+    public void StreamRefinerToBuilder() {
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .sortBy(DIFFICULTY, ASCENDING)
+                .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
+                .sortBy(DISTANCE, ASCENDING)
+                .build();
+        assertEquals(sr, sr.toBuilder().build());
+    }
+
+    @Test
+    public void modifyStreamRefinerWithToBuilder() {
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .sortBy(DIFFICULTY, ASCENDING)
+                .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
+                .sortBy(DISTANCE, ASCENDING)
+                .build();
+        sr = sr.toBuilder().clearCriteria().build();
+        assertEquals(0, sr.getSortCriterias().size());
+    }
+
+    @Test
     public void sortByWithNoCriterias() {
         GameService.StreamRefiner sr = GameService.StreamRefiner.builder().build();
         assertEquals(0, sr.getSortCriterias().size());
@@ -162,11 +185,10 @@ public class GameListActivityTest {
 
     @Test
     public void sortByWithOneCriteria() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner
-                .builder()
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
                 .sortBy(DIFFICULTY, ASCENDING)
                 .build();
-        assertEquals(sr.getSortCriterias().size(), 1);
+        assertEquals(1, sr.getSortCriterias().size());
         assertEquals(new TreeMap<SortCriteria, Ordering>() {{
             put(DIFFICULTY, ASCENDING);
         }}, sr.getSortCriterias());
@@ -217,34 +239,94 @@ public class GameListActivityTest {
     }
 
     @Test
+    public void removeAnAbsentSortCriteria() {
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .sortBy(DIFFICULTY, ASCENDING)
+                .removeOneCriteria(DISTANCE)
+                .build();
+        assertEquals(1, sr.getSortCriterias().size());
+    }
+
+    @Test
     public void removeAllSortCriteria() {
         GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
                 .sortBy(DIFFICULTY, ASCENDING)
                 .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-                .sortBy(DISTANCE, ASCENDING)
                 .clearCriteria()
                 .build();
         assertEquals(0, sr.getSortCriterias().size());
     }
 
     @Test
-    public void StreamRefinerToBuilder() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-                .sortBy(DIFFICULTY, ASCENDING)
-                .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-                .sortBy(DISTANCE, ASCENDING)
-                .build();
-        assertEquals(sr, sr.toBuilder().build());
+    public void filterByWithNoGameFilter() {
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder().build();
+        assertEquals(0, sr.getGameFilters().size());
     }
 
     @Test
-    public void modifyStreamRefinerWithToBuilder() {
+    public void filterByWithOneGameFilter() {
         GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-                .sortBy(DIFFICULTY, ASCENDING)
-                .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-                .sortBy(DISTANCE, ASCENDING)
+                .filterBy(g -> true)
                 .build();
-        sr = sr.toBuilder().clearCriteria().build();
+        assertEquals(1, sr.getGameFilters().size());
+    }
+
+    @Test
+    public void filterByWithRedundantGameFilter() {
+        GameService.StreamRefiner.GameFilter gameFilter = g -> true;
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .filterBy(gameFilter)
+                .filterBy(gameFilter)
+                .build();
+        assertEquals("Failed", 1, sr.getGameFilters().size());
+    }
+
+    @Test
+    public void removeAGameFilter() {
+        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayer() > 4;
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .filterBy(gameFilter)
+                .removeOneFilter(gameFilter)
+                .build();
+        assertEquals(0, sr.getGameFilters().size());
+    }
+
+    @Test
+    public void removeAnAbsentGameFilter() {
+        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayer() > 4;
+        GameService.StreamRefiner.GameFilter absGameFilter = g -> false;
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .filterBy(gameFilter)
+                .removeOneFilter(absGameFilter)
+                .build();
+        assertEquals(1, sr.getGameFilters().size());
+    }
+
+    @Test
+    public void removeAllGameFilters() {
+        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayer() > 4;
+        GameService.StreamRefiner.GameFilter absGameFilter = g -> false;
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .filterBy(gameFilter)
+                .filterBy(absGameFilter)
+                .clearFilters()
+                .build();
+        assertEquals(0, sr.getGameFilters().size());
+    }
+
+    @Test
+    public void removeAllRefinements() {
+        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayer() > 4;
+        GameService.StreamRefiner.GameFilter absGameFilter = g -> false;
+        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
+                .filterBy(gameFilter)
+                .sortBy(DIFFICULTY, DESCENDING)
+                .filterBy(absGameFilter)
+                .sortBy(DISTANCE, ASCENDING)
+                .sortBy(MAX_NUMBER_OF_PLAYERS, ASCENDING)
+                .clearRefinements()
+                .build();
+        assertEquals(0, sr.getGameFilters().size());
         assertEquals(0, sr.getSortCriterias().size());
     }
 }
