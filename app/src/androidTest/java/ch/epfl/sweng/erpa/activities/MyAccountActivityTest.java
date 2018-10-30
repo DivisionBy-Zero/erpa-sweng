@@ -109,7 +109,7 @@ public class MyAccountActivityTest {
     public void testShouldShowProfileWhenLastButtonClicked() {
 
         performClickOnListviewButton(listView.getChildCount() - 1);
-        intended(hasComponent(ProfileActivity.class.getName()));
+        intended(hasComponent(UserProfileActivity.class.getName()));
     }
 
     public void performClickOnListviewButton(int myPosition) {
