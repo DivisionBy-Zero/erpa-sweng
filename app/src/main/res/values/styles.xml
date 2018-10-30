@@ -16,11 +16,6 @@
         <item name="android:colorControlHighlight">@color/primaryDarkColor</item>
         <!--title and menu police-->
         <item name="android:fontFamily">@font/yatraone_regular</item>
-        <!-- TODO(@Ryker): Maybe use these fonts for your preview cards -->
-        <!--preview card police-->
-        <!--<item name="android:fontFamily">@font/italianno_regular</item>-->
-        <!--Noob/chill/hard police-->
-        <!--<item name="android:fontFamily"> @font/nanumbrushscript_regular</item>-->
         <!--form Police-->
         <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
     </style>
@@ -34,6 +29,21 @@
     <style name="ToolBarTitleStyle" parent="ERPAStyle">
         <item name="android:textSize">40sp</item>
         <item name="android:fontFamily">@font/nanumbrushscript_regular</item>
+    </style>
+    <style name="CardViewStyle" parent="ERPAStyle">
+        <item name="android:fontFamily">@font/italianno_regular</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+    <style name="CardViewStyle.title">
+        <item name="android:textSize">35sp</item>
+    </style>
+    <style name="CardViewStyle.players">
+        <item name="android:fontFamily">@font/morrisroman_black</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="CardViewStyle.difficculty">
+        <item name="android:fontFamily">@font/yatraone_regular</item>
+        <item name="android:textSize">23sp</item>
     </style>
 
     <style name="ERPAStyle.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

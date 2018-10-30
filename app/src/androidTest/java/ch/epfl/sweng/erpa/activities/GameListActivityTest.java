@@ -102,23 +102,24 @@ public class GameListActivityTest {
 
     @Test
     public void testFirstCardDisplayAllExpectedFields() {
-        RecyclerView view = intentsTestRule.getActivity().findViewById(R.id.recyclerView);
-        CardView firstCard = (CardView) view.getLayoutManager().getChildAt(0);
+        RecyclerView recyclerView = intentsTestRule.getActivity().findViewById(R.id.recyclerView);
+        View view = recyclerView.getLayoutManager().getChildAt(0);
+        CardView firstCard = view.findViewById(R.id.cardview);
         List<View> vs = getViewChildrensRecursive(firstCard);
+        vs.add(view.findViewById(R.id.difficultyBanner));
         Set<String> textFieldsText = Stream.of(vs)
                 .filter(v -> TextView.class.isAssignableFrom(v.getClass()))
                 .map(v -> (TextView) v)
                 .map(TextView::getText)
-                .map(Object::toString).collect(Collectors.toSet());
+                .map(Object::toString)
+                .collect(Collectors.toSet());
 
         Set<ImageView> imageViews = Stream.of(vs)
                 .filter(v -> ImageView.class.isAssignableFrom(v.getClass()))
                 .map(v -> (ImageView) v).collect(Collectors.toSet());
 
-        Set<String> expectedTextFieldsText = Stream
-                .of("DnD", "Lausanne", "test") // Values from createListData in GameListActivity .
-                .collect(Collectors.toSet());
-        assertEquals(expectedTextFieldsText, textFieldsText);
+        assertEquals(5, textFieldsText.size());
+        assertEquals(2, imageViews.size());
     }
 
     private List<View> getViewChildrensRecursive(ViewGroup parent) {
