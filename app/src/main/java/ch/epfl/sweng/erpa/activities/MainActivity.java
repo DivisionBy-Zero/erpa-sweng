@@ -42,4 +42,14 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
     public void launchMyAccount(View view) {
         startActivity(new Intent(this, MyAccountActivity.class));
     }
+
+    @OnClick(R.id.launch_login_button)
+    public void launchLoginPage(View view) {
+        startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    @OnClick(R.id.launch_signup_button)
+    public void launchSignupPage(View view) {
+        startActivity(new Intent(this, SignupActivity.class));
+    }
 }
