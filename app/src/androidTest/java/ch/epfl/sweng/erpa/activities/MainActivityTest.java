@@ -39,4 +39,16 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(R.id.launch_my_account_button)).perform(ViewActions.click());
         intended(hasComponent(MyAccountActivity.class.getName()));
     }
+
+    @Test
+    public void testCanLaunchLogin() {
+        onView(ViewMatchers.withId(R.id.launch_login_button)).perform(ViewActions.click());
+        intended(hasComponent(LoginActivity.class.getName()));
+    }
+
+    @Test
+    public void testCanLaunchSignup() {
+        onView(ViewMatchers.withId(R.id.launch_signup_button)).perform(ViewActions.click());
+        intended(hasComponent(SignupActivity.class.getName()));
+    }
 }
