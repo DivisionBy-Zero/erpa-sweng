@@ -3,14 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/fab_margin"
+    android:layout_marginStart="@dimen/fab_margin"
+    android:layout_marginTop="@dimen/in_margin"
     android:orientation="vertical"
     tools:context=".activities.MyAccountActivity">
 
     <ListView
         android:id="@+id/myAccountLayout"
-        android:focusedByDefault="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/in_margin"
+        android:focusedByDefault="true"
+        android:listSelector="@android:color/transparent"
         android:orientation="horizontal" />
 
 </LinearLayout>

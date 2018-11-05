@@ -1,6 +1,7 @@
 <resources>
 
     <style name="ERPAStyle" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:padding">0dp</item>
         <!--BaseColor-->
         <item name="android:colorPrimary">@color/primaryColor</item>
         <item name="android:colorPrimaryDark">@color/primaryColor</item>

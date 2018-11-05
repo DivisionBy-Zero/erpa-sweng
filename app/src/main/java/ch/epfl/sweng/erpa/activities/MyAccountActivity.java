@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.annimon.stream.Collectors;
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.util.List;
@@ -20,8 +19,6 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.UserAuthService;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.util.Pair;
 
@@ -108,9 +105,15 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
                 })
                 .collect(Collectors.toList());
 
-        myDrawablesList = Stream.rangeClosed(1, 8).map(
-                i -> context.getDrawable(R.drawable.ic_action_name)).collect(
-                Collectors.toList());
+        myDrawablesList = Stream.of(
+                R.drawable.ic_dice1,
+                R.drawable.ic_dice2,
+                R.drawable.ic_dice3,
+                R.drawable.ic_dice4,
+                R.drawable.ic_dice5,
+                R.drawable.ic_dice6)
+                .map(context::getDrawable)
+                .collect(Collectors.toList());
     }
 
     @android.support.annotation.NonNull
