@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -42,7 +43,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
-        setContentView(R.layout.activity_my_account);
+        DataBindingUtil.setContentView(this, R.layout.activity_my_account);
         onResume();
     }
 

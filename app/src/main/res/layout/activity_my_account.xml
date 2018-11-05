@@ -1,22 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/fab_margin"
-    android:layout_marginStart="@dimen/fab_margin"
-    android:layout_marginTop="@dimen/in_margin"
-    android:orientation="vertical"
-    tools:context=".activities.MyAccountActivity">
-
-    <ListView
-        android:id="@+id/myAccountLayout"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.v4.widget.DrawerLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/in_margin"
-        android:focusedByDefault="true"
-        android:listSelector="@android:color/transparent"
-        android:orientation="horizontal" />
+        android:layout_height="match_parent">
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <include
+                    android:id="@+id/game_list_toolbar"
+                    layout="@layout/toolbar_main"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:title="@{@string/titleMyAccountActivity}"
+                    />
+            </android.support.design.widget.AppBarLayout>
 
-</LinearLayout>
+            <ListView
+                android:id="@+id/myAccountLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_margin"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:layout_marginTop="@dimen/in_margin"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="@dimen/in_margin"
+                android:focusedByDefault="true"
+                android:listSelector="@android:color/transparent"
+                android:orientation="horizontal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        </android.support.design.widget.CoordinatorLayout>
+    </android.support.v4.widget.DrawerLayout>
+</layout>
+
