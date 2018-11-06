@@ -1,6 +1,7 @@
 <resources>
 
     <style name="ERPAStyle" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:padding">0dp</item>
         <!--BaseColor-->
         <item name="android:colorPrimary">@color/primaryColor</item>
         <item name="android:colorPrimaryDark">@color/primaryColor</item>
@@ -19,17 +20,18 @@
         <!--form Police-->
         <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
     </style>
-
     <style name="ERPAStyle.smallprint" parent="ERPAStyle">
         <item name="android:textSize">12sp</item>
     </style>
     <style name="ERPAStyle.title" parent="ERPAStyle">
         <item name="android:textSize">40sp</item>
     </style>
+
     <style name="ToolBarTitleStyle" parent="ERPAStyle">
         <item name="android:textSize">40sp</item>
         <item name="android:fontFamily">@font/nanumbrushscript_regular</item>
     </style>
+
     <style name="CardViewStyle" parent="ERPAStyle">
         <item name="android:fontFamily">@font/italianno_regular</item>
         <item name="android:textSize">28sp</item>
@@ -44,6 +46,10 @@
     <style name="CardViewStyle.difficculty">
         <item name="android:fontFamily">@font/yatraone_regular</item>
         <item name="android:textSize">23sp</item>
+    </style>
+
+    <style name="MyAccountButtonsStyle" parent="ERPAStyle">
+        <item name="android:textSize">35sp</item>
     </style>
 
     <style name="ERPAStyle.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
