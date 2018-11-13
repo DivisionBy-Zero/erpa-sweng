@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -14,13 +15,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.listeners.RecyclerViewClickListener;
+import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
     private List<Game> games;
-    private RecyclerViewClickListener mListener;
+    private ListLikeOnClickListener mListener;
 
-    public GameAdapter(List<Game> games, RecyclerViewClickListener listener) {
+    public GameAdapter(List<Game> games, ListLikeOnClickListener listener) {
         this.games = new ArrayList<>(games);
         mListener = listener;
     }
@@ -43,16 +44,16 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameHolder> {
         return games.size();
     }
 
-    public static class GameHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class GameHolder extends RecyclerView.ViewHolder implements OnClickListener {
         @BindView(R.id.difficultyBanner) TextView difficulty;
         @BindView(R.id.gameTitle) TextView title;
         @BindView(R.id.location) TextView location;
         @BindView(R.id.universeName) TextView universe;
         @BindView(R.id.nbPlayersInfo) TextView players;
-        private RecyclerViewClickListener mListener;
+        private ListLikeOnClickListener mListener;
         private Context context;
 
-        public GameHolder(View itemView, RecyclerViewClickListener listener, Context context) {
+        public GameHolder(View itemView, ListLikeOnClickListener listener, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             mListener = listener;

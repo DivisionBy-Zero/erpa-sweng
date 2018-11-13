@@ -26,7 +26,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.listeners.RecyclerViewClickListener;
+import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.GameAdapter;
 import ch.epfl.sweng.erpa.services.GameService;
@@ -77,7 +77,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-        RecyclerViewClickListener listener = (view, position) -> {
+        ListLikeOnClickListener listener = (view, position) -> {
             Intent intent = new Intent(this, GameViewerActivity.class);
             intent.putExtra(GameService.PROP_INTENT_GAME, games.get(position).getGameUuid());
             startActivity(intent);
