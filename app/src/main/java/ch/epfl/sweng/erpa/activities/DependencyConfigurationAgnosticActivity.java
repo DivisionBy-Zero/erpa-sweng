@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
@@ -15,7 +16,7 @@ import ch.epfl.sweng.erpa.operations.DependencyConfigurationHelper;
 import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import toothpick.Toothpick;
 
-public abstract class DependencyConfigurationAgnosticActivity extends Activity {
+public abstract class DependencyConfigurationAgnosticActivity extends AppCompatActivity {
     @Inject DependencyConfigurationHelper dependencyConfigurationHelper;
 
     @Override
