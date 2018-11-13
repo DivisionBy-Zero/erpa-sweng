@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <android.support.v4.widget.DrawerLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <include
                     android:id="@+id/game_list_toolbar"
                     layout="@layout/toolbar_main"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_scrollFlags="scroll|enterAlways" />
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:title="@string/titleListGamesActivity" />
             </android.support.design.widget.AppBarLayout>
 
             <android.support.v7.widget.RecyclerView
