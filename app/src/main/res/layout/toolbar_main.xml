@@ -7,22 +7,40 @@
         <variable
             name="title"
             type="java.lang.String" />
+
+        <variable
+            name="button_visibility"
+            type="java.lang.Integer" />
     </data>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="0dp"
         android:background="@color/primaryColor"
+        android:padding="0dp"
         app:titleTextAppearance="@style/ToolBarTitleStyle">
 
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{title}" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{title}" />
+
+            <!-- FIXME(@Anne) icon size and visibility -->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:visibility="@{button_visibility}"
+                app:layout_constraintDimensionRatio="1:1"
+                app:srcCompat="@drawable/magnifyingglass" />
+        </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.Toolbar>
-
 </layout>
 
