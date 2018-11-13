@@ -10,7 +10,7 @@ class TestAuthentification(unittest.TestCase):
         signed = pysodium.crypto_sign(chall, sk)
         self.assertTrue(authenticate(signed, chall, pk))
 
-    def test_authenticate_fails_false_sign(self):
+    def test_authenticate_fails_false_signature(self):
         pk, sk = pysodium.crypto_sign_keypair()
         chall = b'This is a test'
         self.assertFalse(authenticate("lol", chall, pk))
