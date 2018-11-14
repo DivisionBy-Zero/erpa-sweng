@@ -1,5 +1,6 @@
-import unittest
 import pysodium
+import unittest
+
 from auth import authenticate
 
 class TestAuthentification(unittest.TestCase):
