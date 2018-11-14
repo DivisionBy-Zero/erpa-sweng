@@ -48,4 +48,14 @@
     <string name="time8">6h</string>
     <string name="time9">+6h</string>
 
+    <!-- Sort strings-->
+    <string name="searchFilterSort">Search/Filter/Sort</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="sortByDifficulty">Sort by difficulty: </string>
+    <string name="sortByMaximumNumberOfPlayers">Sort by maximum number of players:</string>
+    <string name="sort_by_date">Sort by date:</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by_distance">Sort by distance:</string>
+
 </resources>

@@ -4,6 +4,7 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.function.Function;
 import com.annimon.stream.function.FunctionalInterface;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
@@ -20,13 +21,16 @@ public interface GameService extends DataService<Game> {
     String UUID_PREFIX = "game|";
 
     Optional<Game> getGame(String gameUuid);
+
     void saveGame(Game g);
+
     Set<Game> getAllGames();
+
     void removeGames();
 
     @NoArgsConstructor
     @Getter
-    class StreamRefiner {
+    class StreamRefiner implements Serializable {
         @NonNull SortedMap<SortCriteria, Ordering> sortCriterias = new TreeMap<>();
         @NonNull Set<GameFilter> gameFilters = new HashSet<>();
 
@@ -34,7 +38,9 @@ public interface GameService extends DataService<Game> {
             return new StreamRefinerBuilder();
         }
 
-        public StreamRefinerBuilder toBuilder() { return new StreamRefinerBuilder(this); }
+        public StreamRefinerBuilder toBuilder() {
+            return new StreamRefinerBuilder(this);
+        }
 
         public enum Ordering {ASCENDING, DESCENDING}
 
@@ -47,7 +53,7 @@ public interface GameService extends DataService<Game> {
 
     @AllArgsConstructor
     @NoArgsConstructor
-    class StreamRefinerBuilder {
+    class StreamRefinerBuilder implements Serializable {
         private StreamRefiner result = new StreamRefiner();
 
         /**
@@ -67,7 +73,7 @@ public interface GameService extends DataService<Game> {
 
         public StreamRefinerBuilder filterBy(@NonNull StreamRefiner.GameFilter gameFilter) {
             result.getGameFilters().add(gameFilter);
-           return this;
+            return this;
         }
 
         /**
@@ -77,7 +83,8 @@ public interface GameService extends DataService<Game> {
          * @param criteria the criteria to sort by
          * @return a {@link StreamRefinerBuilder}
          */
-        public StreamRefinerBuilder removeOneCriteria(@NonNull StreamRefiner.SortCriteria criteria) {
+        public StreamRefinerBuilder removeOneCriteria(
+                @NonNull StreamRefiner.SortCriteria criteria) {
             result.getSortCriterias().remove(criteria);
             return this;
         }
@@ -102,7 +109,7 @@ public interface GameService extends DataService<Game> {
         public StreamRefinerBuilder clearFilters() {
             if (result.getGameFilters() != null)
                 result.getGameFilters().clear();
-            return  this;
+            return this;
         }
 
         public StreamRefinerBuilder clearRefinements() {

@@ -29,7 +29,7 @@
         <activity android:name=".activities.RemoteServiceGreeterActivity" />
         <activity android:name=".activities.SelectRemoteServicesProviderActivity" />
         <activity android:name=".activities.SignupActivity" />
-        <activity android:name=".activities.SortActivity"></activity>
+        <activity android:name=".activities.SortActivity" />
         <activity android:name=".activities.UserProfileActivity" />
     </application>
 </manifest>

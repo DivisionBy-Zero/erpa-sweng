@@ -6,7 +6,7 @@
     <item
         android:id="@+id/actionSearch"
         android:orderInCategory="200"
-        android:title="Search/Filter/Sort"
+        android:title="@string/searchFilterSort"
         android:icon="@drawable/magnifyingglass"
         app:showAsAction="ifRoom" />
 
