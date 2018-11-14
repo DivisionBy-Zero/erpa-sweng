@@ -8,6 +8,7 @@ from models import Game, PlayerJoinGameRequest, PlayerInGameStatus
 # Need help for filter: distance_from/to
 # and sort criterias: asc_dist, dsc_dist
 
+# Returns a query for a list of games given the different filters and sorting criterias given
 def get_game_list(_db_session: Session, filters: Dict[str, object], sort_criterias: List[str]):
     games_list = _db_session.query(Game)
     for filter_key in filters.keys():
@@ -19,6 +20,7 @@ def get_game_list(_db_session: Session, filters: Dict[str, object], sort_criteri
 
     return games_list
 
+# Adds the filters to the query
 def add_filter(games_list, filter_key, filt):
     if filter_key == "diff":
         games_list = games_list.filter(Game.difficulty == filt)
@@ -42,6 +44,7 @@ def add_filter(games_list, filter_key, filt):
                                 .filter(PlayerJoinGameRequest.user_uuid == filt))
     return games_list
 
+# Adds the sorting cirteria to the query
 def add_sort(games_list, sort_key):
     if sort_key == "asc_diff":
         games_list = games_list.order_by(Game.difficulty.asc())
