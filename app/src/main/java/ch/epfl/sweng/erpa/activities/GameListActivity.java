@@ -5,11 +5,13 @@ import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
@@ -38,7 +40,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     private List<Game> games;
     private Resources resources;
     private Toolbar toolbar;
-    private GameList gameList;
+    private GameList gameList = GameList.FIND_GAME;
     private Bundle bundle;
 
     @Override
@@ -96,9 +98,15 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+        public boolean onOptionsItemSelected(MenuItem item) {
+        return onOptionItemViewSelected(item.getItemId());
+
+    }
+
+    public boolean onOptionItemViewSelected(int id) {
         // Handle action bar item clicks here.
-        switch (item.getItemId()) {
+        bundle = getIntent().getExtras();
+        switch (id) {
             case R.id.actionSearch:
                 Intent intent = new Intent(this, SortActivity.class);
                 intent.putExtras(bundle);
@@ -106,7 +114,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
                 return true;
             default:
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(findViewById(id));
     }
 
     // FIXME(@Roos) list doesn't appear correctly the first time it's rendered
@@ -133,8 +141,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         }
     }
 
-    private void setToolbarText(GameList gameList) {
-        @StringRes int id;
+    protected void setToolbarText(GameList gameList) {
+        @StringRes int id = R.string.title_example_for_toolbar_activity;;
         switch (gameList) {
             case FIND_GAME:
                 id = R.string.titleListGamesActivity;
@@ -155,7 +163,6 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
                 id = R.string.pastHostedGamesText;
                 break;
             default:
-                id = R.string.title_example_for_toolbar_activity;
         }
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarTitle.setText(id);

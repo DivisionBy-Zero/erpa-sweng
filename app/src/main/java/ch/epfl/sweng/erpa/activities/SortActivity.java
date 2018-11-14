@@ -25,9 +25,9 @@ public class SortActivity extends DependencyConfigurationAgnosticActivity {
     @OnClick({R.id.diffAsc, R.id.diffDesc, R.id.maxNumPlayerAsc, R.id.maxNumPlayerDesc,
               R.id.distAsc, R.id.distDesc, R.id.dateAsc, R.id.dateDesc})
     public void onCheckBoxClicked(CheckBox checkBox) {
-        CheckBox checkBox1 = checkBox;
-        GameService.StreamRefiner.SortCriteria criteria;
-        GameService.StreamRefiner.Ordering ordering;
+        CheckBox checkBox1 = findViewById(R.id.dateAsc);
+        GameService.StreamRefiner.SortCriteria criteria = GameService.StreamRefiner.SortCriteria.DATE;
+        GameService.StreamRefiner.Ordering ordering = GameService.StreamRefiner.Ordering.DESCENDING;
         switch (checkBox.getId()) {
             case (R.id.diffAsc):
                 checkBox1 = findViewById(R.id.diffDesc);
@@ -70,9 +70,6 @@ public class SortActivity extends DependencyConfigurationAgnosticActivity {
                 ordering = GameService.StreamRefiner.Ordering.DESCENDING;
                 break;
             default:
-                checkBox1 = findViewById(R.id.dateAsc);
-                criteria = GameService.StreamRefiner.SortCriteria.DATE;
-                ordering = GameService.StreamRefiner.Ordering.DESCENDING;
         }
         if (checkBox1.isChecked()) {
             checkBox1.setChecked(false);

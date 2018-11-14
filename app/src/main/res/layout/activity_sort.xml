@@ -6,6 +6,7 @@
     tools:context=".activities.SortActivity">
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/sortNestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
