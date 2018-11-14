@@ -1,13 +1,17 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.app.Instrumentation;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -57,8 +61,11 @@ public class GameListActivityTest {
     public final IntentsTestRule<GameListActivity> intentsTestRule = new IntentsTestRule<>(
             GameListActivity.class);
 
+    private Toolbar toolbar;
+    private Resources resources;
+
     @Before
-    public void prepare() {
+    public void prepare() throws Throwable {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
         MemberInjectorRegistryLocator.setRootRegistry(
@@ -76,6 +83,12 @@ public class GameListActivityTest {
         Bundle bundle = new Bundle();
         bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
         intentsTestRule.getActivity().getIntent().putExtras(bundle);
+        intentsTestRule.runOnUiThread(() -> {
+            intentsTestRule.getActivity().getIntent().putExtras(bundle);
+            toolbar = intentsTestRule.getActivity().findViewById(R.id.game_list_toolbar);
+            intentsTestRule.getActivity().setSupportActionBar(toolbar);
+        });
+        resources = intentsTestRule.getActivity().getResources();
     }
 
     private int getItemCount(@NonNull RecyclerView view) {
@@ -329,5 +342,23 @@ public class GameListActivityTest {
                 .build();
         assertEquals(0, sr.getGameFilters().size());
         assertEquals(0, sr.getSortCriterias().size());
+    }
+
+    @Test
+    public void testSearchItemSelected() throws Throwable {
+        intentsTestRule.runOnUiThread(() -> {
+            ActionMenuItemView searchItem = toolbar.findViewById(R.id.actionSearch);
+            intentsTestRule.getActivity().onOptionItemViewSelected(searchItem.getId());
+        });
+        intended(hasComponent(SortActivity.class.getName()));
+    }
+
+    @Test
+    public void testToolbarSetText() {
+        TextView toolbarTitle = intentsTestRule.getActivity().findViewById(R.id.toolbar_title);
+        intentsTestRule.getActivity().setToolbarText(GameListActivity.GameList.HOSTED_GAMES);
+        assertEquals(resources.getString(R.string.hostedGamesText), toolbarTitle.getText());
+        intentsTestRule.getActivity().setToolbarText(GameListActivity.GameList.PAST_HOSTED_GAMES);
+        assertEquals(resources.getString(R.string.pastHostedGamesText), toolbarTitle.getText());
     }
 }

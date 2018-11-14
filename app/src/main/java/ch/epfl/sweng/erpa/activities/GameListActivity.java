@@ -5,9 +5,14 @@ import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.annimon.stream.Optional;
 
@@ -34,6 +39,9 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
     private List<Game> games;
     private Resources resources;
+    private Toolbar toolbar;
+    private GameList gameList = GameList.FIND_GAME;
+    private Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +49,6 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         if (dependenciesNotReady()) return;
         DataBindingUtil.setContentView(this, R.layout.activity_game_list);
         ButterKnife.bind(this);
-        onResume();
     }
 
     @Override
@@ -49,12 +56,16 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         super.onResume();
         if (dependenciesNotReady()) return;
         Intent myIntent = getIntent();
-        Bundle bundle = myIntent.getExtras();
+        bundle = myIntent.getExtras();
 
         if (bundle != null) {
-            GameList gameList = (GameList) bundle.getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY);
+            gameList = (GameList) bundle.getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY);
+            toolbar = findViewById(R.id.game_list_toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
             setToolbarText(gameList);
         }
+
         resources = this.getResources();
         games = new ArrayList<>(gameService.getAll());
         // TODO(@Roos) remove when FIXME is fixed
@@ -77,6 +88,33 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
         // TODO(@Roos) uncomment when FIXME is fixed
 //        createListData();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        setToolbarText(gameList);
+        return true;
+    }
+
+    @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+        return onOptionItemViewSelected(item.getItemId());
+
+    }
+
+    public boolean onOptionItemViewSelected(int id) {
+        // Handle action bar item clicks here.
+        bundle = getIntent().getExtras();
+        switch (id) {
+            case R.id.actionSearch:
+                Intent intent = new Intent(this, SortActivity.class);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 1);
+                return true;
+            default:
+        }
+        return super.onOptionsItemSelected(findViewById(id));
     }
 
     // FIXME(@Roos) list doesn't appear correctly the first time it's rendered
@@ -103,8 +141,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         }
     }
 
-    private void setToolbarText(GameList gameList) {
-        @StringRes int id;
+    protected void setToolbarText(GameList gameList) {
+        @StringRes int id = R.string.title_example_for_toolbar_activity;;
         switch (gameList) {
             case FIND_GAME:
                 id = R.string.titleListGamesActivity;
@@ -125,10 +163,19 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
                 id = R.string.pastHostedGamesText;
                 break;
             default:
-                id = R.string.title_example_for_toolbar_activity;
         }
-        Toolbar toolbar = findViewById(R.id.game_list_toolbar);
-        toolbar.setTitle(id);
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarTitle.setText(id);
+        getSupportActionBar().setTitle(id);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK) {
+            //TODO(@Ryker) add sorting using the data from data
+        }
+
     }
 
     public enum GameList {FIND_GAME, PENDING_REQUEST, CONFIRMED_GAMES, PAST_GAMES, HOSTED_GAMES, PAST_HOSTED_GAMES}
