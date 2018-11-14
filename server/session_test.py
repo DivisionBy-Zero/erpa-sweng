@@ -118,6 +118,7 @@ class TestDBSession(unittest.TestCase):
 
             difficulty=10,
             is_campaign=False,
+            max_players=10,
             location_lat=0,
             location_lon=0,
             max_players=10,
