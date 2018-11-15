@@ -5,14 +5,9 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from contexts import with_context_using_instance
-<<<<<<< HEAD:server/operations.py
 from models import Game, GameStatus, User, UserAuth, UserAuthChallenge, \
     UserSessionToken, UserUuid, Username, \
     PlayerJoinGameRequest, PlayerInGameStatus
-=======
-from models import Game, GameStatus, User, UserAuth, UserAuthChallenge, UserSessionToken, UserUuid, \
-    Username, PlayerJoinGameRequest, PlayerInGameStatus
->>>>>>> 1d9f532... Add the new max_players column in operation and session:erpa-gcp-functions/operations.py
 from session import SessionBroker
 
 
@@ -79,13 +74,8 @@ class Operations:
             raise KeyError("Game does not exist or user does not have "
                            "the permission to access it.")
 
-<<<<<<< HEAD:server/operations.py
         existing_game.fromdict(updated_game.asdict(
             exclude=['uuid', 'gm_user_uuid', 'timestamp_created']))
-=======
-        # TODO(@Roos): Check if user has the right to modify
-
->>>>>>> 1d9f532... Add the new max_players column in operation and session:erpa-gcp-functions/operations.py
         existing_game.timestamp_modified = datetime.now()
 
         session.add(existing_game)

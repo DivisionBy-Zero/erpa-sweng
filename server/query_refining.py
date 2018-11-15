@@ -1,9 +1,8 @@
-from sqlalchemy.orm import Session
-
-from typing import List, Dict
-
 import enum
+
 from models import Game, PlayerJoinGameRequest, PlayerInGameStatus
+from sqlalchemy.orm import Session
+from typing import List, Dict
 
 # Need help for filter: distance_from/to
 # and sort criterias: asc_dist, dsc_dist
@@ -28,10 +27,12 @@ def add_filter(games_list, filter_key, filt):
         games_list = games_list.filter(Game.universe == filt)
     elif filter_key == "with_GM":
         games_list = games_list.filter(Game.gm_user_uuid == filt)
+    elif filter_key == "game_status":
+        games_list = games_list.filter(Game.game_status == filt)
     elif filter_key == "from_timestamp":
-        games_list = games_list.filter(Game.duration >= filt)
+        games_list = games_list.filter(Game.session_length_in_minutes >= filt)
     elif filter_key == "to_timestamp":
-        games_list = games_list.filter(Game.duration <= filt)
+        games_list = games_list.filter(Game.session_length_in_minutes <= filt)
     elif filter_key == "title_query":
         games_list = games_list.filter(Game.title.like("%{}%".format(filt)))
     elif filter_key == "with_player":
