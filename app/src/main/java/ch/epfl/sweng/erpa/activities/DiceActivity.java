@@ -1,11 +1,14 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.annimon.stream.IntStream;
 
 import butterknife.OnClick;
 
@@ -16,51 +19,51 @@ import ch.epfl.sweng.erpa.R;
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     Random rng = new Random();    //used as a RNG
+    private final int[] dices = {4, 6, 8, 10, 12, 20, 100};
+    private TextView[] allResultViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dice);
 
-        TextView textView = findViewById(R.id.diceRollResult);
-        textView.setMovementMethod(new ScrollingMovementMethod());
-
-        EditText nbOfRolls = findViewById(R.id.nbOfDice);
-        nbOfRolls.setText("1");
+        allResultViews = getAllResultViews();
     }
 
     @OnClick(R.id.rollButton)
     public void rollDices(View view) {
-        String diceType = ((Spinner) findViewById(R.id.diceTypeSpinner)).getSelectedItem().toString();
-        int nbOfRolls = Integer.parseInt(((EditText) findViewById(R.id.nbOfDice)).getText().toString());
-        TextView textView = findViewById(R.id.diceRollResult);
-
-        textView.setText(rollAllDice(nbOfRolls, diceType));
+        int[] rolls = getNumberOfRolls();
+        if (IntStream.of(rolls).sum() > 15) {
+            createPopup("The number of dice must be less or equal to 15");
+        } else {
+            clearAllResults();
+            rollAndShowAllDice(rolls);
+        }
     }
 
     /**
-     * Rolls dices
-     * @param nbOfRolls Number of rolls to do
-     * @param diceType Type of dice to use
-     * @return a string containing all the results separated by spaces
+     * Rolls and shows all dice
+     * @param rolls An array containing all the dice to roll
      */
-    private String rollAllDice(int nbOfRolls, String diceType) {
-
-        StringBuilder strBuild = new StringBuilder();
-        for (int i = 0; i < nbOfRolls; ++i) {
-            strBuild.append(rollDie(diceType) + "       ");
+    private void rollAndShowAllDice(int[] rolls) {
+        int n = 0;
+        for (int i = 0; i < 7; ++i) {
+            String dieType = "D" + dices[i];
+            for (int j = 0; j < rolls[i]; ++j) {
+                allResultViews[n].setText(dieType + ": " + rollDie(dieType));
+                ++n;
+            }
         }
-        return strBuild.toString();
     }
 
     /**
      * Rolls one die
-     * @param diceType The type of die to roll
+     * @param dieType The type of die to roll
      * @return The result of the roll
      */
-    private int rollDie(String diceType) {
+    private int rollDie(String dieType) {
         int result = -1;
-        switch(diceType) {
+        switch (dieType) {
             case "D4":
                 result = rng.nextInt(4);
                 break;
@@ -84,5 +87,69 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
                 break;
         }
         return ++result;
+    }
+
+    /**
+     * Gets all the TextViews where we write the results of the rolls
+     * @return An array containing all the TextViews
+     */
+    private TextView[] getAllResultViews() {
+        TextView[] list = new TextView[15];
+        for (int i = 1; i < 16; ++i) {
+            String textId = "roll" + i;
+            int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
+            list[i - 1] = findViewById(id);
+        }
+        return list;
+    }
+
+    /**
+     * Gets all the dice to be rolled
+     * @return An array containing all the number of rolls of each die
+     */
+    private int[] getNumberOfRolls() {
+        int[] rolls = new int[7];
+        for (int i = 0; i < 7; ++i) {
+            String textId = "d" + dices[i] + "_number";
+            int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
+            String text = ((EditText)findViewById(id)).getText().toString();
+            if (text.isEmpty())
+                rolls[i] = 0;
+            else
+                rolls[i] = Integer.parseInt(text);
+        }
+        return rolls;
+    }
+
+    /**
+     * Clears all the dice results
+     */
+    private void clearAllResults() {
+        for (int i = 0; i < 15; ++i) {
+            allResultViews[i].setText("");
+        }
+    }
+
+    private void createPopup(String text) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        final TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextColor(Color.RED);
+        tv.setTextSize(16);
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(tv);
+
+        // set dialog message
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
     }
 }
