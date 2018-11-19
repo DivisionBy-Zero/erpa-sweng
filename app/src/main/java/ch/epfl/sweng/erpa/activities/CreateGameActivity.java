@@ -31,6 +31,7 @@ import ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
     @BindView(R.id.campaign) RadioButton campaignRadioButton;
@@ -97,11 +98,11 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     @OnClick(R.id.submit_button)
     public void submitGame(View view) {
         if (!playerNumberIsValid()) {
-            createPopup(getString(R.string.invalidPlayerNumber));
+            createPopup(getString(R.string.invalidPlayerNumber), this);
         } else if (!allObligFieldsFilled()) {
-            createPopup(getString(R.string.emptyFieldMessage));
+            createPopup(getString(R.string.emptyFieldMessage), this);
         } else if (!aRadioButtonIsChecked()) {
-            createPopup(getString(R.string.uncheckedCheckboxMessage));
+            createPopup(getString(R.string.uncheckedCheckboxMessage), this);
         } else {
             createAndPublishGame();
 
@@ -152,23 +153,6 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         int minPlayers = intValueFromEditTextOrMinusOne(valueMin);
         int maxPlayers = intValueFromEditTextOrMinusOne(valueMax);
         return (minPlayers > 0 && maxPlayers >= minPlayers);
-    }
-
-    private void createPopup(String text) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        final TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setTextColor(Color.RED);
-        tv.setTextSize(16);
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(tv);
-        // set dialog message
-        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", (dialog, id) -> {
-        });
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        // show it
-        alertDialog.show();
     }
 
     private static int intValueFromEditTextOrMinusOne(EditText editText) {

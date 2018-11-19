@@ -1,14 +1,10 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import butterknife.OnClick;
 
@@ -22,6 +18,8 @@ import javax.inject.Inject;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
+
+import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class SignupActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -45,51 +43,28 @@ public class SignupActivity extends DependencyConfigurationAgnosticActivity {
         boolean isPlayer = ((CheckBox) findViewById(R.id.isPlayer)).isChecked();
 
         if (usernameText.isEmpty()) {
-            createPopup(getString(R.string.noNameMessage));
+            createPopup(getString(R.string.noNameMessage), this);
             return;
         }
 
         if (passwordText.isEmpty()) {
-            createPopup(getString(R.string.noPassMessage));
+            createPopup(getString(R.string.noPassMessage), this);
             return;
         }
 
         if (!passwordText.equals(confirmText)) {
-            createPopup(getString(R.string.passwords_not_match));
+            createPopup(getString(R.string.passwords_not_match), this);
             return;
         }
 
         if (!isGm && !isPlayer) {
-            createPopup(getString(R.string.not_select_GM_or_player));
+            createPopup(getString(R.string.not_select_GM_or_player), this);
             return;
         }
 
         Optional<UserProfile> newUser = uss.storeNewUser(usernameText, passwordText, levelText, isGm, isPlayer);
         newUser.ifPresent(u -> finish());
 
-        createPopup(getString(R.string.username_in_use));
-    }
-
-    private void createPopup(String text) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        final TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setTextColor(Color.RED);
-        tv.setTextSize(16);
-
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(tv);
-
-        // set dialog message
-        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        // show it
-        alertDialog.show();
+        createPopup(getString(R.string.username_in_use), this);
     }
 }

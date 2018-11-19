@@ -1,8 +1,5 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -15,6 +12,8 @@ import butterknife.OnClick;
 import java.util.Random;
 
 import ch.epfl.sweng.erpa.R;
+
+import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -35,7 +34,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     public void rollDices(View view) {
         int[] rolls = getNumberOfRolls();
         if (IntStream.of(rolls).sum() > 15) {
-            createPopup("The number of dice must be less or equal to 15");
+            createPopup("The number of dice must be less or equal to 15", this);
         } else {
             clearAllResults();
             rollAndShowAllDice(rolls);
@@ -131,28 +130,5 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         for (int i = 0; i < allResultViews.length; ++i) {
             allResultViews[i].setText("");
         }
-    }
-
-    private void createPopup(String text) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-        final TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setTextColor(Color.RED);
-        tv.setTextSize(16);
-
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(tv);
-
-        // set dialog message
-        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        // show it
-        alertDialog.show();
     }
 }
