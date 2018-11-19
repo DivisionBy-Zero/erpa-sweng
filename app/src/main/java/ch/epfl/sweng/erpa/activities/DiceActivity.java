@@ -19,7 +19,8 @@ import ch.epfl.sweng.erpa.R;
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     Random rng = new Random();    //used as a RNG
-    private final int[] dices = {4, 6, 8, 10, 12, 20, 100};
+    private final int[] dice = {4, 6, 8, 10, 12, 20, 100};
+    private final int MAX_DICE_NUMBER = 15;
     private TextView[] allResultViews;
 
     @Override
@@ -48,7 +49,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     private void rollAndShowAllDice(int[] rolls) {
         int n = 0;
         for (int i = 0; i < 7; ++i) {
-            String dieType = "D" + dices[i];
+            String dieType = "D" + dice[i];
             for (int j = 0; j < rolls[i]; ++j) {
                 allResultViews[n].setText(dieType + ": " + rollDie(dieType));
                 ++n;
@@ -85,6 +86,8 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
             case "D100":
                 result = rng.nextInt(100);
                 break;
+            default:
+                throw new AssertionError("Die type is incorrect");
         }
         return ++result;
     }
@@ -94,8 +97,8 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
      * @return An array containing all the TextViews
      */
     private TextView[] getAllResultViews() {
-        TextView[] list = new TextView[15];
-        for (int i = 1; i < 16; ++i) {
+        TextView[] list = new TextView[MAX_DICE_NUMBER];
+        for (int i = 1; i < list.length + 1; ++i) {
             String textId = "roll" + i;
             int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
             list[i - 1] = findViewById(id);
@@ -108,9 +111,9 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
      * @return An array containing all the number of rolls of each die
      */
     private int[] getNumberOfRolls() {
-        int[] rolls = new int[7];
-        for (int i = 0; i < 7; ++i) {
-            String textId = "d" + dices[i] + "_number";
+        int[] rolls = new int[dice.length];
+        for (int i = 0; i < dice.length; ++i) {
+            String textId = "d" + dice[i] + "_number";
             int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
             String text = ((EditText)findViewById(id)).getText().toString();
             if (text.isEmpty())
@@ -125,7 +128,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
      * Clears all the dice results
      */
     private void clearAllResults() {
-        for (int i = 0; i < 15; ++i) {
+        for (int i = 0; i < allResultViews.length; ++i) {
             allResultViews[i].setText("");
         }
     }

@@ -13,15 +13,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-
 import ch.epfl.sweng.erpa.R;
-import static android.support.test.espresso.Espresso.onData;
+
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -39,65 +33,37 @@ public class DiceActivityTest {
 
     @Test
     public void testCorrectOutputForD4Die() {
-        onView(withId(R.id.d4_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(4)));
-        }
+        createTestForDie(R.id.d4_number, 4);
     }
 
     @Test
     public void testCorrectOutputForD6Die() {
-        onView(withId(R.id.d6_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(6)));
-        }
+        createTestForDie(R.id.d6_number, 6);
     }
 
     @Test
     public void testCorrectOutputForD8Die() {
-        onView(withId(R.id.d8_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(8)));
-        }
+        createTestForDie(R.id.d8_number, 8);
     }
 
     @Test
     public void testCorrectOutputForD10Die() {
-        onView(withId(R.id.d6_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(10)));
-        }
+        createTestForDie(R.id.d10_number, 10);
     }
 
     @Test
     public void testCorrectOutputForD12Die() {
-        onView(withId(R.id.d12_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(12)));
-        }
+        createTestForDie(R.id.d12_number, 12);
     }
 
     @Test
     public void testCorrectOutputForD20Die() {
-        onView(withId(R.id.d20_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(20)));
-        }
+        createTestForDie(R.id.d20_number, 20);
     }
 
     @Test
     public void testCorrectOutputForD100Die() {
-        onView(withId(R.id.d100_number)).perform(typeText("1")).perform(closeSoftKeyboard());
-        for (int i = 0; i < 10; ++i) {
-            onView(withId(R.id.rollButton)).perform(click());
-            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(100)));
-        }
+        createTestForDie(R.id.d100_number, 100);
     }
 
     @Test
@@ -167,6 +133,14 @@ public class DiceActivityTest {
         onView(ViewMatchers.withText("The number of dice must be less or equal to 15")).check(matches(isDisplayed()));
     }
 
+    private void createTestForDie(int dieViewId, int dieSize) {
+        onView(withId(dieViewId)).perform(typeText("1")).perform(closeSoftKeyboard());
+        for (int i = 0; i < 10; ++i) {
+            onView(withId(R.id.rollButton)).perform(click());
+            onView(withId(R.id.roll1)).check(matches(textViewHasCorrectValue(dieSize)));
+        }
+    }
+
     private Matcher<View> textViewHasCorrectValue(int diceSize) {
 
         return new TypeSafeMatcher<View>() {
@@ -178,25 +152,15 @@ public class DiceActivityTest {
 
             @Override
             public boolean matchesSafely(View view) {
-                if (!(view instanceof TextView)) {
+                if (!TextView.class.isAssignableFrom(view.getClass())) {
                     return false;
                 }
 
                 if (view != null) {
                     String text = ((TextView) view).getText().toString();
+                    int roll = Integer.parseInt(text.substring(text.indexOf(':') + 2));
 
-                    Scanner scanner = new Scanner(text);
-                    List<Integer> list = new ArrayList<Integer>();
-                    while (scanner.hasNextInt()) {
-                        list.add(scanner.nextInt());
-                    }
-                    
-                    for (int i : list) {
-                        if (i > diceSize) {
-                            return false;
-                        }
-                    }
-                    return true;
+                    return roll <= diceSize;
                 }
 
                 return false;
