@@ -51,4 +51,10 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(R.id.launch_signup_button)).perform(ViewActions.click());
         intended(hasComponent(SignupActivity.class.getName()));
     }
+
+    @Test
+    public void testCanLaunchDiceInterface() {
+        onView(ViewMatchers.withId(R.id.launch_dice_button)).perform(ViewActions.click());
+        intended(hasComponent(DiceActivity.class.getName()));
+    }
 }
