@@ -35,7 +35,7 @@
     collision: {},
     file: 'sampledata/d4.obj',
     name: 'd4',
-    recenter: 'root',
+    recenter: {x:0.5,y:0.5,z:3},
     scale: 0.49429099999999998,
   },
   version: '0.52:1',

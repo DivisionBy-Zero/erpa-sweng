@@ -35,7 +35,7 @@
     collision: {},
     file: 'sampledata/d20_1.obj',
     name: 'd20_1',
-    recenter: 'root',
+    recenter: {x:0.5,y:0.5,z:3},
     scale: 0.24465700000000001,
   },
   version: '0.52:1',
