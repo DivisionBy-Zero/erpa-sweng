@@ -52,4 +52,9 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
     public void launchSignupPage(View view) {
         startActivity(new Intent(this, SignupActivity.class));
     }
+
+    @OnClick(R.id.launch_dice_button)
+    public void launchDicePage(View view) {
+        startActivity(new Intent(this, DiceActivity.class));
+    }
 }
