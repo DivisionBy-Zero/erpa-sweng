@@ -77,7 +77,7 @@ ext {
     depVersionJargon2 = "1.1.1"
     depVersionJhash = "2.1.0"
     depVersionJunit = "4.12"
-    depVersionLombok = "1.18.2"
+    depVersionLombok = "1.16.20" // github.com/rzwitserloot/lombok/issues/1727
     depVersionMockito = "2.22.0"
     depVersionRetroLambda = "3.2.5"
     depVersionRetrolambdaLombokAst = "0.2.3.a2"

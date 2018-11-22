@@ -5,7 +5,8 @@ import lombok.NonNull;
 import lombok.ToString;
 
 @Data
+@ToString(exclude = "accessToken")
 public class UserAuth {
     @NonNull private String uid;
-    @NonNull @ToString.Exclude private String accessToken;
+    @NonNull private String accessToken;
 }
