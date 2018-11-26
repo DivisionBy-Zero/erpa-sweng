@@ -33,7 +33,6 @@
         <activity android:name=".activities.SignupActivity" />
         <activity android:name=".activities.SortActivity" />
         <activity android:name=".activities.UserProfileActivity" />
-        <activity android:name=".activities.UserProfileActivity" />
     </application>
 
 </manifest>
