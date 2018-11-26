@@ -1,6 +1,7 @@
 package ch.epfl.sweng.erpa.activities.sketches;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import ch.epfl.sweng.erpa.util.Triplet;
 import processing.core.PApplet;
@@ -118,10 +119,10 @@ public class DieSketch extends PApplet {
             new HashMap<Integer, Triplet<Float, Float, Float>>() {{
                 put(1, new Triplet(0.25f, 0f, -0.5));
                 put(2, new Triplet(0.75f, 0f, 0.5f));
-                put(3, new Triplet(0.25f, 0f, -1f));
+                put(3, new Triplet(0.25f, 0f, -1));
                 put(4, new Triplet(0.75f, 0f, -0.5f));
                 put(5, new Triplet(0.25f, 0f, 0f));
-                put(6, new Triplet(0.75f, 0f, 1f));
+                put(6, new Triplet(0.75f, 0f, 1));
                 put(7, new Triplet(0.25f, 0f, 0.5f));
                 put(8, new Triplet(0.75f, 0f, 0f));
             }};
