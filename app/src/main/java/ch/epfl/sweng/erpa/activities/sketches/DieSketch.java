@@ -1,85 +1,13 @@
 package ch.epfl.sweng.erpa.activities.sketches;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 import ch.epfl.sweng.erpa.util.Triplet;
 import processing.core.PApplet;
 import processing.core.PShape;
 
 public class DieSketch extends PApplet {
-    private static final Map<Integer, Triplet<Float, Float, Float>> d4rotationTranslationTable =
-            Collections.unmodifiableMap(new HashMap<Integer, Triplet<Float, Float, Float>>() {{
-                put(1, new Triplet(0.5f, 0f, 0f));
-                put(2, new Triplet(1f, 0.2f, 0f));
-                put(3, new Triplet(1.1f, 0.25f, 0.5f));
-                put(4, new Triplet(1.8f, 2f, 0.3f));
-            }});
-    private static final Map<Integer, Triplet<Float, Float, Float>> d6rotationTranslationTable =
-            Collections.unmodifiableMap(new HashMap<Integer, Triplet<Float, Float, Float>>() {{
-                put(1, new Triplet(1.5f, 0.5f, -0.5f));
-                put(2, new Triplet(1f, 0.5f, -0.5f));
-                put(3, new Triplet(1f, 1f, -0.5f));
-                put(4, new Triplet(1f, 0f, 0.5f));
-                put(5, new Triplet(1f, 0.5f, 0.5f));
-                put(6, new Triplet(1.5f, 0.5f, 0.5f));
-            }});
-    private static final Map<Integer, Triplet<Float, Float, Float>> d8rotationTranslationTable =
-            Collections.unmodifiableMap(new HashMap<Integer, Triplet<Float, Float, Float>>() {{
-                put(1, new Triplet(0.25f, 0f, -0.5));
-                put(2, new Triplet(0.75f, 0f, 0.5f));
-                put(3, new Triplet(0.25f, 0f, -1f));
-                put(4, new Triplet(0.75f, 0f, -0.5f));
-                put(5, new Triplet(0.25f, 0f, 0f));
-                put(6, new Triplet(0.75f, 0f, 1f));
-                put(7, new Triplet(0.25f, 0f, 0.5f));
-                put(8, new Triplet(0.75f, 0f, 0f));
-            }});
-    private static final Map<Integer, Triplet<Float, Float, Float>> d10rotationTranslationTable =
-            Collections.unmodifiableMap(new HashMap<Integer, Triplet<Float, Float, Float>>() {{
-                put(1, new Triplet(0.25f, 0f, -1f));
-                put(2, new Triplet(0.75f, 0f, 0.4f));
-                put(3, new Triplet(0.25f, 0f, -0.2f));
-                put(4, new Triplet(0.75f, 0f, -0.8f));
-                put(5, new Triplet(0.25f, 0f, 0.2f));
-                put(6, new Triplet(0.75f, 0f, -0.2f));
-                put(7, new Triplet(0.25f, 0f, -0.6f));
-                put(8, new Triplet(0.75f, 0f, 0f));
-                put(9, new Triplet(0.25f, 0f, 0.6f));
-                put(10, new Triplet(0.75f, 0f, -0.4f));
-            }});
-    private static final Map<Integer, Triplet<Float, Float, Float>> d20rotationTranslationTable =
-            Collections.unmodifiableMap(new HashMap<Integer, Triplet<Float, Float, Float>>() {{
-                put(1, new Triplet(1.125f, 0.5f, 0.2f));
-                put(2, new Triplet(-0.125f, 0.7f, 0.4f));
-                put(3, new Triplet(-0.313f, 0.3f, 1.25f));
-                put(4, new Triplet(1f, 0.3f, 0.75f));
-                put(5, new Triplet(0f, 0.3f, 1.25f));
-                put(6, new Triplet(-0.125f, 0f, 1f));
-                put(7, new Triplet(1.125f, 0.75f, 0.5f));
-                put(8, new Triplet(-0.375f, 0.5f, -1f));
-                put(9, new Triplet(0.81f, 0.3f, 0.5f));
-                put(10, new Triplet(1.188f, 0.2f, -0.5f));
-                put(11, new Triplet(0f, 0.1f, -0.5f));
-                put(12, new Triplet(1f, 0.1f, -0.7f));
-                put(13, new Triplet(1.2f, 0.3f, 0.75f));
-                put(14, new Triplet(-0.3f, -0.1f, 0.8f));
-                put(15, new Triplet(1f, -0.1f, -0.3f));
-                put(16, new Triplet(-0.1f, 0.3f, 0.8f));
-                put(17, new Triplet(0.4f, 1f, 0.45f));
-                put(18, new Triplet(0.625f, 0.5f, -1f));
-                put(19, new Triplet(-0.2f, -0.35f, 0.8f));
-                put(20, new Triplet(0.375f, 0.5f, 0f));
-            }});
-    private static final Map<Integer, Map<Integer, Triplet<Float, Float, Float>>> diceRotationTranslationTable =
-            Collections.unmodifiableMap(new HashMap<Integer, Map<Integer, Triplet<Float, Float, Float>>>() {{
-                put(4, d4rotationTranslationTable);
-                put(6, d6rotationTranslationTable);
-                put(8, d8rotationTranslationTable);
-                put(10, d10rotationTranslationTable);
-                put(20, d20rotationTranslationTable);
-            }});
+
     PShape die = null;
     float angleX = 0;
     float angleY = 0;
@@ -90,9 +18,9 @@ public class DieSketch extends PApplet {
     int dieValue;
     String fileName;
 
-    public DieSketch(String fileName, int dieValue, float factor) {
+    public DieSketch(String fileName, float factor) {
         super();
-        this.dieValue = dieValue;
+        this.dieValue = valueWithFileName(fileName);
         this.fileName = fileName;
         this.factor = factor;
     }
@@ -103,10 +31,12 @@ public class DieSketch extends PApplet {
 
     @Override
     public void setup() {
+
         die = loadShape(fileName);
 
         if (die == null)
             throw new RuntimeException("Cannot get object");
+
     }
 
     public void draw() {
@@ -166,11 +96,106 @@ public class DieSketch extends PApplet {
         angleZ = rotation.getThird() * PI;
     }
 
+    final HashMap<Integer, Triplet<Float, Float, Float>> d4rotationTranslationTable =
+            new HashMap<Integer, Triplet<Float, Float, Float>>() {{
+                put(1, new Triplet(0.5f, 0f, 0f));
+                put(2, new Triplet(1f, 0.2f, 0f));
+                put(3, new Triplet(1.1f, 0.25f, 0.5f));
+                put(4, new Triplet(1.8f, 2f, 0.3f));
+            }};
+
+    final HashMap<Integer, Triplet<Float, Float, Float>> d6rotationTranslationTable =
+            new HashMap<Integer, Triplet<Float, Float, Float>>() {{
+                put(1, new Triplet(1.5f, 0.5f, -0.5f));
+                put(2, new Triplet(1f, 0.5f, -0.5f));
+                put(3, new Triplet(1f, 1f, -0.5f));
+                put(4, new Triplet(1f, 0f, 0.5f));
+                put(5, new Triplet(1f, 0.5f, 0.5f));
+                put(6, new Triplet(1.5f, 0.5f, 0.5f));
+            }};
+
+    final HashMap<Integer, Triplet<Float, Float, Float>> d8rotationTranslationTable =
+            new HashMap<Integer, Triplet<Float, Float, Float>>() {{
+                put(1, new Triplet(0.25f, 0f, -0.5));
+                put(2, new Triplet(0.75f, 0f, 0.5f));
+                put(3, new Triplet(0.25f, 0f, -1f));
+                put(4, new Triplet(0.75f, 0f, -0.5f));
+                put(5, new Triplet(0.25f, 0f, 0f));
+                put(6, new Triplet(0.75f, 0f, 1f));
+                put(7, new Triplet(0.25f, 0f, 0.5f));
+                put(8, new Triplet(0.75f, 0f, 0f));
+            }};
+
+    final HashMap<Integer, Triplet<Float, Float, Float>> d10rotationTranslationTable =
+            new HashMap<Integer, Triplet<Float, Float, Float>>() {{
+                put(1, new Triplet(0.25f, 0f, -1f));
+                put(2, new Triplet(0.75f, 0f, 0.4f));
+                put(3, new Triplet(0.25f, 0f, -0.2f));
+                put(4, new Triplet(0.75f, 0f, -0.8f));
+                put(5, new Triplet(0.25f, 0f, 0.2f));
+                put(6, new Triplet(0.75f, 0f, -0.2f));
+                put(7, new Triplet(0.25f, 0f, -0.6f));
+                put(8, new Triplet(0.75f, 0f, 0f));
+                put(9, new Triplet(0.25f, 0f, 0.6f));
+                put(10, new Triplet(0.75f, 0f, -0.4f));
+            }};
+
+    final HashMap<Integer, Triplet<Float, Float, Float>> d20rotationTranslationTable =
+            new HashMap<Integer, Triplet<Float, Float, Float>>() {{
+                put(1, new Triplet(1.125f, 0.5f, 0.2f));
+                put(2, new Triplet(-0.125f, 0.7f, 0.4f));
+                put(3, new Triplet(-0.313f, 0.3f, 1.25f));
+                put(4, new Triplet(1f, 0.3f, 0.75f));
+                put(5, new Triplet(0f, 0.3f, 1.25f));
+                put(6, new Triplet(-0.125f, 0f, 1f));
+                put(7, new Triplet(1.125f, 0.75f, 0.5f));
+                put(8, new Triplet(-0.375f, 0.5f, -1f));
+                put(9, new Triplet(0.81f, 0.3f, 0.5f));
+                put(10, new Triplet(1.188f, 0.2f, -0.5f));
+                put(11, new Triplet(0f, 0.1f, -0.5f));
+                put(12, new Triplet(1f, 0.1f, -0.7f));
+                put(13, new Triplet(1.2f, 0.3f, 0.75f));
+                put(14, new Triplet(-0.3f, -0.1f, 0.8f));
+                put(15, new Triplet(1f, -0.1f, -0.3f));
+                put(16, new Triplet(-0.1f, 0.3f, 0.8f));
+                put(17, new Triplet(0.4f, 1f, 0.45f));
+                put(18, new Triplet(0.625f, 0.5f, -1f));
+                put(19, new Triplet(-0.2f, -0.35f, 0.8f));
+                put(20, new Triplet(0.375f, 0.5f, 0f));
+            }};
+
+    final HashMap<Integer, HashMap<Integer, Triplet<Float, Float, Float>>> diceRotationTranslationTable =
+            new HashMap<Integer, HashMap<Integer, Triplet<Float, Float, Float>>>() {{
+                put(4, d4rotationTranslationTable);
+                put(6, d6rotationTranslationTable);
+                put(8, d8rotationTranslationTable);
+                put(10, d10rotationTranslationTable);
+                put(20, d20rotationTranslationTable);
+            }};
+
+
     public float checkAndIncrementAngle(float angle, float increment) {
         float mAngle = angle + increment;
         if (mAngle > 4) {
             mAngle = 0;
         }
         return mAngle;
+    }
+
+    private int valueWithFileName(String fileName) {
+        switch (fileName) {
+            case "objs/d4R.obj":
+                return 4;
+            case "objs/d6R.obj":
+                return 6;
+            case "objs/d8R.obj":
+                return 8;
+            case "objs/d10R.obj":
+                return 10;
+            case "objs/d20_1R.obj":
+                return 20;
+            default:
+                return 10;
+        }
     }
 }
