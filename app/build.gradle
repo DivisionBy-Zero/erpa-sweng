@@ -170,33 +170,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     sourceDirectories = files([mainSrc])
     classDirectories = files([debugTree])
     executionData = fileTree(dir: project.buildDir, includes: [
-            'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+        'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
     ])
+
 }
-
-apply plugin: 'com.google.ar.sceneform.plugin'
-
-sceneform.asset('sampledata/d6R.obj',
-        'default',
-        'sampledata/d6.sfa',
-        'src/main/res/raw/d6')
-
-sceneform.asset('sampledata/d4R.obj',
-        'default',
-        'sampledata/d4.sfa',
-        'src/main/res/raw/d4')
-
-sceneform.asset('sampledata/d8R.obj',
-        'default',
-        'sampledata/d8.sfa',
-        'src/main/res/raw/d8')
-
-sceneform.asset('sampledata/d20_1R.obj',
-        'default',
-        'sampledata/d20_1.sfa',
-        'src/main/res/raw/d20_1')
-
-sceneform.asset('sampledata/d20_2R.obj',
-        'default',
-        'sampledata/d20_2.sfa',
-        'src/main/res/raw/d20_2')
