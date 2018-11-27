@@ -35,9 +35,10 @@ public class DiceAnimationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DataBindingUtil.setContentView(this, R.layout.activity_dice_animation);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         flowLayout = findViewById(R.id.dice_animation_flowLayout);
-
         addNewDice(4, 1.5f);
         addNewDice(6, 0.5f);
         addNewDice(8, 0.5f);
