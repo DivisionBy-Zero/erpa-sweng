@@ -1,6 +1,6 @@
 import enum
 
-from models import Game, PlayerJoinGameRequest, PlayerInGameStatus
+from models import Game, PlayerJoinGameRequest, PlayerInGameStatus, User
 from sqlalchemy.orm import Session
 from typing import List, Dict
 
@@ -8,19 +8,19 @@ from typing import List, Dict
 # and sort criterias: asc_dist, dsc_dist
 
 # Returns a query for a list of games given the different filters and sorting criterias given
-def get_game_list(_db_session: Session, filters: Dict[str, object], sort_criterias: List[str]):
+def get_game_list(_db_session: Session, filters: Dict[str, object], sort_criterias: List[str], user: User = None):
     games_list = _db_session.query(Game)
     for filter_key in filters.keys():
         filt = filters[filter_key]
-        games_list = add_filter(games_list, filter_key, filt)
+        games_list = add_filter(games_list, user, filter_key, filt)
         
     for sort_key in sort_criterias:
-        games_list = add_sort(games_list, sort_key)
+        games_list = add_sort(games_list, user, sort_key)
 
     return games_list
 
 # Adds the filters to the query
-def add_filter(games_list, filter_key, filt):
+def add_filter(games_list, user, filter_key, filt):
     if filter_key == "diff":
         games_list = games_list.filter(Game.difficulty == filt)
     elif filter_key == "universe":
@@ -43,10 +43,14 @@ def add_filter(games_list, filter_key, filt):
         games_list = (games_list.join(PlayerJoinGameRequest)
                                 .filter(PlayerJoinGameRequest.request_status == PlayerInGameStatus.REQUEST_TO_JOIN)
                                 .filter(PlayerJoinGameRequest.user_uuid == filt))
+    elif filter_key == "from_distance":
+        games_list = games_list.filter()
+    elif filter_key == "to_distance":
+        games_list = games_list.filter()
     return games_list
 
 # Adds the sorting cirteria to the query
-def add_sort(games_list, sort_key):
+def add_sort(games_list, user, sort_key):
     if sort_key == "asc_diff":
         games_list = games_list.order_by(Game.difficulty.asc())
     elif sort_key == "dsc_diff":
@@ -59,4 +63,8 @@ def add_sort(games_list, sort_key):
         games_list = games_list.order_by(Game.max_players.asc())
     elif sort_key == "dsc_max_player":
         games_list = games_list.order_by(Game.max_players.desc())
+    elif sort_key == "asc_distance":
+        games_list = games_list.order_by()
+    elif sort_key == "dsc_distance":
+        games_list = games_list.order_by()
     return games_list

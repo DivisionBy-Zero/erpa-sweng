@@ -42,8 +42,8 @@ game = Game(
     is_campaign=False,
     min_players=1,
     max_players=10,
-    location_lat=20,
-    location_lon=20,
+    location_lat=30,
+    location_lon=30,
     number_of_sessions = 3,
     session_length_in_minutes = 60,
     universe="Lovecraft",
@@ -196,7 +196,7 @@ def compareArrayOfGames(array1, array2):
         return True
     return False
 
-def create_default_test(self, session, correct_game, correct_filter, fail_filter):
+def create_default_test(self, session, correct_game, correct_filter, fail_filter, user = None):
     self.assertTrue(compareTwoGames(correct_game, get_game_list(session, correct_filter, []).one()))
     self.assertEqual(1, len(get_game_list(session, correct_filter, []).all()))
     self.assertEqual(0, len(get_game_list(session, fail_filter, []).all()))
@@ -240,6 +240,14 @@ class TestQueryRefining(unittest.TestCase):
         create_default_test(self, session, game1, {"with_requesting_player":"This is a UUID"}, {"with_requesting_player":"ahahaha"})
 
     @with_full_session
+    def test_from_distance_filter(self, session):
+        create_default_test(self, session, game1, {"from_distance":30}, {"from_distance":100}, user = user)
+
+    @with_full_session
+    def test_to_distance_filter(self, session):
+        create_default_test(self, session, game, {"to_distance":1}, {"to_distance":-100}, user = user)
+
+    @with_full_session
     def test_gusame_stat_filter(self, session):
         self.assertTrue(compareTwoGames(game, get_game_list(session, {"game_status":GameStatus.CREATED}, []).one()))
         self.assertEqual(1, len(get_game_list(session, {"game_status":GameStatus.CREATED}, []).all()))
@@ -272,3 +280,11 @@ class TestQueryRefining(unittest.TestCase):
     @with_full_session
     def test_max_players_sort_dsc(self, session):
         self.assertTrue(compareArrayOfGames([game, game2, game1], get_game_list(session, {}, ["dsc_max_player"]).all()))
+
+    @with_full_session
+    def test_distance_sort_asc(self, session):
+        self.assertTrue(compareArrayOfGames([game, game2, game1], get_game_list(session, {}, ["asc_distance"], user = user).all()))
+
+    @with_full_session
+    def test_distance_sort_dsc(self, session):
+        self.assertTrue(compareArrayOfGames([game1, game2, game], get_game_list(session, {}, ["dsc_distance"], user = user).all()))
