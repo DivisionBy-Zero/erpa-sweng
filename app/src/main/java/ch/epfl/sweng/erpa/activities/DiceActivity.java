@@ -1,25 +1,29 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.annimon.stream.IntStream;
+import android.widget.Button;
+import android.widget.FrameLayout;
 
 import butterknife.OnClick;
 
-import java.util.Random;
+
+import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
+import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.views.FlowLayout;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
-import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.UserProfileService;
+import processing.android.CompatUtils;
+import processing.android.PFragment;
 
-import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
@@ -27,17 +31,19 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     @Inject UserProfile up;
 
-    Random rng = new Random();    //used as a RNG
-    private final int[] dice = {4, 6, 8, 10, 12, 20, 100};
-    private final int MAX_DICE_NUMBER = 15;
-    private TextView[] allResultViews;
+    private final int MAX_DICE_NUMBER = 9;
+    private final float ROTATION_SPEED = 3f;
+
+    private FlowLayout flowLayout;
+    private ArrayList<DieSketch> allDice = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dice);
-
-        allResultViews = getAllResultViews();
+        DataBindingUtil.setContentView(this, R.layout.activity_dice);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         //Handle navigationMenu interactions
         DrawerLayout mDrawerLayout = findViewById(R.id.dice_drawer_layout);
@@ -46,107 +52,87 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
         setUsernameInMenu(navigationView, up);
+
+        flowLayout = findViewById(R.id.dice_layout);
     }
 
     @OnClick(R.id.rollButton)
     public void rollDices(View view) {
-        int[] rolls = getNumberOfRolls();
-        if (IntStream.of(rolls).sum() > 15) {
-            createPopup("The number of dice must be less or equal to 15", this);
+        Button button = (Button) view;
+        if (button.getText().toString().equals("Roll!")) {
+            button.setText("Stop!");
+            makeAllDiceRoll();
         } else {
-            clearAllResults();
-            rollAndShowAllDice(rolls);
+            button.setText("Roll!");
+            stopAllDice();
         }
     }
 
-    /**
-     * Rolls and shows all dice
-     * @param rolls An array containing all the dice to roll
-     */
-    private void rollAndShowAllDice(int[] rolls) {
-        int n = 0;
-        for (int i = 0; i < 7; ++i) {
-            String dieType = "D" + dice[i];
-            for (int j = 0; j < rolls[i]; ++j) {
-                allResultViews[n].setText(dieType + ": " + rollDie(dieType));
-                ++n;
+    public void addAndUpdateDie(View view) {
+        if (allDice.size() < MAX_DICE_NUMBER) {
+            Button button = (Button) view;
+            addAndShowDie(Integer.parseInt(button.getText().toString().substring(1)));
+        }
+    }
+
+    public void remove_die(View view) {
+        for (int i = allDice.size() - 1; i >= 0 ; i -= 1) {
+            if (allDice.get(i).isToRemove()) {
+                flowLayout.removeViewAt(i);
+                allDice.remove(i);
             }
         }
     }
 
+    private void addAndShowDie(int dieType) {
+        DieSketch dieSketch = new DieSketch(getFileNameFromDieType(dieType), ROTATION_SPEED);
+        allDice.add(dieSketch);
+
+        FrameLayout frame = new FrameLayout(this);
+        frame.setId(CompatUtils.getUniqueViewId());
+        flowLayout.addView(frame);
+
+        PFragment fragment = new PFragment(dieSketch);
+        fragment.setView(frame, this);
+    }
+
     /**
-     * Rolls one die
-     * @param dieType The type of die to roll
-     * @return The result of the roll
+     * Rolls and shows all dice
      */
-    private int rollDie(String dieType) {
-        int result = -1;
+    private void makeAllDiceRoll() {
+        for (DieSketch die : allDice) {
+            die.setRotating();
+        }
+    }
+
+    /**
+     * Stops all rolling dice
+     */
+    private void stopAllDice() {
+        for (DieSketch die : allDice) {
+            die.roll();
+        }
+    }
+
+    private String getFileNameFromDieType(int dieType) {
+        String name = "";
         switch (dieType) {
-            case "D4":
-                result = rng.nextInt(4);
+            case 4:
+                name = "objs/d4R.obj";
                 break;
-            case "D6":
-                result = rng.nextInt(6);
+            case 6:
+                name = "objs/d6R.obj";
                 break;
-            case "D8":
-                result = rng.nextInt(8);
+            case 8:
+                name = "objs/d8R.obj";
                 break;
-            case "D10":
-                result = rng.nextInt(10);
+            case 10:
+                name = "objs/d10R.obj";
                 break;
-            case "D12":
-                result = rng.nextInt(12);
+            case 20:
+                name = "objs/d20_1R.obj";
                 break;
-            case "D20":
-                result = rng.nextInt(20);
-                break;
-            case "D100":
-                result = rng.nextInt(100);
-                break;
-            default:
-                throw new AssertionError("Die type is incorrect");
         }
-        return ++result;
-    }
-
-    /**
-     * Gets all the TextViews where we write the results of the rolls
-     * @return An array containing all the TextViews
-     */
-    private TextView[] getAllResultViews() {
-        TextView[] list = new TextView[MAX_DICE_NUMBER];
-        for (int i = 1; i < list.length + 1; ++i) {
-            String textId = "roll" + i;
-            int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
-            list[i - 1] = findViewById(id);
-        }
-        return list;
-    }
-
-    /**
-     * Gets all the dice to be rolled
-     * @return An array containing all the number of rolls of each die
-     */
-    private int[] getNumberOfRolls() {
-        int[] rolls = new int[dice.length];
-        for (int i = 0; i < dice.length; ++i) {
-            String textId = "d" + dice[i] + "_number";
-            int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
-            String text = ((EditText)findViewById(id)).getText().toString();
-            if (text.isEmpty())
-                rolls[i] = 0;
-            else
-                rolls[i] = Integer.parseInt(text);
-        }
-        return rolls;
-    }
-
-    /**
-     * Clears all the dice results
-     */
-    private void clearAllResults() {
-        for (int i = 0; i < allResultViews.length; ++i) {
-            allResultViews[i].setText("");
-        }
+        return name;
     }
 }
