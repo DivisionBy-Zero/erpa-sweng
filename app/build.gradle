@@ -60,6 +60,17 @@ allprojects {
 
 configurations {
     implementation.exclude module: 'com.android.tools.external.lombok'
+    all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == 'com.android.support') {
+                if (!requested.name.startsWith("multidex")) {
+                    details.useVersion '28.0.0'
+                }
+            }
+
+        }
+    }
 }
 
 repositories {
@@ -68,6 +79,7 @@ repositories {
 
 ext {
     depVersionAndroidTest = "1.0.2"
+    depVersionAndroidWearable = "2.1.0" // needed to fix the version for processing
     depVersionAnnimonStream = "1.1.4"
     depVersionAppcompat = "28.0.0"
     depVersionBcrypt = "0.5.0"
@@ -83,9 +95,16 @@ ext {
     depVersionRetrolambdaLombokAst = "0.2.3.a2"
     depVersionSnakeYaml = "1.23"
     depVersionToothpick = "1.1.3"
+    depVersionProcessing = "4.0.3"
 }
 
 dependencies {
+    implementation "com.android.support:appcompat-v7:${depVersionAppcompat}"
+    implementation "com.android.support:cardview-v7:${depVersionAppcompat}"
+    implementation "com.android.support:design:${depVersionAppcompat}"
+    implementation "com.android.support:recyclerview-v7:${depVersionAppcompat}"
+    compileOnly "com.google.android.wearable:wearable:${depVersionAndroidWearable}"
+
     androidTestAnnotationProcessor "org.projectlombok:lombok:${depVersionLombok}"
     androidTestCompileOnly "org.projectlombok:lombok:${depVersionLombok}"
     androidTestImplementation "com.android.support.test.espresso:espresso-contrib:${depVersionEspresso}"
@@ -101,10 +120,6 @@ dependencies {
     implementation "at.favre.lib:bcrypt:${depVersionBcrypt}"
     implementation "com.amdelamar:jhash:${depVersionJhash}"
     implementation "com.android.support.constraint:constraint-layout:${depVersionToothpick}"
-    implementation "com.android.support:appcompat-v7:${depVersionAppcompat}"
-    implementation "com.android.support:cardview-v7:${depVersionAppcompat}"
-    implementation "com.android.support:design:${depVersionAppcompat}"
-    implementation "com.android.support:recyclerview-v7:${depVersionAppcompat}"
     implementation "com.annimon:stream:${depVersionAnnimonStream}"
     implementation "com.github.stephanenicolas.toothpick:smoothie:${depVersionToothpick}"
     implementation "com.github.stephanenicolas.toothpick:toothpick-runtime:${depVersionToothpick}"
@@ -116,6 +131,7 @@ dependencies {
     implementation "com.linkedin.dexmaker:dexmaker:${depVersionDexmaker}"
     implementation "me.tatarka.retrolambda.projectlombok:lombok.ast:${depVersionRetrolambdaLombokAst}"
     implementation "me.tatarka:gradle-retrolambda:${depVersionRetroLambda}"
+    implementation "org.p5android:processing-core:${depVersionProcessing}"
     implementation "org.yaml:snakeyaml:${depVersionSnakeYaml}"
     testAnnotationProcessor "com.github.stephanenicolas.toothpick:toothpick-compiler:${depVersionToothpick}"
     testImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${depVersionToothpick}"
