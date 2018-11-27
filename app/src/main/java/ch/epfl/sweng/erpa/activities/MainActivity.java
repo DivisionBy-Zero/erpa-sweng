@@ -43,6 +43,11 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         startActivity(new Intent(this, MyAccountActivity.class));
     }
 
+    @OnClick(R.id.launchDiceAnimation)
+    public void launchDiceAnimation(View view) {
+        startActivity(new Intent(this, DiceAnimationActivity.class));
+    }
+
     @OnClick(R.id.launch_login_button)
     public void launchLoginPage(View view) {
         startActivity(new Intent(this, LoginActivity.class));

@@ -13,6 +13,8 @@
         android:theme="@style/ERPAStyle"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.CreateGameActivity" />
+        <activity android:name=".activities.DiceActivity" />
+        <activity android:name=".activities.DiceAnimationActivity" />
         <activity android:name=".activities.ExampleForToolbarActivity" />
         <activity android:name=".activities.GameListActivity" />
         <activity android:name=".activities.GameViewerActivity" />
@@ -31,6 +33,7 @@
         <activity android:name=".activities.SignupActivity" />
         <activity android:name=".activities.SortActivity" />
         <activity android:name=".activities.UserProfileActivity" />
-        <activity android:name=".activities.DiceActivity"></activity>
+        <activity android:name=".activities.UserProfileActivity" />
     </application>
+
 </manifest>
