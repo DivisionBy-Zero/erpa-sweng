@@ -4,10 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.FrameLayout;
-
-import javax.microedition.khronos.opengles.GL10;
 
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
@@ -26,8 +23,6 @@ public class DiceAnimationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DataBindingUtil.setContentView(this, R.layout.activity_dice_animation);
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
