@@ -1,7 +1,7 @@
 package ch.epfl.sweng.erpa.activities.sketches;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Random;
 
 import ch.epfl.sweng.erpa.util.Triplet;
 import processing.core.PApplet;
@@ -9,15 +9,19 @@ import processing.core.PShape;
 
 public class DieSketch extends PApplet {
 
-    PShape die = null;
-    float angleX = 0;
-    float angleY = 0;
-    float angleZ = 0.5f;
-    float factor;
-    float iX = 0;
-    float iZ = 0;
-    int dieValue;
-    String fileName;
+    private PShape die = null;
+    private float angleX = 0;
+    private float angleY = 0;
+    private float angleZ = 0.5f;
+    private float factor;
+    private float iX = 0;
+    private float iZ = 0;
+    private int dieValue;
+    private String fileName;
+
+    private boolean toRemove = false;
+
+    Random rng = new Random();
 
     public DieSketch(String fileName, float factor) {
         super();
@@ -27,17 +31,16 @@ public class DieSketch extends PApplet {
     }
 
     public void settings() {
-        size(500, 500, P3D);
+        size(340, 340, P3D);
     }
 
     @Override
     public void setup() {
-
         die = loadShape(fileName);
 
         if (die == null)
             throw new RuntimeException("Cannot get object");
-
+        iX = 0.1f;
     }
 
     public void draw() {
@@ -49,25 +52,22 @@ public class DieSketch extends PApplet {
         directionalLight(200, 200, 250, 0, -1, 2);
 
         pushMatrix();
-        translate(250, 250, -50);
+        translate(170, 170, -50);
         scale(-100f);
         if (iX == 0)
             staticDie();
-        else
+        else {
+            iZ = iX;
             rotatingDie();
+        }
         stroke(255);
         shape(die);
         popMatrix();
+    }
 
-        if (mousePressed) {
-            if (iX == 0) {
-                iX = 0.1f;
-                iZ = 0.04f;
-            } else {
-                iX = 0;
-            }
-        }
-
+    @Override
+    public void mousePressed() {
+        toRemove = true;
     }
 
     private void rotatingDie() {
@@ -79,22 +79,17 @@ public class DieSketch extends PApplet {
     }
 
     private void staticDie() {
-        pickNumber(4);
-
         rotateX(angleX);
         rotateY(angleY);
         rotateZ(angleZ);
     }
 
-    private void pickNumber(int nb) {
-        rotate(dieValue, nb);
-    }
-
-    private void rotate(int dieNb, int nb) {
-        Triplet<Float, Float, Float> rotation = diceRotationTranslationTable.get(dieNb).get(nb);
+    public void roll() {
+        Triplet<Float, Float, Float> rotation = diceRotationTranslationTable.get(dieValue).get(rng.nextInt(dieValue) + 1);
         angleX = rotation.getFirst() * PI;
         angleY = rotation.getSecond() * PI;
         angleZ = rotation.getThird() * PI;
+        iX = 0;
     }
 
     final HashMap<Integer, Triplet<Float, Float, Float>> d4rotationTranslationTable =
@@ -122,7 +117,7 @@ public class DieSketch extends PApplet {
                 put(3, new Triplet(0.25f, 0f, -1));
                 put(4, new Triplet(0.75f, 0f, -0.5f));
                 put(5, new Triplet(0.25f, 0f, 0f));
-                put(6, new Triplet(0.75f, 0f, 1));
+                put(6, new Triplet(0.75f, 0f, 1f));
                 put(7, new Triplet(0.25f, 0f, 0.5f));
                 put(8, new Triplet(0.75f, 0f, 0f));
             }};
@@ -174,12 +169,8 @@ public class DieSketch extends PApplet {
                 put(20, d20rotationTranslationTable);
             }};
 
-
-    public float checkAndIncrementAngle(float angle, float increment) {
-        float mAngle = angle + increment;
-        if (mAngle > 4) {
-            mAngle = 0;
-        }
+    private float checkAndIncrementAngle(float angle, float increment) {
+        float mAngle = (angle + increment) % 4;
         return mAngle;
     }
 
@@ -198,5 +189,13 @@ public class DieSketch extends PApplet {
             default:
                 return 10;
         }
+    }
+
+    public void setRotating() {
+        iX = 0.1f;
+    }
+
+    public boolean isToRemove() {
+        return toRemove;
     }
 }

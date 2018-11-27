@@ -4,10 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.FrameLayout;
-
-import javax.microedition.khronos.opengles.GL10;
 
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
@@ -32,10 +29,10 @@ public class DiceAnimationActivity extends AppCompatActivity {
         flowLayout = findViewById(R.id.dice_animation_flowLayout);
 
         addNewDice("objs/d4R.obj", 1.5f);
-        addNewDice("objs/d6R.obj", 0.5f);
-        addNewDice("objs/d8R.obj", 0.5f);
-        addNewDice("objs/d10R.obj", 0.5f);
-        addNewDice("objs/d20_1R.obj", 0.5f);
+        addNewDice("objs/d6R.obj", 1.5f);
+        addNewDice("objs/d8R.obj", 1.5f);
+        addNewDice("objs/d10R.obj", 1.5f);
+        addNewDice("objs/d20_1R.obj", 1.5f);
     }
 
     public void addNewDice(String fileName, float factor) {
