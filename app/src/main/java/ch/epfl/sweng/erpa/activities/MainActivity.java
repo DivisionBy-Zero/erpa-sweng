@@ -45,7 +45,7 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
 
     @OnClick(R.id.launchDiceAnimation)
     public void launchDiceAnimation(View view) {
-        startActivity(new Intent(this, DiceAnimationActivity.class));
+        startActivity(new Intent(this, DiceAnimationActivity.class)); // $COVERAGE-IGNORE$
     }
 
     @OnClick(R.id.launch_login_button)
