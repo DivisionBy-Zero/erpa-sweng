@@ -1,132 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-style="@style/ERPAStyle"
-android:layout_height="match_parent"
-tools:context=".activities.GameViewerActivity">
 
-<TextView
-    android:id="@+id/titleTextView"
-    style="@style/ERPAStyle.title"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:text="Title"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/ERPAStyle"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.GameViewerActivity">
 
-<TextView
-    android:id="@+id/gmTextView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:text="Game Master"
-    app:layout_constraintStart_toStartOf="@+id/titleTextView"
-    app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
+    <ExpandableListView
+        android:id="@+id/gameViewerExpandableList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:titleTextAppearance="@style/ExpandableListViewStyle" />
 
-    <TextView
-        android:id="@+id/descriptionTextView"
+    <Button
+        android:id="@+id/joinGameButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Description "
-        android:textAlignment="viewStart"
-        app:layout_constraintStart_toStartOf="@+id/gmTextView"
-        app:layout_constraintTop_toBottomOf="@+id/gmTextView" />
+        android:layout_marginBottom="8dp"
+        android:text="Join Game"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
-<Button
-    android:id="@+id/joinGameButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:text="Join Game"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.5"
-    app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        style="@style/ERPAStyle.smallprint"
-        android:id="@+id/participatingPlayersTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Participating players info"
-        app:layout_constraintStart_toStartOf="@+id/sessionLengthColonTextView"
-        app:layout_constraintTop_toBottomOf="@+id/sessionLengthColonTextView" />
-
-    <TextView
-        android:id="@+id/universeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Universe"
-        app:layout_constraintStart_toStartOf="@+id/descriptionTextView"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
-
-    <TextView
-        android:id="@+id/difficultyColonTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Difficulty:"
-        app:layout_constraintStart_toStartOf="@+id/universeTextView"
-        app:layout_constraintTop_toBottomOf="@+id/universeTextView" />
-
-    <TextView
-        android:id="@+id/difficultyTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Difficulty"
-        app:layout_constraintStart_toEndOf="@+id/difficultyColonTextView"
-        app:layout_constraintTop_toTopOf="@+id/difficultyColonTextView" />
-
-    <TextView
-        android:id="@+id/oneShotOrCampaignTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="OneShot"
-        app:layout_constraintStart_toStartOf="@+id/difficultyColonTextView"
-        app:layout_constraintTop_toBottomOf="@+id/difficultyColonTextView" />
-
-    <TextView
-        android:id="@+id/sessionNumberColonTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Number of Sessions:"
-        app:layout_constraintStart_toStartOf="@+id/oneShotOrCampaignTextView"
-        app:layout_constraintTop_toBottomOf="@+id/oneShotOrCampaignTextView" />
-
-    <TextView
-        android:id="@+id/sessionNumberTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="5"
-        app:layout_constraintStart_toEndOf="@+id/sessionNumberColonTextView"
-        app:layout_constraintTop_toTopOf="@+id/sessionNumberColonTextView" />
-
-    <TextView
-        android:id="@+id/sessionLengthColonTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="SessionLength:"
-        app:layout_constraintStart_toStartOf="@+id/sessionNumberColonTextView"
-        app:layout_constraintTop_toBottomOf="@+id/sessionNumberColonTextView" />
-
-    <TextView
-        android:id="@+id/sessionLengthTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="5 seconds"
-        app:layout_constraintStart_toEndOf="@+id/sessionLengthColonTextView"
-        app:layout_constraintTop_toTopOf="@+id/sessionLengthColonTextView" />
 </android.support.constraint.ConstraintLayout>
