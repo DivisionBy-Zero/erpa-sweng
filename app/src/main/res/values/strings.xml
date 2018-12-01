@@ -60,4 +60,7 @@
     <string name="sort">Sort</string>
     <string name="sort_by_distance">Sort by distance:</string>
 
+    <!-- Player Adapter string-->
+    <string name="playerX">Player %1$d:</string>
+
 </resources>
