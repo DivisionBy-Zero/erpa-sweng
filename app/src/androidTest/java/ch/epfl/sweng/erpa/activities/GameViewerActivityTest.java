@@ -1,6 +1,7 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.rule.ActivityTestRule;
@@ -29,6 +30,8 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
 import static org.hamcrest.core.StringContains.containsString;
 
@@ -58,6 +61,9 @@ public class GameViewerActivityTest {
 
         Intent i = new Intent();
         i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        i.putExtras(bundle);
         activityTestRule.launchActivity(i);
 
     }
@@ -113,6 +119,9 @@ public class GameViewerActivityTest {
         Intent iOld = activityTestRule.getActivity().getIntent();
         activityTestRule.finishActivity();
         Intent i = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        i.putExtras(bundle);
         i.putExtra(GameService.PROP_INTENT_GAME, emptyOptGame.getGameUuid());
         activityTestRule.launchActivity(i);
         onView(withId(R.id.sessionNumberTextView)).check(matches(withText("Unspecified")));
