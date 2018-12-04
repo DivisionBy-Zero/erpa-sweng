@@ -16,6 +16,7 @@ def with_session(f):
     @contextmanager
     def mk_session():
         engine = create_engine('sqlite:///:memory:')
+        SessionBroker.maybe_initialize_tables(engine)
         with SessionBroker(engine=engine).get_session() as session:
             session.execute('pragma foreign_keys=on')  # https://stackoverflow.com/a/31797403
             yield session
