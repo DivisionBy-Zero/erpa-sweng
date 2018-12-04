@@ -9,6 +9,7 @@ from inflection import camelize, underscore
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
+from werkzeug.exceptions import HTTPException
 import logging
 import os
 
@@ -289,9 +290,10 @@ def handle_invalid_usage(exception):
     status_code = getattr(exception, 'status_code', 400)
     return str(exception), status_code
 
-
 @app.errorhandler(Exception)
 def handle_server_errors(exception):
+    if isinstance(exception, HTTPException):
+        raise exception
     now = str(datetime.now())
     reference = hash('{}-{}'.format(now, str(exception)))
     log.warning('Request caused server error (%s). url: %s data: %s',
