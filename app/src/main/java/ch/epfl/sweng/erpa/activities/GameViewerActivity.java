@@ -2,17 +2,18 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
-import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -28,7 +29,6 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.PlayerAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
@@ -52,10 +52,12 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
     @BindView(R.id.gameViewerPlayerListView) ListView playerListView;
 
+    @BindView(R.id.joinGameButton) Button joinGameButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_viewer);
+        DataBindingUtil.setContentView(this, R.layout.activity_game_viewer);
         ButterKnife.bind(this);
     }
 
@@ -71,19 +73,24 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         GameListActivity.GameList gameList = (GameListActivity.GameList) bundle.getSerializable(
                 GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY);
 
-        ArrayList<String> uuidArray = new ArrayList<String>(game.getPlayersUuid());
+        if (!gameList.equals(GameListActivity.GameList.FIND_GAME))
+            joinGameButton.setVisibility(View.INVISIBLE);
 
-        ListLikeOnClickListener mListener = ((v, position) -> {
-            game = game.removePlayer(uuidArray.get(position));
-            gs.saveGame(game);
-            uuidArray.remove(position);
-        });
+        if (!gameList.equals(GameListActivity.GameList.FIND_GAME) && !gameList.equals(GameListActivity.GameList.PENDING_REQUEST)) {
+            ArrayList<String> uuidArray = new ArrayList<String>(game.getPlayersUuid());
 
-        PlayerAdapter myPlayerAdapter = new PlayerAdapter(this, uuidArray,
-                gameList.equals(HOSTED_GAMES),
-                mListener);
-        playerListView.setAdapter(myPlayerAdapter);
-        setListViewHeightBasedOnChildren(playerListView);
+            ListLikeOnClickListener mListener = ((v, position) -> {
+                game = game.removePlayer(uuidArray.get(position));
+                gs.saveGame(game);
+                uuidArray.remove(position);
+            });
+
+            PlayerAdapter myPlayerAdapter = new PlayerAdapter(this, uuidArray,
+                    gameList.equals(HOSTED_GAMES),
+                    mListener);
+            playerListView.setAdapter(myPlayerAdapter);
+            setListViewHeightBasedOnChildren(playerListView);
+        }
     }
 
     private void getGameOrFinish(Optional<Game> optGame) {
