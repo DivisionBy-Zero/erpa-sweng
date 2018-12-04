@@ -27,6 +27,7 @@ import toothpick.registries.FactoryRegistryLocator;
 import toothpick.registries.MemberInjectorRegistryLocator;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -62,7 +63,7 @@ public class GameViewerActivityTest {
         Intent i = new Intent();
         i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.HOSTED_GAMES);
         i.putExtras(bundle);
         activityTestRule.launchActivity(i);
 
@@ -120,12 +121,27 @@ public class GameViewerActivityTest {
         activityTestRule.finishActivity();
         Intent i = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.PAST_GAMES);
         i.putExtras(bundle);
         i.putExtra(GameService.PROP_INTENT_GAME, emptyOptGame.getGameUuid());
         activityTestRule.launchActivity(i);
         onView(withId(R.id.sessionNumberTextView)).check(matches(withText("Unspecified")));
         onView(withId(R.id.sessionLengthTextView)).check(matches(withText("Unspecified")));
+        activityTestRule.finishActivity();
+        activityTestRule.launchActivity(iOld);
+    }
+
+    @Test
+    public void testClickOnJoinGameButton() {
+        Intent iOld = activityTestRule.getActivity().getIntent();
+        activityTestRule.finishActivity();
+        Intent i = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        i.putExtras(bundle);
+        i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
+        activityTestRule.launchActivity(i);
+        onView(withId(R.id.joinGameButton)).perform(click());
         activityTestRule.finishActivity();
         activityTestRule.launchActivity(iOld);
     }
