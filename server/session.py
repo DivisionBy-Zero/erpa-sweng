@@ -19,15 +19,16 @@ class SessionBroker:
         assert database_url or engine, \
             "Need a database_url or an engine to start a session"
 
-        def memoized_engine(database_url: Optional[str]):
+        def memoized_engine(database_url: str):
             if database_url not in db_engines:
-                engine = create_engine(database_url, echo=True)
+                engine = create_engine(database_url)
                 engine.pool._use_threadlocal = True
                 self.maybe_initialize_tables(engine)
                 db_engines[database_url] = engine
             return db_engines[database_url]
 
-        self.engine = memoized_engine(database_url) if engine is None else engine
+        self.engine = (memoized_engine(str(database_url))
+                       if engine is None else engine)
         self.session_factory = sessionmaker(bind=self.engine)
 
     @staticmethod
@@ -38,7 +39,7 @@ class SessionBroker:
     def get_session(self) -> Session:
         session = self.session_factory()
         yield session
-        session.flush()  # Flush entities before expunging to converge instances
+        session.flush()  # Flush entities before expunging (converge instances)
         session.expunge_all()
         if session.is_active:
             session.commit()
