@@ -34,6 +34,12 @@ public class DiceActivityTest {
         createTestForDie(R.id.d20_button);
     }
 
+    @Test
+    public void testCanRemoveDie() {
+        onView(withId(R.id.d4_button)).perform(click());
+        onView(withId(R.id.dice_layout)).perform(click()).check(matches(flowLayoutIsEmpty()));
+    }
+
     private void createTestForDie(int dieButtonId) {
         onView(withId(dieButtonId)).perform(click());
         onView(withId(R.id.dice_layout)).check(matches(dieIsOnFlowLayout()));
@@ -59,6 +65,32 @@ public class DiceActivityTest {
                     int count = ((FlowLayout) view).getChildCount();
                     ((FlowLayout) view).removeAllViewsInLayout();
                     return  count == 1;
+                }
+
+                return false;
+            }
+        };
+    }
+
+    private Matcher<View> flowLayoutIsEmpty() {
+
+        return new TypeSafeMatcher<View>() {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("The FlowLayout shows no die");
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                if (!FlowLayout.class.isAssignableFrom(view.getClass())) {
+                    return false;
+                }
+
+                if (view != null) {
+                    int count = ((FlowLayout) view).getChildCount();
+                    ((FlowLayout) view).removeAllViewsInLayout();
+                    return  count == 0;
                 }
 
                 return false;
