@@ -5,13 +5,11 @@ import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
@@ -26,7 +24,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.listeners.RecyclerViewClickListener;
+import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.GameAdapter;
 import ch.epfl.sweng.erpa.services.GameService;
@@ -34,6 +32,7 @@ import ch.epfl.sweng.erpa.services.GameService;
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
     public static final String GAME_LIST_ACTIVTIY_CLASS_KEY = "Game list activity class key";
+    public static final String GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY = "Game list viewer activity class key";
 
     @Inject public GameService gameService;
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
@@ -77,9 +76,10 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-        RecyclerViewClickListener listener = (view, position) -> {
+        ListLikeOnClickListener listener = (view, position) -> {
             Intent intent = new Intent(this, GameViewerActivity.class);
             intent.putExtra(GameService.PROP_INTENT_GAME, games.get(position).getGameUuid());
+            putExtraOnGameViewer(intent);
             startActivity(intent);
         };
 
@@ -98,9 +98,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         return onOptionItemViewSelected(item.getItemId());
-
     }
 
     public boolean onOptionItemViewSelected(int id) {
@@ -142,7 +141,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     protected void setToolbarText(GameList gameList) {
-        @StringRes int id = R.string.title_example_for_toolbar_activity;;
+        @StringRes int id = R.string.title_example_for_toolbar_activity;
         switch (gameList) {
             case FIND_GAME:
                 id = R.string.titleListGamesActivity;
@@ -175,7 +174,14 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         if (resultCode == RESULT_OK) {
             //TODO(@Ryker) add sorting using the data from data
         }
+    }
 
+    private void putExtraOnGameViewer(Intent intent) {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            GameList gameList = (GameList) bundle.getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY);
+            intent.putExtra(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, gameList);
+        }
     }
 
     public enum GameList {FIND_GAME, PENDING_REQUEST, CONFIRMED_GAMES, PAST_GAMES, HOSTED_GAMES, PAST_HOSTED_GAMES}

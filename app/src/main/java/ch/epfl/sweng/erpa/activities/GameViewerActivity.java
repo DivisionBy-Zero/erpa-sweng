@@ -1,13 +1,21 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
-import com.annimon.stream.Stream;
 
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
@@ -16,12 +24,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 import ch.epfl.sweng.erpa.model.Game;
+import ch.epfl.sweng.erpa.model.PlayerAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
 import static android.content.ContentValues.TAG;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GameList.HOSTED_GAMES;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
     @Inject GameService gs;
@@ -38,12 +49,15 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.oneShotOrCampaignTextView) TextView type;
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
     @BindView(R.id.sessionLengthTextView) TextView sessionLength;
-    @BindView(R.id.participatingPlayersTextView) TextView playersInGame;
+
+    @BindView(R.id.gameViewerPlayerListView) ListView playerListView;
+
+    @BindView(R.id.joinGameButton) Button joinGameButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_viewer);
+        DataBindingUtil.setContentView(this, R.layout.activity_game_viewer);
         ButterKnife.bind(this);
     }
 
@@ -51,6 +65,32 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     protected void onResume() {
         super.onResume();
         updateGame();
+
+        Intent myIntent = getIntent();
+        Bundle bundle = myIntent.getExtras();
+        finishIfNull(bundle);
+
+        GameListActivity.GameList gameList = (GameListActivity.GameList) bundle.getSerializable(
+                GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY);
+
+        if (!gameList.equals(GameListActivity.GameList.FIND_GAME))
+            joinGameButton.setVisibility(View.INVISIBLE);
+
+        if (!gameList.equals(GameListActivity.GameList.FIND_GAME) && !gameList.equals(GameListActivity.GameList.PENDING_REQUEST)) {
+            ArrayList<String> uuidArray = new ArrayList<String>(game.getPlayersUuid());
+
+            ListLikeOnClickListener mListener = ((v, position) -> {
+                game = game.removePlayer(uuidArray.get(position));
+                gs.saveGame(game);
+                uuidArray.remove(position);
+            });
+
+            PlayerAdapter myPlayerAdapter = new PlayerAdapter(this, uuidArray,
+                    gameList.equals(HOSTED_GAMES),
+                    mListener);
+            playerListView.setAdapter(myPlayerAdapter);
+            setListViewHeightBasedOnChildren(playerListView);
+        }
     }
 
     private void getGameOrFinish(Optional<Game> optGame) {
@@ -61,6 +101,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
             finish();
         }
     }
+
     private String getGameId() {
 
         String gameId = getIntent().getStringExtra(GameService.PROP_INTENT_GAME);
@@ -85,6 +126,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         getGameOrFinish(gs.getGame(getGameId()));
         updateFields();
     }
+
     @SuppressLint("SetTextI18n")
     private void updateFields() {
         Log.d(TAG, "onResume: Successfully fetched game");
@@ -102,8 +144,34 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         String gameLength = game.getSessionLengthInMinutes().map(Object::toString).orElse("Unspecified");
         sessionLength.setText(gameLength);
 
-        String playerInfo = Stream.of(game.getPlayersUuid()).reduce("", (elem, acc)->acc + ", " + elem);
-        playersInGame.setText(playerInfo);
-
     }
+
+    /*Method for Setting the Height of the ListView dynamically.
+     Hack to fix the issue of not showing all the items of the ListView
+     when placed inside a ScrollView  */
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ConstraintLayout.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
+
+    private void finishIfNull(Object obj) {
+        if (obj == null) finish();
+    }
+
 }

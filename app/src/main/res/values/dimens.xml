@@ -3,4 +3,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="in_margin">8dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="button_text">8dp</dimen>
 </resources>
