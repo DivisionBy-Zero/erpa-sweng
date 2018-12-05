@@ -58,13 +58,17 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     @OnClick(R.id.rollButton)
     public void rollDices(View view) {
-        Button button = (Button) view;
-        if (button.getText().toString().equals("Roll!")) {
-            button.setText("Stop!");
-            makeAllDiceRoll();
-        } else {
-            button.setText("Roll!");
-            stopAllDice();
+        for (DieSketch die : allDice) {
+            die.roll();
+        }
+    }
+
+    @OnClick(R.id.dice_layout)
+    public void removeDie(View view) {
+        if (!allDice.isEmpty()) {
+            int index = allDice.size() - 1;
+            allDice.remove(index);
+            flowLayout.removeViewAt(index);
         }
     }
 
@@ -72,15 +76,6 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         if (allDice.size() < MAX_DICE_NUMBER) {
             Button button = (Button) view;
             addAndShowDie(Integer.parseInt(button.getText().toString().substring(1)));
-        }
-    }
-
-    public void remove_die(View view) {
-        for (int i = allDice.size() - 1; i >= 0 ; i -= 1) {
-            if (allDice.get(i).isToRemove()) {
-                flowLayout.removeViewAt(i);
-                allDice.remove(i);
-            }
         }
     }
 
@@ -94,24 +89,6 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
         PFragment fragment = new PFragment(dieSketch);
         fragment.setView(frame, this);
-    }
-
-    /**
-     * Rolls and shows all dice
-     */
-    private void makeAllDiceRoll() {
-        for (DieSketch die : allDice) {
-            die.setRotating();
-        }
-    }
-
-    /**
-     * Stops all rolling dice
-     */
-    private void stopAllDice() {
-        for (DieSketch die : allDice) {
-            die.roll();
-        }
     }
 
     private String getFileNameFromDieType(int dieType) {
