@@ -92,7 +92,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_navigation, menu);
         setToolbarText(gameList);
         return true;
     }
@@ -102,18 +102,33 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         return onOptionItemViewSelected(item.getItemId());
     }
 
-    public boolean onOptionItemViewSelected(int id) {
-        // Handle action bar item clicks here.
+
+    // Handle action bar menu item clicks
+    public boolean onOptionItemViewSelected(int menuItemId) {
         bundle = getIntent().getExtras();
-        switch (id) {
-            case R.id.actionSearch:
-                Intent intent = new Intent(this, SortActivity.class);
+        Intent intent;
+        switch (menuItemId) {
+            case R.id.menu_actionSearch:
+                intent = new Intent(this, SortActivity.class);
                 intent.putExtras(bundle);
+                startActivityForResult(intent, 1);
+                return true;
+            case R.id.menu_createGame:
+                intent = new Intent(this, CreateGameActivity.class);
+                startActivityForResult(intent, 1);
+                return true;
+            case R.id.menu_findGame:
+                intent = new Intent(this, GameListActivity.class);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 1);
+                return true;
+            case R.id.menu_myAccount:
+                intent = new Intent(this, MyAccountActivity.class);
                 startActivityForResult(intent, 1);
                 return true;
             default:
         }
-        return super.onOptionsItemSelected(findViewById(id));
+        return super.onOptionsItemSelected(findViewById(menuItemId));
     }
 
     // FIXME(@Roos) list doesn't appear correctly the first time it's rendered
