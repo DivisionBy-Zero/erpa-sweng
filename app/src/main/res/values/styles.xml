@@ -20,9 +20,11 @@
         <!--form Police-->
         <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
     </style>
+
     <style name="ERPAStyle.smallprint" parent="ERPAStyle">
         <item name="android:textSize">12sp</item>
     </style>
+
     <style name="ERPAStyle.title" parent="ERPAStyle">
         <item name="android:textSize">40sp</item>
     </style>
@@ -36,13 +38,16 @@
         <item name="android:fontFamily">@font/italianno_regular</item>
         <item name="android:textSize">28sp</item>
     </style>
+
     <style name="CardViewStyle.title">
         <item name="android:textSize">35sp</item>
     </style>
+
     <style name="CardViewStyle.players">
         <item name="android:fontFamily">@font/morrisroman_black</item>
         <item name="android:textSize">22sp</item>
     </style>
+
     <style name="CardViewStyle.difficculty">
         <item name="android:fontFamily">@font/yatraone_regular</item>
         <item name="android:textSize">23sp</item>
