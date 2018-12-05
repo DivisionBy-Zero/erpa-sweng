@@ -103,7 +103,7 @@ class TestAPI(unittest.TestCase):
         old_isgm = user.isGm
         user.isGm = False if user.isGm else True
         self.curl.post('/users/uuid/{}'.format(user_uuid),
-                       headers={'user_uuid': user_uuid},
+                       headers={'UserUuid': user_uuid},
                        json=user)
         new_user = self.curl.get('/users/uuid/{}'.format(user_uuid)).asObject()
         self.assertNotEqual(old_isgm, user.isGm)
@@ -146,12 +146,12 @@ class TestAPI(unittest.TestCase):
         self.assertFalse(game_join_requests)
 
         join_request = self.curl.post('/games/join/{}'.format(game.uuid),
-                                      headers={'user_uuid': user_uuid}
+                                      headers={'UserUuid': user_uuid}
                                       ).asObject()
         self.assertIsNotNone(join_request.requestStatus)
 
         game_join_requests_seen_by_others = self.curl.get(
-            participats_url, headers={'user_uuid': user_uuid2}).asDict()
+            participats_url, headers={'UserUuid': user_uuid2}).asDict()
         self.assertFalse(game_join_requests_seen_by_others)
 
         game_join_requests = self.curl.get(participats_url).asDict()
@@ -165,7 +165,7 @@ class TestAPI(unittest.TestCase):
         self.curl.post(participats_url, json=join_request).asDict()
 
         game_join_requests_seen_by_others = self.curl.get(
-            participats_url, headers={'user_uuid': user_uuid2}).asDict()
+            participats_url, headers={'UserUuid': user_uuid2}).asDict()
         self.assertTrue(game_join_requests_seen_by_others)
         join_request = Bunch(game_join_requests_seen_by_others[0])
         self.assertEqual(models.PlayerInGameStatus.CONFIRMED.numerator,
@@ -184,12 +184,12 @@ class TestAPI(unittest.TestCase):
         self.assertFalse(game_join_requests)
 
         join_request = self.curl.post('/games/join/{}'.format(game.uuid),
-                                      headers={'user_uuid': user_uuid}
+                                      headers={'UserUuid': user_uuid}
                                       ).asObject()
         self.assertIsNotNone(join_request.requestStatus)
 
         game_join_requests_seen_by_others = self.curl.get(
-            participats_url, headers={'user_uuid': user_uuid2}).asDict()
+            participats_url, headers={'UserUuid': user_uuid2}).asDict()
         self.assertFalse(game_join_requests_seen_by_others)
 
         game_join_requests = self.curl.get(participats_url).asDict()
@@ -203,7 +203,7 @@ class TestAPI(unittest.TestCase):
         self.curl.post(participats_url, json=join_request).asDict()
 
         game_join_requests_seen_by_others = self.curl.get(
-                participats_url, headers={'user_uuid': user_uuid2}).asDict()
+                participats_url, headers={'UserUuid': user_uuid2}).asDict()
         self.assertFalse(game_join_requests_seen_by_others)
 
         game_join_requests = self.curl.get(participats_url).asDict()
