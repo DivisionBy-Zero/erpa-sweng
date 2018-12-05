@@ -1,8 +1,10 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
@@ -346,11 +348,33 @@ public class GameListActivityTest {
 
     @Test
     public void testSearchItemSelected() throws Throwable {
+        testItemSelected(R.id.menu_actionSearch, SortActivity.class.getName());
+    }
+
+    @Test
+    public void testFindGameItemSelected() throws Throwable {
+        Looper.prepare();
+        intentsTestRule.getActivity().openOptionsMenu();
+        testItemSelected(R.id.menu_findGame, GameListActivity.class.getName());
+    }
+
+    @Test
+    public void testCreateGameItemSelected() throws Throwable {
+        testItemSelected(R.id.menu_createGame, CreateGameActivity.class.getName());
+    }
+
+    @Test
+    public void testMyAccountItemSelected() throws Throwable {
+        intentsTestRule.getActivity().openOptionsMenu();
+        testItemSelected(R.id.menu_myAccount, MyAccountActivity.class.getName());
+    }
+
+    private void testItemSelected(int id, String activityName) throws Throwable {
         intentsTestRule.runOnUiThread(() -> {
-            ActionMenuItemView searchItem = toolbar.findViewById(R.id.actionSearch);
-            intentsTestRule.getActivity().onOptionItemViewSelected(searchItem.getId());
+            MenuItem item = toolbar.getMenu().findItem(id);
+            intentsTestRule.getActivity().onOptionItemViewSelected(item.getItemId());
         });
-        intended(hasComponent(SortActivity.class.getName()));
+        intended(hasComponent(activityName));
     }
 
     @Test
