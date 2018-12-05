@@ -14,6 +14,7 @@ def with_operations(f):
     @contextmanager
     def mk_ops():
         engine = create_engine('sqlite:///:memory:')
+        SessionBroker.maybe_initialize_tables(engine)
         yield Operations(session_broker=SessionBroker(engine=engine))
     return with_context(mk_ops)(f)
 

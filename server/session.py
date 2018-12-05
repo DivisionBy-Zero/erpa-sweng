@@ -5,22 +5,29 @@ from psycopg2.pool import ThreadedConnectionPool, SimpleConnectionPool
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session, sessionmaker
+from typing import Optional
 
 import models
 
-pg_pool = None
+db_engines = dict()  # type: Dict[str, Engine]
 
 
 class SessionBroker:
     """Generate a session with the backing db."""
-    def __init__(self, database_url: str = None, engine: Engine = None) -> None:
-        assert database_url or engine, "Need a database_url or an engine to start a session"
-        # global pg_pool
-        # if not pg_pool:
-        #     pg_pool = SimpleConnectionPool(1, 100, **pg_config)
+    def __init__(self, database_url: Optional[str] = None,
+                 engine: Optional[Engine] = None) -> None:
+        assert database_url or engine, \
+            "Need a database_url or an engine to start a session"
 
-        self.engine = create_engine(database_url) if engine is None else engine
-        self.maybe_initialize_tables(self.engine)
+        def memoized_engine(database_url: Optional[str]):
+            if database_url not in db_engines:
+                engine = create_engine(database_url, echo=True)
+                engine.pool._use_threadlocal = True
+                self.maybe_initialize_tables(engine)
+                db_engines[database_url] = engine
+            return db_engines[database_url]
+
+        self.engine = memoized_engine(database_url) if engine is None else engine
         self.session_factory = sessionmaker(bind=self.engine)
 
     @staticmethod
