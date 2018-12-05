@@ -82,7 +82,7 @@ def with_operations_and_maybe_user(f):
     @with_operations
     def register_user(ops):
         # TODO(@Roos): Remove when the auth system is complete
-        user_uuid_in_header = request.headers.get('user_uuid')
+        user_uuid_in_header = request.headers.get('UserUuid')
         if user_uuid_in_header:
             user = ops.get_user(user_uuid_in_header)
         else:
