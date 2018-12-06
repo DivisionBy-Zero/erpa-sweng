@@ -351,24 +351,6 @@ public class GameListActivityTest {
         testItemSelected(R.id.menu_actionSearch, SortActivity.class.getName());
     }
 
-    @Test
-    public void testFindGameItemSelected() throws Throwable {
-        Looper.prepare();
-        intentsTestRule.getActivity().openOptionsMenu();
-        testItemSelected(R.id.menu_findGame, GameListActivity.class.getName());
-    }
-
-    @Test
-    public void testCreateGameItemSelected() throws Throwable {
-        testItemSelected(R.id.menu_createGame, CreateGameActivity.class.getName());
-    }
-
-    @Test
-    public void testMyAccountItemSelected() throws Throwable {
-        intentsTestRule.getActivity().openOptionsMenu();
-        testItemSelected(R.id.menu_myAccount, MyAccountActivity.class.getName());
-    }
-
     private void testItemSelected(int id, String activityName) throws Throwable {
         intentsTestRule.runOnUiThread(() -> {
             MenuItem item = toolbar.getMenu().findItem(id);

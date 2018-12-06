@@ -92,7 +92,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_navigation, menu);
+        getMenuInflater().inflate(R.menu.menu_appbar, menu);
         setToolbarText(gameList);
         return true;
     }
@@ -111,19 +111,6 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
             case R.id.menu_actionSearch:
                 intent = new Intent(this, SortActivity.class);
                 intent.putExtras(bundle);
-                startActivityForResult(intent, 1);
-                return true;
-            case R.id.menu_createGame:
-                intent = new Intent(this, CreateGameActivity.class);
-                startActivityForResult(intent, 1);
-                return true;
-            case R.id.menu_findGame:
-                intent = new Intent(this, GameListActivity.class);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 1);
-                return true;
-            case R.id.menu_myAccount:
-                intent = new Intent(this, MyAccountActivity.class);
                 startActivityForResult(intent, 1);
                 return true;
             default:
