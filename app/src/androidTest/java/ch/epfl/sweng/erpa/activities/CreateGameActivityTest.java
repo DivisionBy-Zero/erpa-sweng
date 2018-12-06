@@ -3,9 +3,12 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.res.Resources;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.contrib.DrawerActions;
+import android.support.test.espresso.contrib.NavigationViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.Gravity;
 import android.view.View;
 
 import com.annimon.stream.Optional;
@@ -36,6 +39,9 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.contrib.DrawerMatchers.isClosed;
+import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
@@ -232,5 +238,32 @@ public class CreateGameActivityTest {
         onView(ViewMatchers.withId(R.id.submit_button)).perform(ViewActions.click());
         //check if the popup is displayed
         onView(ViewMatchers.withText(R.string.invalidPlayerNumber)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testClickOnFindGameMenu() {
+        testClickItemMenu(R.id.menu_findGame, GameListActivity.class.getName());
+    }
+
+    @Test
+    public void testClickOnCreateGameMenu() {
+        testClickItemMenu(R.id.menu_createGame, CreateGameActivity.class.getName());
+    }
+
+    @Test
+    public void testClickOnMyAccountMenu() {
+        testClickItemMenu(R.id.menu_myAccount, MyAccountActivity.class.getName());
+    }
+
+    private void testClickItemMenu(int menuItemId, String className) {
+        // Open Drawer to click on navigation.
+        onView(withId(R.id.createGameDrawerLayout))
+                .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
+                .perform(DrawerActions.open()); // Open Drawer
+
+        // Start the screen of your activity.
+        onView(withId(R.id.navigation_view))
+                .perform(NavigationViewActions.navigateTo(menuItemId));
+        intended(hasComponent(className));
     }
 }
