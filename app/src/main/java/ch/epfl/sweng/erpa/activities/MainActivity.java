@@ -2,6 +2,8 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 
 import butterknife.ButterKnife;
@@ -9,6 +11,7 @@ import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 
 public class MainActivity extends DependencyConfigurationAgnosticActivity {
     @Override
@@ -17,6 +20,13 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        //Handle navigationMenu interactions
+        DrawerLayout mDrawerLayout = findViewById(R.id.createGameDrawerLayout);
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
     }
 
     @OnClick(R.id.launch_storage_provider_greet)
