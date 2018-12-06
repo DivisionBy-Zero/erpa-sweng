@@ -16,6 +16,7 @@
     <string name="title_signup_activity">Sign Up</string>
     <string name="titleMyAccountActivity">My Account</string>
     <string name="title_activity_dice_animation">Dice Animation</string>
+    <string name="title_dice_activity">Dice Throw</string>
 
     <!-- Login error messages-->
     <string name="noNameMessage">No username</string>

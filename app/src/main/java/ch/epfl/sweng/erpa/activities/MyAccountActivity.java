@@ -6,6 +6,8 @@ import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -24,6 +26,7 @@ import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.util.Pair;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     @Inject UserProfile userProfile;
@@ -77,6 +80,12 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
             intent.putExtras(bundle);
             startActivity(intent);
         });
+        //Handle navigationMenu interactions
+        DrawerLayout mDrawerLayout = findViewById(R.id.my_account_drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.my_account_navigation_view);
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
     }
 
     private void initializeArrays() {

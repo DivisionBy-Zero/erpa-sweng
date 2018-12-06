@@ -1,6 +1,8 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import java.util.Random;
 import ch.epfl.sweng.erpa.R;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -28,6 +31,13 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         setContentView(R.layout.activity_dice);
 
         allResultViews = getAllResultViews();
+
+        //Handle navigationMenu interactions
+        DrawerLayout mDrawerLayout = findViewById(R.id.dice_drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.dice_navigation_view);
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
     }
 
     @OnClick(R.id.rollButton)

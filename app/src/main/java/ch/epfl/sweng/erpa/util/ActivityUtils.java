@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.activities.CreateGameActivity;
+import ch.epfl.sweng.erpa.activities.DiceActivity;
 import ch.epfl.sweng.erpa.activities.GameListActivity;
 import ch.epfl.sweng.erpa.activities.MyAccountActivity;
 
@@ -59,6 +60,9 @@ public class ActivityUtils {
                 bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
                 intent = new Intent(activity, GameListActivity.class);
                 intent.putExtras(bundle);
+                break;
+            case R.id.menu_dice:
+                intent = new Intent(activity, DiceActivity.class);
                 break;
             default:
         }
