@@ -63,4 +63,7 @@
     <!-- Player Adapter string-->
     <string name="playerX">Player %1$d:</string>
 
+    <!-- Menu string-->
+    <string name="you_are_logged_as">You are logged as:</string>
+
 </resources>
