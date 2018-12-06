@@ -27,8 +27,10 @@ import ch.epfl.sweng.erpa.util.Pair;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
+
     @Inject UserProfile userProfile;
     @Inject UserProfileService ups;
 
@@ -86,6 +88,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         NavigationView navigationView = findViewById(R.id.my_account_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+        setUsernameInMenu(navigationView, userProfile);
     }
 
     private void initializeArrays() {

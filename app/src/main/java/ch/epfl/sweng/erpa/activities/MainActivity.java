@@ -6,14 +6,22 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 
+import javax.inject.Inject;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class MainActivity extends DependencyConfigurationAgnosticActivity {
+
+    @Inject UserProfile up;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +35,9 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         NavigationView navigationView = findViewById(R.id.main_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+
+        setUsernameInMenu(navigationView, up);
+
     }
 
     @OnClick(R.id.launch_storage_provider_greet)

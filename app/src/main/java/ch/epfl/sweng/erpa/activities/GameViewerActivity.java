@@ -31,16 +31,20 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.PlayerAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GameList.HOSTED_GAMES;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
+
     @Inject GameService gs;
     // TODO(@Sapphie) change this once proper login is implemented
     @Inject UserProfile up;
+
 
     private Game game;
 
@@ -100,6 +104,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         NavigationView navigationView = findViewById(R.id.game_viewer_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+
+        setUsernameInMenu(navigationView, up);
     }
 
     private void getGameOrFinish(Optional<Game> optGame) {

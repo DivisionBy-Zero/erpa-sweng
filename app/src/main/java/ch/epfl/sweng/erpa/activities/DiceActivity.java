@@ -13,12 +13,19 @@ import butterknife.OnClick;
 
 import java.util.Random;
 
+import javax.inject.Inject;
+
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
+
+    @Inject UserProfile up;
 
     Random rng = new Random();    //used as a RNG
     private final int[] dice = {4, 6, 8, 10, 12, 20, 100};
@@ -38,6 +45,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         NavigationView navigationView = findViewById(R.id.dice_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+        setUsernameInMenu(navigationView, up);
     }
 
     @OnClick(R.id.rollButton)
