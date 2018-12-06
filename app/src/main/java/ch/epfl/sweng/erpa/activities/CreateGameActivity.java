@@ -88,9 +88,9 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         });
 
         //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.createGameDrawerLayout);
+        DrawerLayout mDrawerLayout = findViewById(R.id.create_game_drawer_layout);
 
-        NavigationView navigationView = findViewById(R.id.navigation_view);
+        NavigationView navigationView = findViewById(R.id.create_game_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
 

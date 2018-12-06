@@ -255,14 +255,19 @@ public class CreateGameActivityTest {
         testClickItemMenu(R.id.menu_myAccount, MyAccountActivity.class.getName());
     }
 
+    @Test
+    public void testClickOnDiceMenu() {
+        testClickItemMenu(R.id.menu_dice, DiceActivity.class.getName());
+    }
+
     private void testClickItemMenu(int menuItemId, String className) {
         // Open Drawer to click on navigation.
-        onView(withId(R.id.createGameDrawerLayout))
+        onView(withId(R.id.create_game_drawer_layout))
                 .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
                 .perform(DrawerActions.open()); // Open Drawer
 
         // Start the screen of your activity.
-        onView(withId(R.id.navigation_view))
+        onView(withId(R.id.create_game_navigation_view))
                 .perform(NavigationViewActions.navigateTo(menuItemId));
         intended(hasComponent(className));
     }

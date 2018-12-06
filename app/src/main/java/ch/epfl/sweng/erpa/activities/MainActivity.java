@@ -22,9 +22,9 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         ButterKnife.bind(this);
 
         //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.createGameDrawerLayout);
+        DrawerLayout mDrawerLayout = findViewById(R.id.main_drawer_layout);
 
-        NavigationView navigationView = findViewById(R.id.navigation_view);
+        NavigationView navigationView = findViewById(R.id.main_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
     }

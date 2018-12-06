@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +30,8 @@ import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.GameAdapter;
 import ch.epfl.sweng.erpa.services.GameService;
+
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -85,6 +89,13 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
         RecyclerView.Adapter mAdapter = new GameAdapter(games, listener);
         mRecyclerView.setAdapter(mAdapter);
+
+        //Handle navigationMenu interactions
+        DrawerLayout mDrawerLayout = findViewById(R.id.game_list_drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.game_list_navigation_view);
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
 
         // TODO(@Roos) uncomment when FIXME is fixed
 //        createListData();

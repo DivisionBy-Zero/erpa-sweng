@@ -23,4 +23,10 @@
         android:icon="@drawable/ic_account"
         android:orderInCategory="200"
         android:title="@string/titleMyAccountActivity"/>
+
+    <item
+        android:id="@+id/menu_dice"
+        android:icon="@drawable/ic_dice5"
+        android:orderInCategory="200"
+        android:title="@string/title_dice_activity"/>
 </menu>

@@ -2,6 +2,8 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static android.content.ContentValues.TAG;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 
 public class UserProfileActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -47,6 +50,12 @@ public class UserProfileActivity extends DependencyConfigurationAgnosticActivity
             Log.d(TAG, "onResume: could not find UserProfile in database. Exiting", new NoSuchElementException());
             finish();
         }
+        //Handle navigationMenu interactions
+        DrawerLayout mDrawerLayout = findViewById(R.id.user_profile_drawer_layout);
+
+        NavigationView navigationView = findViewById(R.id.user_profile_navigation_view);
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
 
     }
 
