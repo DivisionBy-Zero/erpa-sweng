@@ -6,7 +6,10 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -32,6 +35,7 @@ import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 
 public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
     @BindView(R.id.campaign) RadioButton campaignRadioButton;
@@ -82,6 +86,14 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             public void onNothingSelected(AdapterView<?> parentView) {
             }
         });
+
+        //Handle navigationMenu interactions
+        DrawerLayout mDrawerLayout = findViewById(R.id.createGameDrawerLayout);
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+
     }
 
     @Override

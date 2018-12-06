@@ -2,22 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <group android:id="@+id/menu_findGame_group">
-        <item
-            android:id="@+id/menu_actionSearch"
-            android:orderInCategory="200"
-            android:title="@string/searchFilterSort"
-            android:icon="@drawable/magnifyingglass"
-            app:showAsAction="ifRoom"/>
-    </group>
-
     <group android:id="@+id/menu_gm_group">
         <item
             android:id="@+id/menu_createGame"
             android:icon="@drawable/ic_quill"
             android:orderInCategory="200"
-            android:title="@string/title_create_game_activity"
-            app:showAsAction="ifRoom" />
+            android:title="@string/title_create_game_activity"/>
     </group>
 
     <group android:id="@+id/menu_player_group">
@@ -25,14 +15,12 @@
             android:id="@+id/menu_findGame"
             android:icon="@drawable/magnifyingglass"
             android:orderInCategory="200"
-            android:title="@string/titleListGamesActivity"
-            app:showAsAction="ifRoom" />
+            android:title="@string/titleListGamesActivity"/>
     </group>
 
     <item
         android:id="@+id/menu_myAccount"
         android:icon="@drawable/ic_account"
         android:orderInCategory="200"
-        android:title="@string/titleMyAccountActivity"
-        app:showAsAction="ifRoom" />
+        android:title="@string/titleMyAccountActivity"/>
 </menu>
