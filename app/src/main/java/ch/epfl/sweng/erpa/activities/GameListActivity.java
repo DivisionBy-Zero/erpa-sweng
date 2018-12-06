@@ -29,9 +29,12 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.GameAdapter;
+import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -39,6 +42,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     public static final String GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY = "Game list viewer activity class key";
 
     @Inject public GameService gameService;
+    @Inject UserProfile up;
+
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
     private List<Game> games;
     private Resources resources;
@@ -96,6 +101,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         NavigationView navigationView = findViewById(R.id.game_list_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+        setUsernameInMenu(navigationView, up);
 
         // TODO(@Roos) uncomment when FIXME is fixed
 //        createListData();

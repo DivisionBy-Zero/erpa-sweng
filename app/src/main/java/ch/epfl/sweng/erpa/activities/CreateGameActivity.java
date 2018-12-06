@@ -1,27 +1,25 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.util.HashMap;
 import java.util.HashSet;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,14 +28,19 @@ import ch.epfl.sweng.erpa.CreateGameFormFragment;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign;
+import ch.epfl.sweng.erpa.model.UserProfile;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
+
+    @Inject UserProfile up;
+
     @BindView(R.id.campaign) RadioButton campaignRadioButton;
     @BindView(R.id.create_game_name_field) EditText gameName;
     @BindView(R.id.description_field) EditText gameDescription;
@@ -93,7 +96,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
         NavigationView navigationView = findViewById(R.id.create_game_navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-
+        setUsernameInMenu(navigationView, up);
     }
 
     @Override
