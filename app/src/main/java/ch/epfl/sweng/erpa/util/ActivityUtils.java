@@ -8,7 +8,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -53,6 +57,13 @@ public class ActivityUtils {
         alertDialog.show();
     }
 
+    //Handle navigationMenu interactions
+    public static void addNavigationMenu(Activity activity, DrawerLayout mDrawerLayout, NavigationView navigationView, UserProfile up){
+        navigationView.setNavigationItemSelectedListener(
+                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, activity));
+        setUsernameInMenu(navigationView, up);
+    }
+
     public static boolean onNavigationItemMenuSelected(MenuItem menuItem, DrawerLayout mDrawerLayout, Activity activity) {
         // close drawer when item is tapped
         mDrawerLayout.closeDrawers();
@@ -90,5 +101,21 @@ public class ActivityUtils {
         else {
             username.setText("currently not logged");
         }
+    }
+
+    public static void setMenuInToolbar(AppCompatActivity activity, Toolbar toolbar){
+        activity.setSupportActionBar(toolbar);
+        ActionBar actionbar = activity.getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+    }
+
+    public static boolean onOptionItemSelectedUtils(int menuItemId, DrawerLayout mDrawerLayout) {
+        switch (menuItemId) {
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return false;
     }
 }

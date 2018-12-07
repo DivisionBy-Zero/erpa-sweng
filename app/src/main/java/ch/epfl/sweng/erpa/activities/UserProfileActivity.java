@@ -26,6 +26,7 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static android.content.ContentValues.TAG;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
@@ -58,14 +59,8 @@ public class UserProfileActivity extends DependencyConfigurationAgnosticActivity
             Log.d(TAG, "onResume: could not find UserProfile in database. Exiting", new NoSuchElementException());
             finish();
         }
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.user_profile_drawer_layout);
 
-        NavigationView navigationView = findViewById(R.id.user_profile_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-
-        setUsernameInMenu(navigationView, up);
+        addNavigationMenu(this, findViewById(R.id.user_profile_drawer_layout), findViewById(R.id.user_profile_navigation_view), up);
 
     }
 
