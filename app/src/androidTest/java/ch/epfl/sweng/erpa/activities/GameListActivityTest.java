@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -47,12 +49,14 @@ import toothpick.registries.MemberInjectorRegistryLocator;
 
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering.ASCENDING;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering.DESCENDING;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria.DIFFICULTY;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria.DISTANCE;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria.MAX_NUMBER_OF_PLAYERS;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -351,6 +355,14 @@ public class GameListActivityTest {
         testItemSelected(R.id.menu_actionSearch, SortActivity.class.getName());
     }
 
+    @Test
+    public void testMenuButtonSelected() throws Throwable {
+        intentsTestRule.runOnUiThread(() -> {
+            DrawerLayout drawerLayout = intentsTestRule.getActivity().findViewById(R.id.game_list_drawer_layout);
+            onOptionItemSelectedUtils(android.R.id.home, drawerLayout);
+        });
+    }
+
     private void testItemSelected(int id, String activityName) throws Throwable {
         intentsTestRule.runOnUiThread(() -> {
             MenuItem item = toolbar.getMenu().findItem(id);
@@ -360,11 +372,13 @@ public class GameListActivityTest {
     }
 
     @Test
-    public void testToolbarSetText() {
-        TextView toolbarTitle = intentsTestRule.getActivity().findViewById(R.id.toolbar_title);
-        intentsTestRule.getActivity().setToolbarText(GameListActivity.GameList.HOSTED_GAMES);
-        assertEquals(resources.getString(R.string.hostedGamesText), toolbarTitle.getText());
-        intentsTestRule.getActivity().setToolbarText(GameListActivity.GameList.PAST_HOSTED_GAMES);
-        assertEquals(resources.getString(R.string.pastHostedGamesText), toolbarTitle.getText());
+    public void testToolbarSetText() throws Throwable {
+        intentsTestRule.runOnUiThread(() -> {
+            ActionBar actionBar = intentsTestRule.getActivity().getSupportActionBar();
+            intentsTestRule.getActivity().setToolbarText(GameListActivity.GameList.HOSTED_GAMES);
+            assertEquals(resources.getString(R.string.hostedGamesText), actionBar.getTitle());
+            intentsTestRule.getActivity().setToolbarText(GameListActivity.GameList.PAST_HOSTED_GAMES);
+            assertEquals(resources.getString(R.string.pastHostedGamesText), actionBar.getTitle());
+        });
     }
 }

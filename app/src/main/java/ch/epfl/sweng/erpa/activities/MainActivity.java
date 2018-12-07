@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import javax.inject.Inject;
@@ -15,6 +17,7 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
@@ -29,15 +32,7 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.main_drawer_layout);
-
-        NavigationView navigationView = findViewById(R.id.main_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-
-        setUsernameInMenu(navigationView, up);
-
+        addNavigationMenu(this, findViewById(R.id.main_drawer_layout), findViewById(R.id.main_navigation_view), up);
     }
 
     @OnClick(R.id.launch_storage_provider_greet)

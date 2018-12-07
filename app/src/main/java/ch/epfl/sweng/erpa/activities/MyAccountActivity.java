@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -26,7 +27,10 @@ import ch.epfl.sweng.erpa.services.UserProfileService;
 import ch.epfl.sweng.erpa.util.Pair;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
@@ -48,7 +52,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
-        DataBindingUtil.setContentView(this, R.layout.activity_my_account);
+        setContentView(R.layout.activity_my_account);
         onResume();
     }
 
@@ -82,13 +86,18 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
             intent.putExtras(bundle);
             startActivity(intent);
         });
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.my_account_drawer_layout);
 
-        NavigationView navigationView = findViewById(R.id.my_account_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-        setUsernameInMenu(navigationView, userProfile);
+        addNavigationMenu(this, findViewById(R.id.my_account_drawer_layout), findViewById(R.id.my_account_navigation_view), userProfile);
+        setMenuInToolbar(this, findViewById(R.id.myAccountToolbar));
+        getSupportActionBar().setTitle(R.string.titleMyAccountActivity);
+
+    }
+
+    //Handle toolbar items clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.my_account_drawer_layout));
+        return found || super.onOptionsItemSelected(item);
     }
 
     private void initializeArrays() {

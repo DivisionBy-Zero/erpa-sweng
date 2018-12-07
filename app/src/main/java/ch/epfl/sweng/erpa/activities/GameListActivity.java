@@ -1,5 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
@@ -33,7 +34,10 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.UserProfileService;
 
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
@@ -46,7 +50,6 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
     private List<Game> games;
-    private Resources resources;
     private Toolbar toolbar;
     private GameList gameList = GameList.FIND_GAME;
     private Bundle bundle;
@@ -55,7 +58,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
-        DataBindingUtil.setContentView(this, R.layout.activity_game_list);
+       setContentView(R.layout.activity_game_list);
         ButterKnife.bind(this);
     }
 
@@ -66,15 +69,15 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         Intent myIntent = getIntent();
         bundle = myIntent.getExtras();
 
+        toolbar = findViewById(R.id.game_list_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         if (bundle != null) {
             gameList = (GameList) bundle.getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY);
-            toolbar = findViewById(R.id.game_list_toolbar);
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
             setToolbarText(gameList);
         }
 
-        resources = this.getResources();
         games = new ArrayList<>(gameService.getAll());
         // TODO(@Roos) remove when FIXME is fixed
         createListData();
@@ -95,13 +98,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         RecyclerView.Adapter mAdapter = new GameAdapter(games, listener);
         mRecyclerView.setAdapter(mAdapter);
 
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.game_list_drawer_layout);
-
-        NavigationView navigationView = findViewById(R.id.game_list_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-        setUsernameInMenu(navigationView, up);
+        addNavigationMenu(this, findViewById(R.id.game_list_drawer_layout), findViewById(R.id.game_list_navigation_view), up);
+        setMenuInToolbar(this, toolbar);
 
         // TODO(@Roos) uncomment when FIXME is fixed
 //        createListData();
@@ -116,7 +114,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return onOptionItemViewSelected(item.getItemId());
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.game_list_drawer_layout));
+        return found || onOptionItemViewSelected(item.getItemId());
     }
 
 
@@ -182,8 +181,6 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
                 break;
             default:
         }
-        TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText(id);
         getSupportActionBar().setTitle(id);
     }
 
