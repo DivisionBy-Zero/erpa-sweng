@@ -5,8 +5,12 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -33,8 +37,11 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
 import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
@@ -74,7 +81,7 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DataBindingUtil.setContentView(this, R.layout.activity_create_game);
+        setContentView(R.layout.activity_create_game);
         ButterKnife.bind(this);
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -90,13 +97,16 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             }
         });
 
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.create_game_drawer_layout);
+        addNavigationMenu(this, findViewById(R.id.create_game_drawer_layout), findViewById(R.id.create_game_navigation_view), up);
+        setMenuInToolbar(this, findViewById(R.id.create_game_toolbar));
+        getSupportActionBar().setTitle(R.string.title_create_game_activity);
+    }
 
-        NavigationView navigationView = findViewById(R.id.create_game_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-        setUsernameInMenu(navigationView, up);
+    //Handle toolbar items clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.create_game_drawer_layout));
+        return found || super.onOptionsItemSelected(item);
     }
 
     @Override

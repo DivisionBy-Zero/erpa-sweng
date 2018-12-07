@@ -36,6 +36,7 @@ import ch.epfl.sweng.erpa.services.UserProfileService;
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GameList.HOSTED_GAMES;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
@@ -98,14 +99,9 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
             playerListView.setAdapter(myPlayerAdapter);
             setListViewHeightBasedOnChildren(playerListView);
         }
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.game_viewer_drawer_layout);
 
-        NavigationView navigationView = findViewById(R.id.game_viewer_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
+        addNavigationMenu(this, findViewById(R.id.game_viewer_drawer_layout), findViewById(R.id.game_viewer_navigation_view), up);
 
-        setUsernameInMenu(navigationView, up);
     }
 
     private void getGameOrFinish(Optional<Game> optGame) {
