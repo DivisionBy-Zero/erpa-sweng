@@ -133,15 +133,24 @@ public class GameViewerActivityTest {
 
     @Test
     public void testClickOnJoinGameButton() {
+        testButtonClick(GameListActivity.GameList.FIND_GAME, R.id.joinGameButton);
+    }
+
+    @Test
+    public void testClickOnLeaveGameButton() {
+        testButtonClick(GameListActivity.GameList.PENDING_REQUEST, R.id.leave_game_button);
+    }
+
+    private void testButtonClick(GameListActivity.GameList gamelist, int id) {
         Intent iOld = activityTestRule.getActivity().getIntent();
         activityTestRule.finishActivity();
         Intent i = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, gamelist);
         i.putExtras(bundle);
         i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
         activityTestRule.launchActivity(i);
-        onView(withId(R.id.joinGameButton)).perform(click());
+        onView(withId(id)).perform(click());
         activityTestRule.finishActivity();
         activityTestRule.launchActivity(iOld);
     }

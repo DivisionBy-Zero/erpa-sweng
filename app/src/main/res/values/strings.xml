@@ -67,4 +67,8 @@
     <!-- Menu string-->
     <string name="you_are_logged_as">You are logged as:</string>
 
+    <!-- GameViewer strings-->
+    <string name="leave_game">Leave Game</string>
+    <string name="join_game">Join Game</string>
+
 </resources>

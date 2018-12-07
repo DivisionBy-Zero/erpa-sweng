@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,14 +29,11 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.PlayerAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.UserProfileService;
 
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GameList.HOSTED_GAMES;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -61,6 +56,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.gameViewerPlayerListView) ListView playerListView;
 
     @BindView(R.id.joinGameButton) Button joinGameButton;
+    @BindView(R.id.leave_game_button) Button leaveGameButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,23 +77,26 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         GameListActivity.GameList gameList = (GameListActivity.GameList) bundle.getSerializable(
                 GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY);
 
-        if (!gameList.equals(GameListActivity.GameList.FIND_GAME))
+        if (!(gameList.equals(GameListActivity.GameList.PENDING_REQUEST) || gameList.equals(GameListActivity.GameList.CONFIRMED_GAMES)))
+            leaveGameButton.setVisibility(View.INVISIBLE);
+
+        if (!gameList.equals(GameListActivity.GameList.FIND_GAME)) {
             joinGameButton.setVisibility(View.INVISIBLE);
+            if (!gameList.equals(GameListActivity.GameList.PENDING_REQUEST)) {
+                ArrayList<String> uuidArray = new ArrayList<String>(game.getPlayersUuid());
 
-        if (!gameList.equals(GameListActivity.GameList.FIND_GAME) && !gameList.equals(GameListActivity.GameList.PENDING_REQUEST)) {
-            ArrayList<String> uuidArray = new ArrayList<String>(game.getPlayersUuid());
+                ListLikeOnClickListener mListener = ((v, position) -> {
+                    game = game.removePlayer(uuidArray.get(position));
+                    gs.saveGame(game);
+                    uuidArray.remove(position);
+                });
 
-            ListLikeOnClickListener mListener = ((v, position) -> {
-                game = game.removePlayer(uuidArray.get(position));
-                gs.saveGame(game);
-                uuidArray.remove(position);
-            });
-
-            PlayerAdapter myPlayerAdapter = new PlayerAdapter(this, uuidArray,
-                    gameList.equals(HOSTED_GAMES),
-                    mListener);
-            playerListView.setAdapter(myPlayerAdapter);
-            setListViewHeightBasedOnChildren(playerListView);
+                PlayerAdapter myPlayerAdapter = new PlayerAdapter(this, uuidArray,
+                        gameList.equals(HOSTED_GAMES),
+                        mListener);
+                playerListView.setAdapter(myPlayerAdapter);
+                setListViewHeightBasedOnChildren(playerListView);
+            }
         }
 
         addNavigationMenu(this, findViewById(R.id.game_viewer_drawer_layout), findViewById(R.id.game_viewer_navigation_view), up);
@@ -129,6 +128,13 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @OnClick(R.id.joinGameButton)
     void joinGame() {
         game = game.withPlayer(up.getUuid());
+        gs.saveGame(game);
+        updateGame();
+    }
+
+    @OnClick(R.id.leave_game_button)
+    void leaveGame() {
+        game = game.removePlayer(up.getUuid());
         gs.saveGame(game);
         updateGame();
     }

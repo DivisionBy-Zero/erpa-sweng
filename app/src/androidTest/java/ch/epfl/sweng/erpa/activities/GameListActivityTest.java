@@ -1,17 +1,14 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -49,7 +46,6 @@ import toothpick.registries.MemberInjectorRegistryLocator;
 
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering.ASCENDING;
 import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering.DESCENDING;
