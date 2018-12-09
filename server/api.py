@@ -229,6 +229,13 @@ def get_username_uuid(ops, username: str = None):
     return ops.get_user_uuid_from_username(username)
 
 
+@app.route('/users/username/<user_uuid>')
+@with_operations
+def get_uuid_for_username(ops, user_uuid: str = None):
+    """Returns the last username registered to the specified user_uuid."""
+    return send_object(ops.get_username_from_user_uuid(user_uuid))
+
+
 @app.route('/users/newuser/<username>', methods=['POST'])
 @with_operations
 def register_username(ops, username: str = None):

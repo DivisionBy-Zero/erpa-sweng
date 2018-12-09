@@ -71,8 +71,12 @@ class TestOperations(unittest.TestCase):
         ops.get_user(created_user_uuid)
 
         user_uuid_from_username = ops.get_user_uuid_from_username(username_str)
+        username_from_user_uuid = ops.get_username_from_user_uuid(
+            created_user_uuid)
+
         self.assertIsNotNone(user_uuid_from_username)
         self.assertEqual(created_user_uuid, user_uuid_from_username)
+        self.assertEqual(username_str, username_from_user_uuid.username)
 
     @with_operations
     def test_register_new_user(self, ops):

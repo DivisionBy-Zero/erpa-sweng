@@ -199,6 +199,18 @@ class Operations:
         return existing_username_uuid
 
     @with_session
+    def get_username_from_user_uuid(self, user_uuid: str, session: Session
+                                    ) -> str:
+        existing_username = (session.query(Username)
+                             .filter(Username.user_uuid == user_uuid)
+                             .scalar()
+                             )
+        if not existing_username:
+            raise KeyError("No username with such uuid could be found")
+
+        return existing_username
+
+    @with_session
     def register_user_auth(self, user_auth: UserAuth, session: Session
                            ) -> UserAuth:
         user_uuid = user_auth.user_uuid

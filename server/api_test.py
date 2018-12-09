@@ -31,7 +31,7 @@ class MyCurl():
         def mk_wrapped_call(*args, **kwargs):
             res = getattr(self.app, x)(*args, **kwargs)
             res.asDict = lambda: json.loads(res.data)
-            res.asStr = lambda: str(res.data)
+            res.asStr = lambda: res.data.decode('UTF-8')
             res.asObject = lambda: Bunch(res.asDict())
             return res
         return mk_wrapped_call
@@ -89,7 +89,10 @@ class TestAPI(unittest.TestCase):
         user_uuid = create_and_register_username(self.curl, username)
         self.assertEqual(user_uuid, self.curl.get(user_url).asStr())
         user = self.curl.get('/users/uuid/{}'.format(user_uuid)).asObject()
+        retrieved_username = self.curl.get(
+            '/users/username/{}'.format(user_uuid)).asObject()
         self.assertTrue(user.uuid)
+        self.assertEqual(username, retrieved_username.username)
 
     def test_update_user(self):
         username = user_prefix + str(datetime.now())
