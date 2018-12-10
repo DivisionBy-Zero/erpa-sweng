@@ -28,7 +28,8 @@ class Operations:
     @with_session
     def get_authenticated_user(self, authtoken: str, session: Session) -> User:
         user = (session.query(User)
-                .join(UserSessionToken)
+                .join(UserSessionToken,
+                      User.uuid == UserSessionToken.user_uuid)
                 .filter(UserSessionToken.session_token == authtoken)
                 .scalar()
                 )
