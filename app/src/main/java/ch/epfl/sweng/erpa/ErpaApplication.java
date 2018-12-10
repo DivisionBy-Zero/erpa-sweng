@@ -17,7 +17,6 @@ import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
-import ch.epfl.sweng.erpa.services.firebase.FirebaseRemoteServicesProvider;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
@@ -35,7 +34,6 @@ public class ErpaApplication extends Application {
     // Remote Service Providers
     private final Set<Class<? extends RemoteServicesProvider>> remoteServicesProviders = Stream.of(
             DummyRemoteServicesProvider.class,
-            FirebaseRemoteServicesProvider.class
     ).collect(Collectors.toSet());
 
     List<Game> sampleListOfGames = new ArrayList<>();
