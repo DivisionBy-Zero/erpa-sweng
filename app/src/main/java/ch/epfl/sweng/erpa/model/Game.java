@@ -2,9 +2,9 @@ package ch.epfl.sweng.erpa.model;
 
 import com.annimon.stream.Optional;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.UUID;
 
+import ch.epfl.sweng.erpa.services.GameService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,39 +16,27 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Game implements UuidObject {
-    @Override public String getUuid() {
-        return getGameUuid();
+    @NonNull private String uuid;
+    @NonNull private String gmUserUuid;
+    @NonNull private String title;
+    @NonNull private Integer minPlayers;
+    @NonNull private Integer maxPlayers;
+    @NonNull private Difficulty difficulty;
+    @NonNull private String universe;
+    @NonNull private Boolean isCampaign;
+    @NonNull private Optional<Integer> numberOfSessions;
+    @NonNull private Optional<Integer> sessionLengthInMinutes;
+    @NonNull private String description;
+    @NonNull private Double locationLat;
+    @NonNull private Double locationLon;
+
+    public String getOneshotOrCampaign() {
+        return isCampaign ? "Campaign" : "Oneshot";
     }
 
     public enum Difficulty {NOOB, CHILL, HARD}
 
-    public enum OneshotOrCampaign {ONESHOT, CAMPAIGN}
-
-    @NonNull private String gameUuid;
-    @NonNull private String gmUuid;
-    @NonNull private Set<String> playersUuid;
-    @NonNull private String name;
-    @NonNull private Integer minPlayer;
-    @NonNull private Integer maxPlayer;
-    @NonNull private Difficulty difficulty;
-    @NonNull private String universe;
-    @NonNull private OneshotOrCampaign oneshotOrCampaign;
-    @NonNull private Optional<Integer> numberSessions;
-    @NonNull private Optional<Integer> sessionLengthInMinutes;
-    @NonNull private String description;
-
-    public Game withPlayer(String newPlayerUuid){
-        HashSet<String> newPlayerSet = new HashSet<>(playersUuid);
-        newPlayerSet.add(newPlayerUuid);
-
-        return this.toBuilder().playersUuid(newPlayerSet).build();
-    }
-
-    public Game removePlayer(String playerToRemove){
-        HashSet<String> newPlayerSet = new HashSet<>(playersUuid);
-        newPlayerSet.remove(playerToRemove);
-
-        return this.toBuilder().playersUuid(newPlayerSet).build();
+    public static String genGameUuid() {
+        return GameService.UUID_PREFIX + UUID.randomUUID();
     }
 }
-

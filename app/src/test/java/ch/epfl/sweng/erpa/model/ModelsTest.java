@@ -8,7 +8,7 @@ public class ModelsTest {
     @Test
     public void testUserAuthToStringExcludesToken() {
         String secret = "casablanca";
-        UserAuth ua = new UserAuth("User UUID", secret);
+        UserSessionToken ua = new UserSessionToken("User UUID", secret);
         assertFalse(ua.toString().contains(secret));
     }
 }

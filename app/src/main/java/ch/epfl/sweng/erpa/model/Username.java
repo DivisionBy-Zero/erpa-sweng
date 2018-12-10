@@ -8,8 +8,7 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAuth {
+public class Username {
     @NonNull private String userUuid;
-    @NonNull private String publicKey;
-    @NonNull private String authenticationStrategy = "Grenouille";
+    @NonNull private String username;
 }
