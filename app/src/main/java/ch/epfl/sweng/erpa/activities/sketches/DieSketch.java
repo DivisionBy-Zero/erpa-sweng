@@ -99,6 +99,10 @@ public class DieSketch extends PApplet {
         rollLength = rng.nextInt(2000) + 1000;
     }
 
+    public boolean isRolling() {
+        return rolling;
+    }
+
     private float checkAndIncrementAngle(float angle, float increment) {
         float mAngle = (angle + increment) % 4;
         return mAngle;

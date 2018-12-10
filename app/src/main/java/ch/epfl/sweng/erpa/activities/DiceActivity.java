@@ -11,12 +11,14 @@ import android.widget.FrameLayout;
 
 import butterknife.OnClick;
 
-
 import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.views.FlowLayout;
 
+import com.annimon.stream.Stream;
+
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -24,8 +26,8 @@ import javax.inject.Inject;
 import processing.android.CompatUtils;
 import processing.android.PFragment;
 
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -41,28 +43,32 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dice);
-        DataBindingUtil.setContentView(this, R.layout.activity_dice);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.dice_drawer_layout);
-
-        NavigationView navigationView = findViewById(R.id.dice_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-        setUsernameInMenu(navigationView, up);
+        addNavigationMenu(this, findViewById(R.id.dice_drawer_layout), findViewById(R.id.dice_navigation_view), up);
+        setMenuInToolbar(this, findViewById(R.id.dice_toolbar));
+        getSupportActionBar().setTitle(R.string.title_dice_activity);
 
         flowLayout = findViewById(R.id.dice_layout);
     }
 
+    /**
+     * Checks if any die is rolling else rolls all dice
+     * @param view not used
+     */
     @OnClick(R.id.rollButton)
     public void rollDices(View view) {
-        for (DieSketch die : allDice) {
-            die.roll();
+        if (Stream.of(allDice).allMatch(dice -> !dice.isRolling())) {
+            for (DieSketch die : allDice) {
+                die.roll();
+            }
         }
     }
 
+    /**
+     * Removes the last die on the layout
+     * @param view
+     */
     @OnClick(R.id.dice_layout)
     public void removeDie(View view) {
         if (!allDice.isEmpty()) {
@@ -72,6 +78,10 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         }
     }
 
+    /**
+     * Add a die on the FlowLayout if there is place depending on which button is pressed
+     * @param view The button that has been pressed, needs to be cast to Button
+     */
     public void addAndUpdateDie(View view) {
         if (allDice.size() < MAX_DICE_NUMBER) {
             Button button = (Button) view;
@@ -79,6 +89,10 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         }
     }
 
+    /**
+     * Add a button of type dieType on the layout
+     * @param dieType
+     */
     private void addAndShowDie(int dieType) {
         DieSketch dieSketch = new DieSketch(getFileNameFromDieType(dieType), ROTATION_SPEED);
         allDice.add(dieSketch);
@@ -91,6 +105,12 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         fragment.setView(frame, this);
     }
 
+    /**
+     * Return the file name of the die type given
+     * @param dieType The type of the die. Has to be 4, 6, 8, 10 or 20
+     * @return The name of the file to load
+     * @throws InvalidParameterException if the die type is not 4, 6, 8, 10 or 20
+     */
     private String getFileNameFromDieType(int dieType) {
         String name = "";
         switch (dieType) {
@@ -109,6 +129,8 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
             case 20:
                 name = "objs/d20_1R.obj";
                 break;
+            default:
+                throw new InvalidParameterException("Not a valid die type");
         }
         return name;
     }
