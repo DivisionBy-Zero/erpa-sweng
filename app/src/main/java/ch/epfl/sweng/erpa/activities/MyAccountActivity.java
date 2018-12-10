@@ -3,11 +3,8 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -23,20 +20,21 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.UserProfileService;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
+import ch.epfl.sweng.erpa.services.UserManagementService;
 import ch.epfl.sweng.erpa.util.Pair;
 
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
-
+    @Inject OptionalDependencyManager optionalDependency;
+    @Inject Username username;
     @Inject UserProfile userProfile;
-    @Inject UserProfileService ups;
+    @Inject UserManagementService ups;
 
     // TODO: (Anne) add Butterknife for better readability
     private ListView myListView;
@@ -71,23 +69,26 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
                 Pair::new).collect(Collectors.toList());
 
         Bundle profileBundle = new Bundle();
-        profileBundle.putString(UserProfileService.PROP_INTENT_USER, userProfile.getUuid());
+        profileBundle.putString(UserManagementService.PROP_INTENT_USER, username.getUserUuid());
         collect.add(new Pair<>(new MyAccountButton(resources.getString(R.string.profileText),
                 UserProfileActivity.class, profileBundle, true, true),
                 context.getDrawable(R.drawable.ic_action_name)));
+
         // TODO (@Anne) remove when proper authentication is implemented
-        ups.saveUserProfile(userProfile);
+        // TODO (@Sapphie) Remove or handle gracefully
+        //Exceptional.of(() -> userManagementService.register(userProfile)).get();
 
         myAdapter = new MyAccountButtonAdapter(this, collect);
         myListView.setAdapter(myAdapter);
         myListView.setOnItemClickListener((l, v, position, id) -> {
             Intent intent = new Intent(this, collect.get(position).getFirst().getActivityClass());
+            intent.putExtra(UserManagementService.PROP_INTENT_USER, username.getUserUuid());
             Bundle bundle = collect.get(position).getFirst().getBundle();
             intent.putExtras(bundle);
             startActivity(intent);
         });
 
-        addNavigationMenu(this, findViewById(R.id.my_account_drawer_layout), findViewById(R.id.my_account_navigation_view), userProfile);
+        addNavigationMenu(this, findViewById(R.id.my_account_drawer_layout), findViewById(R.id.my_account_navigation_view), optionalDependency);
         setMenuInToolbar(this, findViewById(R.id.myAccountToolbar));
         getSupportActionBar().setTitle(R.string.titleMyAccountActivity);
 
@@ -118,9 +119,9 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
                         empty, false, true))
                 .map(b -> {
                     Bundle bundle = new Bundle();
-                    GameListActivity.GameList targetList;
+                    GameListActivity.GameListType targetList;
                     targetList = findTargetGameListType(b);
-                    bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, targetList);
+                    bundle.putSerializable(GAME_LIST_ACTIVITY_CLASS_KEY, targetList);
                     return new MyAccountButton(b.getText(), b.getActivityClass(),
                             bundle,
                             b.getActiveForPlayer(), b.getActiveForGM());
@@ -139,18 +140,18 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     @android.support.annotation.NonNull
-    private GameListActivity.GameList findTargetGameListType(MyAccountButton b) {
-        GameListActivity.GameList targetList;
+    private GameListActivity.GameListType findTargetGameListType(MyAccountButton b) {
+        GameListActivity.GameListType targetList;
         if (b.getText().equals(resources.getString(R.string.pendingRequestText))) {
-            targetList = GameListActivity.GameList.PENDING_REQUEST;
+            targetList = GameListActivity.GameListType.PENDING_REQUEST;
         } else if (b.getText().equals(resources.getString(R.string.confirmedGamesText))) {
-            targetList = GameListActivity.GameList.CONFIRMED_GAMES;
+            targetList = GameListActivity.GameListType.CONFIRMED_GAMES;
         } else if (b.getText().equals(resources.getString(R.string.pastGamesText))) {
-            targetList = GameListActivity.GameList.PAST_GAMES;
+            targetList = GameListActivity.GameListType.PAST_GAMES;
         } else if (b.getText().equals(resources.getString(R.string.hostedGamesText))) {
-            targetList = GameListActivity.GameList.HOSTED_GAMES;
+            targetList = GameListActivity.GameListType.HOSTED_GAMES;
         } else {
-            targetList = GameListActivity.GameList.PAST_HOSTED_GAMES;
+            targetList = GameListActivity.GameListType.PAST_HOSTED_GAMES;
         }
         return targetList;
     }
