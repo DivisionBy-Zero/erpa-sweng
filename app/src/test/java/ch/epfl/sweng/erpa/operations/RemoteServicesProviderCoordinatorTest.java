@@ -47,7 +47,7 @@ public class RemoteServicesProviderCoordinatorTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) // Methods calls return mocks (e.g. builders).
             SharedPreferences sharedPreferences;
     @Mock GameService gameService;
-    @Mock UserProfileService userProfileService;
+    @Mock UserManagementService userManagementService;
 
     private Scope scope;
 
@@ -183,20 +183,5 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     @Override
     public UserProfileService getUserProfileService() {
         return null;
-    }
-
-    @Override
-    public Optional<String> getUidFromUsername(String username) {
-        return null;
-    }
-
-    @Override
-    public boolean verifyAccessToken(String uid, String accessToken) {
-        return false;
-    }
-
-    @Override
-    public void storeNewUser(UserProfile user) {
-        return;
     }
 }
