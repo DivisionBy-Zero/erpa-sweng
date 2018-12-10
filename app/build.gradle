@@ -86,12 +86,14 @@ ext {
     depVersionButterknife = "8.8.1"
     depVersionDexmaker = "2.19.1"
     depVersionEspresso = "3.0.2"
+    depVersionGuava = "27.0.1-android"
     depVersionJargon2 = "1.1.1"
     depVersionJhash = "2.1.0"
     depVersionJunit = "4.12"
     depVersionLombok = "1.16.20" // github.com/rzwitserloot/lombok/issues/1727
     depVersionMockito = "2.22.0"
     depVersionRetroLambda = "3.2.5"
+    depVersionRetrofit = "2.4.0"
     depVersionRetrolambdaLombokAst = "0.2.3.a2"
     depVersionSnakeYaml = "1.23"
     depVersionToothpick = "1.1.3"
@@ -123,12 +125,15 @@ dependencies {
     implementation "com.annimon:stream:${depVersionAnnimonStream}"
     implementation "com.github.stephanenicolas.toothpick:smoothie:${depVersionToothpick}"
     implementation "com.github.stephanenicolas.toothpick:toothpick-runtime:${depVersionToothpick}"
+    implementation "com.google.guava:guava:${depVersionGuava}"
     implementation "com.jakewharton:butterknife:${depVersionButterknife}"
     implementation "com.kosprov.jargon2:jargon2-api:${depVersionJargon2}"
     implementation "com.kosprov.jargon2:jargon2-api:${depVersionJargon2}"
     implementation "com.kosprov.jargon2:jargon2-native-ri-backend:${depVersionJargon2}"
     implementation "com.kosprov.jargon2:jargon2-native-ri-backend:${depVersionJargon2}"
     implementation "com.linkedin.dexmaker:dexmaker:${depVersionDexmaker}"
+    implementation "com.squareup.retrofit2:converter-gson:${depVersionRetrofit}"
+    implementation "com.squareup.retrofit2:retrofit:${depVersionRetrofit}"
     implementation "me.tatarka.retrolambda.projectlombok:lombok.ast:${depVersionRetrolambdaLombokAst}"
     implementation "me.tatarka:gradle-retrolambda:${depVersionRetroLambda}"
     implementation "org.p5android:processing-core:${depVersionProcessing}"
@@ -170,6 +175,6 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     sourceDirectories = files([mainSrc])
     classDirectories = files([debugTree])
     executionData = fileTree(dir: project.buildDir, includes: [
-      'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+            'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
     ])
 }
