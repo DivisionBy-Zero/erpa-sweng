@@ -56,7 +56,7 @@ public class DiceAnimationActivity extends AppCompatActivity {
                 compressedDiceResourcesPath.get(dieValue),
                 "Could not find resource file for die of value " + dieValue);
 
-        sketch = new DieSketch(shapeResourcePath, dieValue, factor);
+        sketch = new DieSketch(shapeResourcePath, factor);
         PFragment fragment = new PFragment(sketch);
         fragment.setView(frame, this);
     }

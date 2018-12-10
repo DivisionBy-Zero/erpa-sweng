@@ -13,14 +13,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-
 import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 import ch.epfl.sweng.erpa.views.FlowLayout;
 
+import com.annimon.stream.Stream;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -29,12 +33,11 @@ import processing.android.PFragment;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.installDefaultNavigationMenuHandler;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
-
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
-    private static final int[] dice = {4, 6, 8, 10, 12, 20, 100};
-    private static final int MAX_DICE_NUMBER = 15;
 
     @BindView(R.id.dice_navigation_view) NavigationView navigationView;
     @BindView(R.id.dice_drawer_layout) DrawerLayout drawerLayout;
@@ -46,6 +49,18 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     private FlowLayout flowLayout;
     private ArrayList<DieSketch> allDice = new ArrayList<>();
+
+    /**
+     * Map from die type to filename
+     */
+    private static final Map<Integer, String> compressedDiceResourcesPath =
+            Collections.unmodifiableMap(new HashMap<Integer, String>() {{
+                put(4, "shapes/d4.obj");
+                put(6, "shapes/d6.obj");
+                put(8, "shapes/d8.obj");
+                put(10, "shapes/d10.obj");
+                put(20, "shapes/d20.obj");
+            }});
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,16 +86,31 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
 
+        //Handle navigationMenu interactions
+        addNavigationMenu(this, findViewById(R.id.dice_drawer_layout), findViewById(R.id.dice_navigation_view), up);
+        setMenuInToolbar(this, findViewById(R.id.dice_toolbar));
+        getSupportActionBar().setTitle(R.string.title_dice_activity);
+
         flowLayout = findViewById(R.id.dice_layout);
     }
 
+    /**
+     * Checks if any die is rolling else rolls all dice
+     * @param view not used
+     */
     @OnClick(R.id.rollButton)
     public void rollDices(View view) {
-        for (DieSketch die : allDice) {
-            die.roll();
+        if (Stream.of(allDice).allMatch(dice -> !dice.isRolling())) {
+            for (DieSketch die : allDice) {
+                die.roll();
+            }
         }
     }
 
+    /**
+     * Removes the last die on the layout
+     * @param view
+     */
     @OnClick(R.id.dice_layout)
     public void removeDie(View view) {
         if (!allDice.isEmpty()) {
@@ -90,6 +120,10 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         }
     }
 
+    /**
+     * Add a die on the FlowLayout if there is place depending on which button is pressed
+     * @param view The button that has been pressed, needs to be cast to Button
+     */
     public void addAndUpdateDie(View view) {
         if (allDice.size() < MAX_DICE_NUMBER) {
             Button button = (Button) view;
@@ -97,8 +131,12 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         }
     }
 
+    /**
+     * Add a button of type dieType on the layout
+     * @param dieType The die type to show
+     */
     private void addAndShowDie(int dieType) {
-        DieSketch dieSketch = new DieSketch(getFileNameFromDieType(dieType), ROTATION_SPEED);
+        DieSketch dieSketch = new DieSketch(compressedDiceResourcesPath.get(dieType), ROTATION_SPEED);
         allDice.add(dieSketch);
 
         FrameLayout frame = new FrameLayout(this);
@@ -107,27 +145,5 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
         PFragment fragment = new PFragment(dieSketch);
         fragment.setView(frame, this);
-    }
-
-    private String getFileNameFromDieType(int dieType) {
-        String name = "";
-        switch (dieType) {
-            case 4:
-                name = "objs/d4R.obj";
-                break;
-            case 6:
-                name = "objs/d6R.obj";
-                break;
-            case 8:
-                name = "objs/d8R.obj";
-                break;
-            case 10:
-                name = "objs/d10R.obj";
-                break;
-            case 20:
-                name = "objs/d20_1R.obj";
-                break;
-        }
-        return name;
     }
 }
