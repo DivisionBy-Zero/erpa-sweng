@@ -3,7 +3,6 @@ package ch.epfl.sweng.erpa.util;
 import com.annimon.stream.Optional;
 import com.annimon.stream.function.Function;
 
-import java.util.HashSet;
 import java.util.List;
 
 import ch.epfl.sweng.erpa.model.Game;
@@ -13,19 +12,20 @@ import ch.epfl.sweng.erpa.services.DataService;
 
 public class TestUtils {
     public static final int numTests = 500;
-    public static Game getGame(String gid) {
+    public static Game getGame(String gameUuid) {
         return new Game(
-                gid,
+                gameUuid,
                 "Sapphie",
-                new HashSet<String>(),
                 "The land of the Sapphie",
                 0, 5,
                 Game.Difficulty.CHILL,
                 "Sapphtopia",
-                Game.OneshotOrCampaign.ONESHOT,
-                Optional.<Integer>of(-73),
-                Optional.<Integer>of(Integer.MAX_VALUE),
-                "bepsi is gud"
+                false,
+                Optional.of(-73),
+                Optional.of(Integer.MAX_VALUE),
+                "bepsi is gud",
+                0.0,
+                0.0
         );
     }
 

@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAuth {
+@ToString(exclude = "sessionToken")
+public class UserSessionToken {
     @NonNull private String userUuid;
-    @NonNull private String publicKey;
-    @NonNull private String authenticationStrategy = "Grenouille";
+    @NonNull private String sessionToken;
 }
