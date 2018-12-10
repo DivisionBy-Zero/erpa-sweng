@@ -1,15 +1,9 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,7 +15,6 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import javax.inject.Inject;
 
@@ -31,36 +24,18 @@ import butterknife.OnClick;
 import ch.epfl.sweng.erpa.CreateGameFormFragment;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
-import ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign;
-import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.AsyncTaskService;
+import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
+import ch.epfl.sweng.erpa.services.GameService;
 
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
-import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.CAMPAIGN;
-import static ch.epfl.sweng.erpa.model.Game.OneshotOrCampaign.ONESHOT;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
-public class CreateGameActivity extends AppCompatActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
-
-    @Inject UserProfile up;
-
-    @BindView(R.id.campaign) RadioButton campaignRadioButton;
-    @BindView(R.id.create_game_name_field) EditText gameName;
-    @BindView(R.id.description_field) EditText gameDescription;
-    @BindView(R.id.difficulty_spinner) Spinner difficultySpinner;
-    @BindView(R.id.layout_num_sessions) View numSessionsView;
-    @BindView(R.id.max_num_player_field) EditText valueMax;
-    @BindView(R.id.min_num_player_field) EditText valueMin;
-    @BindView(R.id.num_session_field) EditText numSess;
-    @BindView(R.id.oneshot) RadioButton oneshotRadioButton;
-    @BindView(R.id.session_length_spinner) Spinner sessionLengthSpinner;
-    @BindView(R.id.universe_field) EditText universeField;
-    @BindView(R.id.universes_spinner) Spinner universesSpinner;
-
+public class CreateGameActivity extends DependencyConfigurationAgnosticActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
     private static final HashMap<String, Integer> sessionLengthTranslationTable = new HashMap<String, Integer>() {{
         put("Undefined", null);
         put("-1h", 30);
@@ -75,21 +50,57 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
 
     private static final HashMap<String, Game.Difficulty> difficultyTranslationTable = new HashMap<String, Game.Difficulty>() {{
         Stream.of(Game.Difficulty.values())
-                .forEach(difficulty -> put(difficulty.toString().toUpperCase(), difficulty));
+            .forEach(difficulty -> put(difficulty.toString().toUpperCase(), difficulty));
     }};
+
+    @BindView(R.id.campaign) RadioButton campaignRadioButton;
+    @BindView(R.id.create_game_name_field) EditText gameName;
+    @BindView(R.id.description_field) EditText gameDescription;
+    @BindView(R.id.difficulty_spinner) Spinner difficultySpinner;
+    @BindView(R.id.layout_num_sessions) View numSessionsView;
+    @BindView(R.id.max_num_player_field) EditText valueMax;
+    @BindView(R.id.min_num_player_field) EditText valueMin;
+    @BindView(R.id.num_session_field) EditText numSess;
+    @BindView(R.id.oneshot) RadioButton oneshotRadioButton;
+    @BindView(R.id.session_length_spinner) Spinner sessionLengthSpinner;
+    @BindView(R.id.universe_field) EditText universeField;
+    @BindView(R.id.universes_spinner) Spinner universesSpinner;
+    @BindView(R.id.loadingPanelCreateGame) View loader;
+
+    @Inject GameService gameService;
+    @Inject OptionalDependencyManager optionalDependency;
+    @Inject Username username;
+
+    private AsyncTaskService asyncTaskService;
+
+    private static Optional<Integer> intValueFromEditText(EditText editText) {
+        return Optional.of(editText.getText().toString())
+            .filter(t -> !t.isEmpty()).map(Integer::parseInt);
+    }
+
+    static Optional<Integer> findSessionLength(String sessionLength) {
+        return Optional.ofNullable(sessionLengthTranslationTable.get(sessionLength));
+    }
+
+    static Game.Difficulty findDifficulty(String difficulty) {
+        return difficultyTranslationTable.get(String.valueOf(difficulty).toUpperCase());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_create_game);
         ButterKnife.bind(this);
+        asyncTaskService = new AsyncTaskService();
+        asyncTaskService.setResultConsumerContext(this::runOnUiThread);
+
         universesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String feedbackType = universesSpinner.getSelectedItem().toString();
-                universeField.setVisibility((feedbackType.equals(
-                        getString(R.string.univOther))) ? View.VISIBLE : View.GONE);
+                boolean shouldDisplay = feedbackType.equals(getString(R.string.univOther));
+                universeField.setVisibility(shouldDisplay ? View.VISIBLE : View.GONE);
             }
 
             @Override
@@ -97,12 +108,15 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
             }
         });
 
-        addNavigationMenu(this, findViewById(R.id.create_game_drawer_layout), findViewById(R.id.create_game_navigation_view), up);
+        addNavigationMenu(this, findViewById(R.id.create_game_drawer_layout),
+            findViewById(R.id.create_game_navigation_view), optionalDependency);
         setMenuInToolbar(this, findViewById(R.id.create_game_toolbar));
         getSupportActionBar().setTitle(R.string.title_create_game_activity);
+
+        loader.setVisibility(View.GONE);
     }
 
-    //Handle toolbar items clicks
+    // Handle toolbar items clicks
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.create_game_drawer_layout));
@@ -122,47 +136,54 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
     //call when the user submit a game and check if no requested field is empty
     @OnClick(R.id.submit_button)
     public void submitGame(View view) {
-        if (!playerNumberIsValid()) {
-            createPopup(getString(R.string.invalidPlayerNumber), this);
-        } else if (!allObligFieldsFilled()) {
-            createPopup(getString(R.string.emptyFieldMessage), this);
-        } else if (!aRadioButtonIsChecked()) {
-            createPopup(getString(R.string.uncheckedCheckboxMessage), this);
-        } else {
-            createAndPublishGame();
+        if (getErrorMessage().executeIfPresent(m -> createPopup(m, this)).isPresent())
+            return;
 
-            Intent intent = new Intent(this, GameListActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
-            intent.putExtras(bundle);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-            startActivity(intent);
-        }
+        Optional<Integer> optionalNbSessions = Optional.of(numSess.getText().toString())
+            .filter(s -> !s.isEmpty()).map(Integer::parseInt);
+
+        Game newGame = new Game(Game.genGameUuid(),
+            username.getUserUuid(),
+            gameName.getText().toString(),
+            intValueFromEditText(valueMin).get(),
+            intValueFromEditText(valueMax).get(),
+            findDifficulty(difficultySpinner.getSelectedItem().toString()),
+            universesSpinner.getSelectedItem().toString(),
+            !oneshotRadioButton.isChecked(),
+            optionalNbSessions,
+            findSessionLength(sessionLengthSpinner.getSelectedItem().toString()),
+            gameDescription.getText().toString(),
+            0.0,
+            0.0);
+
+        loader.setVisibility(View.VISIBLE);
+
+        asyncTaskService.run(() -> gameService.createGame(newGame), game -> {
+            loader.setVisibility(View.GONE);
+            launchGameViewer(game);
+        }, this::handleException);
     }
 
-    // Only call this method after activity elements have been verified!
-    private void createAndPublishGame() {
-        Integer minPlayers = intValueFromEditTextOrMinusOne(valueMin);
-        Integer maxPlayers = intValueFromEditTextOrMinusOne(valueMax);
+    Optional<String> getErrorMessage() {
+        if (!playerNumberIsValid()) return Optional.of(getString(R.string.invalidPlayerNumber));
+        if (!allObligFieldsFilled()) return Optional.of(getString(R.string.emptyFieldMessage));
+        if (!aRadioButtonIsChecked())
+            return Optional.of(getString(R.string.uncheckedCheckboxMessage));
+        return Optional.empty();
+    }
 
-        OneshotOrCampaign oneShotOrCampaign = oneshotRadioButton.isChecked() ? ONESHOT : CAMPAIGN;
-        Game.Difficulty difficulty = findDifficulty(
-                difficultySpinner.getSelectedItem().toString());
-        Optional<Integer> numbSession = Optional.of(numSess.getText().toString())
-                .filter(s -> !s.isEmpty()).map(Integer::parseInt);
-        Optional<Integer> sessionLength = findSessionLength(
-                sessionLengthSpinner.getSelectedItem().toString());
-        String universe = universesSpinner.getSelectedItem().toString();
+    private void launchGameViewer(Game g) {
+        Intent intent = new Intent(this, GameListActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(GAME_LIST_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.FIND_GAME);
+        intent.putExtras(bundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        startActivity(intent);
+    }
 
-        String gameUUID = "";
-
-        String gmUUID = "";
-
-        Game newGame = new Game(gameUUID, gmUUID, new HashSet<>(), gameName.toString(),
-                minPlayers, maxPlayers, difficulty, universe, oneShotOrCampaign, numbSession,
-                sessionLength, gameDescription.toString());
-
-        // TODO(@Roos): Generate a valid gameUUID and send the new game to the gameService.
+    void handleException(Throwable exc) {
+        Log.e("createGamePost", "Could not create game", exc);
+        createPopup("Could not create game: " + exc.getMessage(), this);
     }
 
     private boolean aRadioButtonIsChecked() {
@@ -171,25 +192,12 @@ public class CreateGameActivity extends AppCompatActivity implements CreateGameF
 
     private boolean allObligFieldsFilled() {
         return Stream.of(gameName, valueMin, valueMax, gameDescription)
-                .allMatch(f -> !f.getText().toString().isEmpty());
+            .allMatch(f -> !f.getText().toString().isEmpty());
     }
 
     private boolean playerNumberIsValid() {
-        int minPlayers = intValueFromEditTextOrMinusOne(valueMin);
-        int maxPlayers = intValueFromEditTextOrMinusOne(valueMax);
+        int minPlayers = intValueFromEditText(valueMin).orElse(-1);
+        int maxPlayers = intValueFromEditText(valueMax).orElse(-1);
         return (minPlayers > 0 && maxPlayers >= minPlayers);
-    }
-
-    private static int intValueFromEditTextOrMinusOne(EditText editText) {
-        return Optional.of(editText.getText().toString())
-                .filter(t -> !t.isEmpty()).map(Integer::parseInt).orElse(-1);
-    }
-
-    static Optional<Integer> findSessionLength(String sessionLength) {
-        return Optional.ofNullable(sessionLengthTranslationTable.get(sessionLength));
-    }
-
-    static Game.Difficulty findDifficulty(String difficulty) {
-        return difficultyTranslationTable.get(String.valueOf(difficulty).toUpperCase());
     }
 }
