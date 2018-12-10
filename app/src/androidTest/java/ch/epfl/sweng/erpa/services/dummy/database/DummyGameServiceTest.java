@@ -1,6 +1,5 @@
 package ch.epfl.sweng.erpa.services.dummy.database;
 
-import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -40,7 +39,7 @@ import static junit.framework.TestCase.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class DummyGameServiceTest {
-    private GameService gs;
+    private DummyGameService underTest;
 
     @Before
     public void prepare() {
@@ -59,30 +58,31 @@ public class DummyGameServiceTest {
             bind(Map.class).withName(RES_DEPENDENCY_COORDINATORS)
                     .toInstance(new HashMap<Class, DependencyCoordinator>());
         }});
-        gs = scope.getInstance(DummyGameService.class);
+        underTest = scope.getInstance(DummyGameService.class);
     }
     @After
     public void cleanUp() {
-        gs.removeGames();
+        underTest.removeGames();
     }
 
     @Test
     public void testConstant() {
-        assertEquals(DummyGameService.SAVED_GAME_DATA_FOLDER,((DummyGameService)gs).dataFolder());
+        assertEquals(DummyGameService.SAVED_GAME_DATA_FOLDER, underTest.dataFolder());
     }
 
     @Test
     public void testAdded() {
         Game g = getGame("testAdded");
-        gs.saveGame(g);
-        Optional<Game> res = gs.getGame(g.getGameUuid());
+        Optional<Game> res;
+        underTest.updateGame(g);
+        res = underTest.getGame(g.getUuid());
         assertTrue(res.isPresent());
         assertEquals(g,res.get());
     }
     @Test
     public void testAllAdded() {
         List<Game> games = new ArrayList<>(numTests);
-        populateUUIDObjects(games,gs,TestUtils::getGame);
-        assertTrue(gs.getAllGames().containsAll(games));
+        populateUUIDObjects(games, underTest,TestUtils::getGame);
+        assertTrue(underTest.getAllGames(new GameService.StreamRefiner()).containsAll(games));
     }
 }
