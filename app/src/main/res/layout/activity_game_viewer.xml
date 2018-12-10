@@ -3,9 +3,9 @@
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/game_viewer_drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/game_viewer_drawer_layout">
+    android:layout_height="match_parent">
 
     <android.support.v4.widget.NestedScrollView
         style="@style/ERPAStyle"
@@ -18,10 +18,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/text_info_constraintLayout"
+            <RelativeLayout
+                android:id="@+id/game_viewer_activity_loading_panel"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="visible">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true" />
+            </RelativeLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/game_viewer_activity_content_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/titleTextView"
@@ -39,7 +53,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Game Master"
+                    android:visibility="gone"
+                    android:text="..Fetching GameMaster.."
                     app:layout_constraintStart_toStartOf="@+id/titleTextView"
                     app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
@@ -126,13 +141,11 @@
                     app:layout_constraintTop_toTopOf="@+id/sessionLengthColonTextView" />
             </android.support.constraint.ConstraintLayout>
 
-
             <ListView
                 android:id="@+id/gameViewerPlayerListView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_constraintTop_toBottomOf="@id/text_info_constraintLayout" />
-
+                app:layout_constraintTop_toBottomOf="@id/game_viewer_activity_content_panel" />
 
             <Button
                 android:id="@+id/joinGameButton"
@@ -144,10 +157,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent" />
-
         </android.support.constraint.ConstraintLayout>
-
-
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.NavigationView
@@ -156,6 +166,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/menu_navigation"
-        app:headerLayout="@layout/menu_header"/>
+        app:headerLayout="@layout/menu_header"
+        app:menu="@menu/menu_navigation" />
 </android.support.v4.widget.DrawerLayout>
