@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -27,6 +28,7 @@ import processing.android.CompatUtils;
 import processing.android.PFragment;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
@@ -50,6 +52,13 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         getSupportActionBar().setTitle(R.string.title_dice_activity);
 
         flowLayout = findViewById(R.id.dice_layout);
+    }
+
+    //Handle toolbar items clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.dice_drawer_layout));
+        return found || super.onOptionsItemSelected(item);
     }
 
     /**
