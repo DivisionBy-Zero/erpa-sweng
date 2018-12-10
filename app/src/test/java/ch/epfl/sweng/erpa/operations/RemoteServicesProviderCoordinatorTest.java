@@ -3,8 +3,6 @@ package ch.epfl.sweng.erpa.operations;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.annimon.stream.Optional;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,11 +15,11 @@ import org.mockito.junit.MockitoRule;
 
 import java.lang.reflect.Proxy;
 
-import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
-import ch.epfl.sweng.erpa.services.UserProfileService;
+import ch.epfl.sweng.erpa.services.UserManagementService;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
+import ch.epfl.sweng.erpa.util.TestUtils;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
@@ -45,7 +43,7 @@ public class RemoteServicesProviderCoordinatorTest {
     @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock Context androidApplicationContext;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS) // Methods calls return mocks (e.g. builders).
-            SharedPreferences sharedPreferences;
+        SharedPreferences sharedPreferences;
     @Mock GameService gameService;
     @Mock UserManagementService userManagementService;
 
@@ -64,7 +62,7 @@ public class RemoteServicesProviderCoordinatorTest {
             bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
         }});
         scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
-                DummyRemoteServicesProvider.class
+            DummyRemoteServicesProvider.class
         );
         toothPickRule.inject(this);
     }
@@ -89,7 +87,7 @@ public class RemoteServicesProviderCoordinatorTest {
         RemoteServicesProviderCoordinator underTest = scope.getInstance(RemoteServicesProviderCoordinator.class);
         underTest.bindRemoteServicesProvider(null);
         when(sharedPreferences.getString(anyString(), any()))
-                .thenReturn(this.getClass().getName());
+            .thenReturn(this.getClass().getName());
         underTest.rspClassFromApplicationPreferences().ifPresent(underTest::bindRemoteServicesProvider);
         assertFalse(underTest.dependencyIsConfigured());
     }
@@ -124,8 +122,8 @@ public class RemoteServicesProviderCoordinatorTest {
         underTest.bindRemoteServicesProvider(syntheticProvider.getClass());
 
         RemoteServicesProvider proxifiedInstance =
-                (RemoteServicesProvider) Proxy.newProxyInstance(RemoteServicesProvider.class.getClassLoader(),
-                        new Class[]{RemoteServicesProvider.class}, underTest);
+            (RemoteServicesProvider) Proxy.newProxyInstance(RemoteServicesProvider.class.getClassLoader(),
+                new Class[]{RemoteServicesProvider.class}, underTest);
 
         assertEquals(SyntheticRemoteServicesProvider.mlp, proxifiedInstance.getFriendlyProviderName());
     }
@@ -136,7 +134,7 @@ public class RemoteServicesProviderCoordinatorTest {
         underTest.bindRemoteServicesProvider(SyntheticRemoteServicesProvider.class);
         assertTrue(underTest.dependencyIsConfigured());
 
-        Fuse fuse = ((SyntheticRemoteServicesProvider) underTest.getCurrentProvider().get()).fuse;
+        TestUtils.Fuse fuse = ((SyntheticRemoteServicesProvider) underTest.getCurrentProvider().get()).fuse;
         underTest.bindRemoteServicesProvider(null);
         assertFalse(underTest.dependencyIsConfigured());
 
@@ -144,18 +142,10 @@ public class RemoteServicesProviderCoordinatorTest {
     }
 }
 
-class Fuse {
-    boolean ignited = false;
-
-    void ignite() {
-        ignited = true;
-    }
-}
-
 @SuppressWarnings("WeakerAccess")
 class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     final static String mlp = "My little pony";
-    public final Fuse fuse = new Fuse();
+    public final TestUtils.Fuse fuse = new TestUtils.Fuse();
 
     public SyntheticRemoteServicesProvider() {
     }
@@ -181,7 +171,7 @@ class SyntheticRemoteServicesProvider implements RemoteServicesProvider {
     }
 
     @Override
-    public UserProfileService getUserProfileService() {
+    public UserManagementService getUserProfileService() {
         return null;
     }
 }
