@@ -3,13 +3,18 @@ package ch.epfl.sweng.erpa.activities;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
-import android.support.test.runner.AndroidJUnit4;
 
+import com.annimon.stream.function.Consumer;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -19,11 +24,25 @@ import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 
-@RunWith(AndroidJUnit4.class)
-public class LoginActivityTest {
+@RunWith(MockitoJUnitRunner.class)
+public class LoginActivityTest extends DependencyConfigurationAgnosticTest {
     @Rule
     public final IntentsTestRule<LoginActivity> intentsTestRule = new IntentsTestRule<>(LoginActivity.class);
+
+    @Mock LoggedUserCoordinator luc;
+
+    @Before
+    public void prepare() throws Throwable {
+        super.prepare();
+        intentsTestRule.getActivity().loggedUserCoordinator = luc;
+        doAnswer(invocation -> {
+            invocation.<Runnable>getArgument(3).run();
+            return null;
+        }).when(luc).tryLogin(any(), any(), any(), any(), any());
+    }
 
     @Test
     public void testEmptyUsernameCreatesCorrectPopup() {
@@ -42,11 +61,16 @@ public class LoginActivityTest {
 
     @Test
     public void testIncorrectLoginCreatesCorrectPopup() {
+        String errorString = "Bad auth";
+        doAnswer(invocation -> {
+            invocation.<Consumer<Throwable>>getArgument(4).accept(new IllegalArgumentException(errorString));
+            return null;
+        }).when(luc).tryLogin(any(), any(), any(), any(), any());
         onView(ViewMatchers.withId(R.id.username)).perform(typeText("lol"));
         onView(ViewMatchers.withId(R.id.password)).perform(typeText("lol")).perform(closeSoftKeyboard());
         onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click());
         // Check if the popup is displayed
-        onView(ViewMatchers.withText(R.string.incorrectLogin)).check(matches(isDisplayed()));
+        onView(ViewMatchers.withSubstring(errorString)).check(matches(isDisplayed()));
     }
 
     @Test
