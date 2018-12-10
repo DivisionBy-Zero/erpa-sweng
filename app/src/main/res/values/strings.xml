@@ -59,7 +59,13 @@
     <string name="sort">Sort</string>
     <string name="sort_by_distance">Sort by distance:</string>
 
-    <!-- Menu string-->
+    <!-- Menu strings-->
     <string name="you_are_logged_as">You are logged as:</string>
+
+    <!-- User Profile strings-->
+    <string name="user_profile_player_and_gm">Player and Game master</string>
+    <string name="user_profile_player_only">Player</string>
+    <string name="user_profile_gm_only">Game master</string>
+    <string name="user_profile_neither_player_nor_gm">You\'re neither a Player nor a Game Master</string>
 
 </resources>
