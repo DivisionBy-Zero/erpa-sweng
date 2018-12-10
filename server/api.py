@@ -53,7 +53,7 @@ def get_default_user(ops):
         def_user_uuid = ops.register_username(def_username)
         ops.register_user_auth(UserAuth(
             user_uuid=def_user_uuid,
-            public_key="Hello, I'm a Base64 public key :D"
+            public_key=def_user_uuid
             ))
     try:
         return ops.get_user(def_user_uuid)
@@ -62,15 +62,13 @@ def get_default_user(ops):
         return ops.register_user(def_user)
 
 
-def get_user_from_authorization_header(auth_header: str) -> Optional[User]:
+@with_operations
+def get_user_from_authorization_header(auth_header: str,
+                                       ops) -> Optional[User]:
     """
     Retrieves the identified user from based on the authorization header.
     """
-    if not auth_header:
-        # TODO(@Roos): Remove when the auth system is complete
-        return get_default_user()
-    else:
-        raise ValueError("User authentication not implemented")
+    return ops.get_authenticated_user(auth_header)
 
 
 def with_operations_and_maybe_user(f):
@@ -82,12 +80,9 @@ def with_operations_and_maybe_user(f):
     @with_operations
     def register_user(ops):
         # TODO(@Roos): Remove when the auth system is complete
-        user_uuid_in_header = request.headers.get('UserUuid')
-        if user_uuid_in_header:
-            user = ops.get_user(user_uuid_in_header)
-        else:
-            user = get_user_from_authorization_header(
-                    request.headers.get('Authorization'))
+        auth_header = request.headers.get('Authorization')
+        user = (get_user_from_authorization_header(auth_header)
+                if auth_header else None)
 
         yield (ops, user)
     return with_context(register_user)(f)
@@ -229,6 +224,13 @@ def get_username_uuid(ops, username: str = None):
     return ops.get_user_uuid_from_username(username)
 
 
+@app.route('/users/username/<user_uuid>')
+@with_operations
+def get_uuid_for_username(ops, user_uuid: str = None):
+    """Returns the last username registered to the specified user_uuid."""
+    return send_object(ops.get_username_from_user_uuid(user_uuid))
+
+
 @app.route('/users/newuser/<username>', methods=['POST'])
 @with_operations
 def register_username(ops, username: str = None):
@@ -240,7 +242,11 @@ def register_username(ops, username: str = None):
 @with_operations
 def register_user_auth(ops):
     """Register a new user auth."""
-    ops.register_user_auth(retrieve_post_data(UserAuth))
+    user_auth = retrieve_post_data(UserAuth)
+    ops.register_user_auth(user_auth)
+    # TODO(@Roos): Remove when the auth system is complete
+    ops.register_session_token(user_auth.user_uuid,
+                               session_token_str=user_auth.user_uuid)
     return '', 200
 
 

@@ -28,7 +28,8 @@ class Operations:
     @with_session
     def get_authenticated_user(self, authtoken: str, session: Session) -> User:
         user = (session.query(User)
-                .join(UserSessionToken)
+                .join(UserSessionToken,
+                      User.uuid == UserSessionToken.user_uuid)
                 .filter(UserSessionToken.session_token == authtoken)
                 .scalar()
                 )
@@ -197,6 +198,18 @@ class Operations:
             raise KeyError("No user with such username could be found")
 
         return existing_username_uuid
+
+    @with_session
+    def get_username_from_user_uuid(self, user_uuid: str, session: Session
+                                    ) -> str:
+        existing_username = (session.query(Username)
+                             .filter(Username.user_uuid == user_uuid)
+                             .scalar()
+                             )
+        if not existing_username:
+            raise KeyError("No username with such uuid could be found")
+
+        return existing_username
 
     @with_session
     def register_user_auth(self, user_auth: UserAuth, session: Session
