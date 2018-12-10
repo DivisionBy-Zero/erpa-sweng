@@ -16,6 +16,7 @@ import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
 import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
+import ch.epfl.sweng.erpa.services.GCP.GCPRemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
@@ -35,6 +36,7 @@ public class ErpaApplication extends Application {
     // Remote Service Providers
     private final Set<Class<? extends RemoteServicesProvider>> remoteServicesProviders = Stream.of(
             DummyRemoteServicesProvider.class,
+            GCPRemoteServicesProvider.class
     ).collect(Collectors.toSet());
 
     List<Game> sampleListOfGames = new ArrayList<>();
