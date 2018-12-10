@@ -3,7 +3,6 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewAssertion;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -14,10 +13,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+
 import ch.epfl.sweng.erpa.ErpaApplication;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
+import ch.epfl.sweng.erpa.services.GCP.ServerException;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
 import toothpick.Scope;
@@ -31,19 +33,17 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
-import static org.hamcrest.core.StringContains.containsString;
 
 @RunWith(AndroidJUnit4.class)
 public class GameViewerActivityTest {
     @Rule public final ActivityTestRule<GameViewerActivity> activityTestRule = new ActivityTestRule<>(GameViewerActivity.class, false, false);
-    private Game game = getGame("hewwo");
-    private Game emptyOptGame = getGame("empty");
+    private final Game game = getGame("hewwo");
+    private final Game emptyOptGame = getGame("empty");
 
     @Before
-    public void prepare() {
+    public void prepare() throws IOException, ServerException {
         Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
         FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
         MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
@@ -55,15 +55,15 @@ public class GameViewerActivityTest {
         scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
                 DummyRemoteServicesProvider.class
         );
-        emptyOptGame.setNumberSessions(Optional.empty());
+        emptyOptGame.setNumberOfSessions(Optional.empty());
         emptyOptGame.setSessionLengthInMinutes(Optional.empty());
-        scope.getInstance(GameService.class).saveGame(game);
-        scope.getInstance(GameService.class).saveGame(emptyOptGame);
+        scope.getInstance(GameService.class).updateGame(game);
+        scope.getInstance(GameService.class).updateGame(emptyOptGame);
 
         Intent i = new Intent();
-        i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
+        i.putExtra(GameService.PROP_INTENT_GAME_UUID, game.getUuid());
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.HOSTED_GAMES);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.HOSTED_GAMES);
         i.putExtras(bundle);
         activityTestRule.launchActivity(i);
 
@@ -71,7 +71,7 @@ public class GameViewerActivityTest {
 
     @Test
     public void testHasIntent() {
-        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.PROP_INTENT_GAME));
+        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.PROP_INTENT_GAME_UUID));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class GameViewerActivityTest {
 
     @Test
     public void testGmName() {
-        onView(withId(R.id.gmTextView)).check(matches(withText(game.getGmUuid())));
+        onView(withId(R.id.gmTextView)).check(matches(withText(game.getGmUserUuid())));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class GameViewerActivityTest {
 
     @Test
     public void testTitle() {
-        onView(withId(R.id.titleTextView)).check(matches(withText(game.getName())));
+        onView(withId(R.id.titleTextView)).check(matches(withText(game.getTitle())));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class GameViewerActivityTest {
 
     @Test
     public void testType() {
-        onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getOneshotOrCampaign().toString())));
+        onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getOneshotOrCampaign())));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class GameViewerActivityTest {
 
     @Test
     public void testNumSessions() {
-        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberSessions().get().toString())));
+        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberOfSessions().get().toString())));
     }
 
     @Test
@@ -121,9 +121,9 @@ public class GameViewerActivityTest {
         activityTestRule.finishActivity();
         Intent i = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.PAST_GAMES);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.PAST_GAMES);
         i.putExtras(bundle);
-        i.putExtra(GameService.PROP_INTENT_GAME, emptyOptGame.getGameUuid());
+        i.putExtra(GameService.PROP_INTENT_GAME_UUID, emptyOptGame.getUuid());
         activityTestRule.launchActivity(i);
         onView(withId(R.id.sessionNumberTextView)).check(matches(withText("Unspecified")));
         onView(withId(R.id.sessionLengthTextView)).check(matches(withText("Unspecified")));
@@ -137,9 +137,9 @@ public class GameViewerActivityTest {
         activityTestRule.finishActivity();
         Intent i = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.FIND_GAME);
         i.putExtras(bundle);
-        i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
+        i.putExtra(GameService.PROP_INTENT_GAME_UUID, game.getUuid());
         activityTestRule.launchActivity(i);
         onView(withId(R.id.joinGameButton)).perform(click());
         activityTestRule.finishActivity();
