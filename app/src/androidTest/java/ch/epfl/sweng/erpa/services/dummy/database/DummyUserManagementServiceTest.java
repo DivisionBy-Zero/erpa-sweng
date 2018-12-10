@@ -19,7 +19,6 @@ import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.operations.DependencyConfigurationHelper;
 import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
-import ch.epfl.sweng.erpa.services.dummy.database.DummyUserService;
 import ch.epfl.sweng.erpa.util.TestUtils;
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -36,7 +35,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class DummyUserProfileServiceTest {
+public class DummyUserManagementServiceTest {
 
     DummyUserService ups;
 
@@ -62,10 +61,10 @@ public class DummyUserProfileServiceTest {
 
     @Test
     public void testAddedPersists() {
-        String uid = "-1";
-        UserProfile up = getUserProfile(uid);
+        String gameUuid = "-1";
+        UserProfile up = getUserProfile(gameUuid);
         ups.saveUserProfile(up);
-        Optional<UserProfile> optUp = ups.getUserProfile(uid);
+        Optional<UserProfile> optUp = ups.getUserProfile(gameUuid);
         assertTrue(optUp.isPresent());
         assertEquals(up, optUp.get());
     }
@@ -76,6 +75,6 @@ public class DummyUserProfileServiceTest {
         List<UserProfile> userProfiles = new ArrayList<>(numTests);
 
         populateUUIDObjects(userProfiles, ups, TestUtils::getUserProfile);
-        assertTrue("Contains all added elements", ups.getAllUserProfiles().containsAll(userProfiles));
+        userProfiles.forEach(up -> assertTrue(ups.getUserProfile(up.getUuid()).isPresent()));
     }
 }

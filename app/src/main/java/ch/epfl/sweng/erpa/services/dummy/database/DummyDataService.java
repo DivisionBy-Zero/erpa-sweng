@@ -27,35 +27,44 @@ import lombok.Getter;
 import static android.content.ContentValues.TAG;
 
 public abstract class DummyDataService<T extends UuidObject> implements DataService<T> {
-    final static String SAVED_DATA_FILE_EXTENSION = ".yaml";
+    static final String SAVED_DATA_FILE_EXTENSION = ".yaml";
     @Getter private final Function<File, T> fileFetcher;
-
     @Getter private final File dataDir;
 
-    DummyDataService(Context ctx, Class<T> tClass) {
+    DummyDataService(Context ctx, Class<T> cls) {
         this.dataDir = new File(ctx.getFilesDir(), dataFolder());
-        this.fileFetcher = file -> fetchExistingDataFromFile(file, tClass);
-        if (!dataDir.mkdir()) {
-            if (!dataDir.isDirectory()) {
-                throw new IllegalStateException(tClass.getName() +
-                        " data folder (\"" +
-                        dataDir.getAbsolutePath() +
-                        "\") exists and is not a folder!");
-            }
+        this.fileFetcher = file -> fetchExistingDataFromFile(file, cls);
+        if (!dataDir.mkdir() && !dataDir.isDirectory()) {
+            throw new IllegalStateException(
+                String.format("%s data folder (%s) exists and is not a folder!",
+                    cls.getSimpleName(), dataDir.getAbsolutePath()));
         }
+    }
+
+    private static <U> U fetchExistingDataFromFile(File dataFile, Class<U> uClass) {
+        FileReader fileReader = Exceptional.of(() -> new FileReader(dataFile))
+            .ifExceptionIs(FileNotFoundException.class,
+                (FileNotFoundException e) -> {
+                    throw new IllegalArgumentException("File given as argument does not exist!");
+                })
+            .ifExceptionIs(IOException.class,
+                (IOException e) -> {
+                    Log.e("FetchData", Arrays.toString(e.getStackTrace()));
+                    throw new RuntimeException(e);
+                })
+            .getOrThrowRuntimeException();
+        return new Yaml().loadAs(fileReader, uClass);
     }
 
     abstract String dataFolder();
 
-
     @Override
     public void removeAll() {
-        File[] files = dataDir.listFiles();
         boolean res = true;
-        for (File f : files) {
+        for (File f : dataDir.listFiles()) {
             res = f.delete() && res;
         }
-        if(!res) throw new RuntimeException("Unable to remove all save files!");
+        if (!res) throw new RuntimeException("Unable to remove all save files!");
     }
 
     @Override
@@ -65,9 +74,9 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
             throw new IllegalStateException("Folder " + gameFile.getAbsolutePath() + " exists!");
         } else {
             return Optional.of(gameFile)
-                    .filter(File::exists)
-                    .filter(File::isFile)
-                    .map(fileFetcher);
+                .filter(File::exists)
+                .filter(File::isFile)
+                .map(fileFetcher);
         }
     }
 
@@ -82,39 +91,24 @@ public abstract class DummyDataService<T extends UuidObject> implements DataServ
             } else if (gameFile.isDirectory()) {
                 throw new IllegalStateException("Trying to write to existing folder, as file! " + gameFile.getAbsolutePath());
             }
-            FileOutputStream fOut = new FileOutputStream(gameFile, false);
-            OutputStreamWriter writer = new OutputStreamWriter(fOut);
-
-            new Yaml().dump(t, writer);
-        } catch (FileNotFoundException ignored) { //we just created the file. it cannot possibly not exist (unless createNewFile threw an error)
+            try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(gameFile, false))) {
+                new Yaml().dump(t, writer);
+            }
+        } catch (FileNotFoundException ignored) {
+            // We just created the file. it cannot possibly not exist (unless createNewFile threw an error)
         } catch (IOException e) {
             Log.e(TAG, Arrays.toString(e.getStackTrace()));
             throw new RuntimeException("Could not save file");
         }
     }
 
-    private static <U> U fetchExistingDataFromFile(File dataFile, Class<U> uClass) {
-        FileReader fileReader = Exceptional.of(() -> new FileReader(dataFile))
-                .ifExceptionIs(FileNotFoundException.class,
-                        (FileNotFoundException e) -> {
-                            throw new IllegalArgumentException("File given as argument does not exist!");
-                        })
-                .ifExceptionIs(IOException.class,
-                        (IOException e) -> {
-                            Log.e("FetchData", Arrays.toString(e.getStackTrace()));
-                            throw new RuntimeException();
-                        })
-                .getOrThrowRuntimeException();
-        return new Yaml().loadAs(fileReader, uClass);
-    }
-
     @Override
     public Set<T> getAll() {
         File[] games = dataDir.listFiles();
         return Stream.of(games)
-                .filter(file -> file.getPath().endsWith(SAVED_DATA_FILE_EXTENSION))
-                .filter(File::isFile)
-                .map(fileFetcher)
-                .collect(Collectors.toSet());
+            .filter(file -> file.getPath().endsWith(SAVED_DATA_FILE_EXTENSION))
+            .filter(File::isFile)
+            .map(fileFetcher)
+            .collect(Collectors.toSet());
     }
 }

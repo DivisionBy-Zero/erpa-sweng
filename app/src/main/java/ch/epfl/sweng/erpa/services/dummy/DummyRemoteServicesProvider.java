@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;

@@ -1,6 +1,5 @@
 package ch.epfl.sweng.erpa.services.dummy.database;
 
-import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -40,7 +39,7 @@ import static junit.framework.TestCase.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class DummyGameServiceTest {
-    private GameService gs;
+    private DummyGameService gs;
 
     @Before
     public void prepare() {
@@ -68,14 +67,15 @@ public class DummyGameServiceTest {
 
     @Test
     public void testConstant() {
-        assertEquals(DummyGameService.SAVED_GAME_DATA_FOLDER,((DummyGameService)gs).dataFolder());
+        assertEquals(DummyGameService.SAVED_GAME_DATA_FOLDER, gs.dataFolder());
     }
 
     @Test
     public void testAdded() {
         Game g = getGame("testAdded");
-        gs.saveGame(g);
-        Optional<Game> res = gs.getGame(g.getGameUuid());
+        Optional<Game> res;
+        gs.updateGame(g);
+        res = gs.getGame(g.getUuid());
         assertTrue(res.isPresent());
         assertEquals(g,res.get());
     }
@@ -83,6 +83,6 @@ public class DummyGameServiceTest {
     public void testAllAdded() {
         List<Game> games = new ArrayList<>(numTests);
         populateUUIDObjects(games,gs,TestUtils::getGame);
-        assertTrue(gs.getAllGames().containsAll(games));
+        assertTrue(gs.getAllGames(new GameService.StreamRefiner()).containsAll(games));
     }
 }
