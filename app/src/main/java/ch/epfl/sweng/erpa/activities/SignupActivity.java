@@ -1,70 +1,90 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import butterknife.OnClick;
-
-import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.UserSignupService;
-
+import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 
 import javax.inject.Inject;
 
-import toothpick.Scope;
-import toothpick.Toothpick;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.operations.AsyncTaskService;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class SignupActivity extends DependencyConfigurationAgnosticActivity {
+    @BindView(R.id.signup_activity_loading_panel) View progressLoader;
+    @BindView(R.id.user_input_panel) View inputPanel;
+    @BindView(R.id.isGM) CheckBox isGmV;
+    @BindView(R.id.isPlayer) CheckBox isPlayerV;
+    @BindView(R.id.levelSelect) Spinner levelTextV;
+    @BindView(R.id.nameText) EditText usernameTextV;
+    @BindView(R.id.passText) EditText passwordTextV;
+    @BindView(R.id.passTextConfirm) EditText confirmTextV;
 
-    @Inject Scope scope;
-    @Inject UserSignupService uss;
+    @Inject LoggedUserCoordinator loggedUserCoordinator;
+
+    AsyncTaskService asyncTaskService;
+    AsyncTask<Void, Void, Exceptional<String>> signUpTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_signup);
-        Toothpick.inject(this, scope);
+        ButterKnife.bind(this);
+
+        asyncTaskService = new AsyncTaskService();
+        asyncTaskService.setResultConsumerContext(this::runOnUiThread);
     }
 
     @OnClick(R.id.signupButton)
     public void signUp(View view) {
-        String usernameText = ((EditText) findViewById(R.id.nameText)).getText().toString();
-        String passwordText = ((EditText) findViewById(R.id.passText)).getText().toString();
-        String confirmText = ((EditText) findViewById(R.id.passTextConfirm)).getText().toString();
-        String levelText = ((Spinner) findViewById(R.id.levelSelect)).getSelectedItem().toString();
-        boolean isGm = ((CheckBox) findViewById(R.id.isGM)).isChecked();
-        boolean isPlayer = ((CheckBox) findViewById(R.id.isPlayer)).isChecked();
+        String username = usernameTextV.getText().toString();
+        String password = passwordTextV.getText().toString();
+        boolean isGm = isGmV.isChecked();
+        boolean isPlayer = isPlayerV.isChecked();
 
-        if (usernameText.isEmpty()) {
-            createPopup(getString(R.string.noNameMessage), this);
+        if (getErrorMessage(username, password, isGm, isPlayer)
+            .executeIfPresent(m -> createPopup(m, this)).isPresent())
             return;
-        }
 
-        if (passwordText.isEmpty()) {
-            createPopup(getString(R.string.noPassMessage), this);
-            return;
-        }
+        inputPanel.setVisibility(View.GONE);
+        progressLoader.setVisibility(View.VISIBLE);
 
-        if (!passwordText.equals(confirmText)) {
-            createPopup(getString(R.string.passwords_not_match), this);
-            return;
-        }
+        UserProfile newUser = new UserProfile("", null, null, null, isGm, isPlayer);
+        signUpTask = loggedUserCoordinator.trySignUp(asyncTaskService, username, password, newUser, this::finish,
+            exception -> {
+                inputPanel.setVisibility(View.VISIBLE);
+                progressLoader.setVisibility(View.GONE);
+                createPopup("Could not create account: " + exception.getMessage(), this);
+                Log.e("tryLogin", "Could not create account", exception);
+            });
+    }
 
-        if (!isGm && !isPlayer) {
-            createPopup(getString(R.string.not_select_GM_or_player), this);
-            return;
-        }
+    @Override protected void onStop() {
+        super.onStop();
+        if (signUpTask != null)
+            signUpTask.cancel(true);
+    }
 
-        Optional<UserProfile> newUser = uss.storeNewUser(usernameText, passwordText, levelText, isGm, isPlayer);
-        newUser.ifPresent(u -> finish());
-
-        createPopup(getString(R.string.username_in_use), this);
+    Optional<String> getErrorMessage(String username, String password, boolean isGm, boolean isPlayer) {
+        if (username.isEmpty()) return Optional.of(getString(R.string.noNameMessage));
+        if (password.isEmpty()) return Optional.of(getString(R.string.noPassMessage));
+        if (!password.equals(confirmTextV.getText().toString()))
+            return Optional.of(getString(R.string.passwords_not_match));
+        if (!isGm && !isPlayer) return Optional.of(getString(R.string.not_select_GM_or_player));
+        return Optional.empty();
     }
 }
