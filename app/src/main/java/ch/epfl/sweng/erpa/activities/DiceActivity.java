@@ -1,5 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -9,43 +10,47 @@ import android.widget.TextView;
 
 import com.annimon.stream.IntStream;
 
-import butterknife.OnClick;
-
 import java.util.Random;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.UserProfileService;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.installDefaultNavigationMenuHandler;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
+    private static final int[] dice = {4, 6, 8, 10, 12, 20, 100};
+    private static final int MAX_DICE_NUMBER = 15;
 
-    @Inject UserProfile up;
+    @BindView(R.id.dice_navigation_view) NavigationView navigationView;
+    @BindView(R.id.dice_drawer_layout) DrawerLayout drawerLayout;
 
-    Random rng = new Random();    //used as a RNG
-    private final int[] dice = {4, 6, 8, 10, 12, 20, 100};
-    private final int MAX_DICE_NUMBER = 15;
+    @Inject OptionalDependencyManager optionalDependency;
+
+    private Random rng = new Random();
     private TextView[] allResultViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_dice);
+        ButterKnife.bind(this);
 
         allResultViews = getAllResultViews();
+        installDefaultNavigationMenuHandler(navigationView, drawerLayout, this);
+    }
 
-        //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.dice_drawer_layout);
-
-        NavigationView navigationView = findViewById(R.id.dice_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-        setUsernameInMenu(navigationView, up);
+    @Override protected void onResume() {
+        super.onResume();
+        setUsernameInMenu(navigationView, optionalDependency.get(Username.class));
     }
 
     @OnClick(R.id.rollButton)
@@ -61,9 +66,10 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     /**
      * Rolls and shows all dice
+     *
      * @param rolls An array containing all the dice to roll
      */
-    private void rollAndShowAllDice(int[] rolls) {
+    @SuppressLint("SetTextI18n") private void rollAndShowAllDice(int[] rolls) {
         int n = 0;
         for (int i = 0; i < 7; ++i) {
             String dieType = "D" + dice[i];
@@ -76,6 +82,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     /**
      * Rolls one die
+     *
      * @param dieType The type of die to roll
      * @return The result of the roll
      */
@@ -111,6 +118,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     /**
      * Gets all the TextViews where we write the results of the rolls
+     *
      * @return An array containing all the TextViews
      */
     private TextView[] getAllResultViews() {
@@ -125,6 +133,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     /**
      * Gets all the dice to be rolled
+     *
      * @return An array containing all the number of rolls of each die
      */
     private int[] getNumberOfRolls() {
@@ -132,7 +141,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         for (int i = 0; i < dice.length; ++i) {
             String textId = "d" + dice[i] + "_number";
             int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
-            String text = ((EditText)findViewById(id)).getText().toString();
+            String text = ((EditText) findViewById(id)).getText().toString();
             if (text.isEmpty())
                 rolls[i] = 0;
             else
