@@ -1,58 +1,85 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.Application;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.UserAuth;
-import ch.epfl.sweng.erpa.services.UserAuthService;
-import toothpick.Scope;
-import toothpick.Toothpick;
+import ch.epfl.sweng.erpa.operations.AsyncTaskService;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class LoginActivity extends DependencyConfigurationAgnosticActivity {
-    @Inject UserAuthService uas;
-    @Inject Scope scope;
+    @BindView(R.id.login_activity_loading_panel) View progressLoader;
+    @BindView(R.id.login_activity_input_panel) View inputPanel;
+    @BindView(R.id.username) EditText usernameET;
+    @BindView(R.id.password) EditText passwordET;
+
+    @Inject LoggedUserCoordinator loggedUserCoordinator;
+
+    AsyncTaskService asyncTaskService;
+    AsyncTask<Void, Void, Exceptional<String>> loginTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Application application = getApplication();
-        Toothpick.inject(this, scope);
+        if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+        asyncTaskService = new AsyncTaskService();
+        asyncTaskService.setResultConsumerContext(this::runOnUiThread);
     }
 
+    @OnClick(R.id.login_button)
     public void login(View view) {
-        String usernameText = ((EditText) findViewById(R.id.username)).getText().toString();
-        String passwordText = ((EditText) findViewById(R.id.password)).getText().toString();
+        String username = usernameET.getText().toString();
+        String password = passwordET.getText().toString();
 
-        if (usernameText.isEmpty()) {
-            createPopup(getString(R.string.noNameMessage), this);
+        if (getErrorMessage(username, password)
+            .executeIfPresent(m -> createPopup(m, this)).isPresent())
             return;
-        }
 
-        if (passwordText.isEmpty()) {
-            createPopup(getString(R.string.noPassMessage), this);
-            return;
-        }
+        inputPanel.setVisibility(View.GONE);
+        progressLoader.setVisibility(View.VISIBLE);
 
-        Optional<UserAuth> ua = uas.getUserAuth(usernameText, passwordText);
-
-        ua.ifPresent(u -> finish());
-
-        createPopup(getString(R.string.incorrectLogin), this);
+        loginTask = loggedUserCoordinator.tryLogin(asyncTaskService, username, password, this::finish,
+            exception -> {
+                inputPanel.setVisibility(View.VISIBLE);
+                progressLoader.setVisibility(View.GONE);
+                createPopup("Could not login: " + exception.getMessage(), this);
+                Log.e("tryLogin", "Could not login", exception);
+            });
     }
 
+    @Override protected void onStop() {
+        super.onStop();
+        if (loginTask != null)
+            loginTask.cancel(true);
+    }
+
+    @OnClick(R.id.no_login_button)
     public void continueWithoutLogin(View view) {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         startActivity(intent);
+        finish();
+    }
+
+    Optional<String> getErrorMessage(String username, String password) {
+        if (username.isEmpty()) return Optional.of(getString(R.string.noNameMessage));
+        if (password.isEmpty()) return Optional.of(getString(R.string.noPassMessage));
+        return Optional.empty();
     }
 }
