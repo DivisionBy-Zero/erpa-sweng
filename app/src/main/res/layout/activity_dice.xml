@@ -6,19 +6,26 @@
     android:layout_height="match_parent"
     android:id="@+id/dice_drawer_layout">
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/dice_navigation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/menu_header"
-        app:menu="@menu/menu_navigation" />
-
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activities.DiceActivity">
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ERPAStyle.AppBarOverlay">
+
+            <include
+                android:id="@+id/dice_toolbar"
+                layout="@layout/toolbar_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:title="@{@string/title_activity_dice}" />
+
+        </android.support.design.widget.AppBarLayout>
 
         <Button
             android:id="@+id/rollButton"
@@ -26,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
             android:onClick="rollDices"
-            android:text="Stop!"
+            android:text="Roll!"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,8 +43,8 @@
         <ch.epfl.sweng.erpa.views.FlowLayout
             android:id="@+id/dice_layout"
             android:layout_width="368dp"
-            android:layout_height="371dp"
-            android:onClick="remove_die"
+            android:layout_height="344dp"
+            android:onClick="removeDie"
             app:layout_constraintBottom_toTopOf="@+id/rollButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -54,7 +61,7 @@
             app:layout_constraintEnd_toStartOf="@+id/d6_button"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
 
         <Button
             android:id="@+id/d6_button"
@@ -66,7 +73,7 @@
             app:layout_constraintEnd_toStartOf="@+id/d8_button"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/d4_button"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
 
         <Button
             android:id="@+id/d8_button"
@@ -78,7 +85,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/d6_button"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
 
         <Button
             android:id="@+id/d10_button"
@@ -105,4 +112,13 @@
             app:layout_constraintTop_toBottomOf="@+id/d6_button" />
 
     </android.support.constraint.ConstraintLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/dice_navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/menu_header"
+        app:menu="@menu/menu_navigation" />
 </android.support.v4.widget.DrawerLayout>
