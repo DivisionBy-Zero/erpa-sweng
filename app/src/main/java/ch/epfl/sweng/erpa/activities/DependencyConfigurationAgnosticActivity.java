@@ -1,6 +1,5 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,7 +37,7 @@ public abstract class DependencyConfigurationAgnosticActivity extends AppCompatA
                     .collect(Collectors.toList());
 
             // Push ourselves on the top of the call stack
-            this.startActivity(new Intent(this, this.getClass()));
+            this.startActivity(getIntent());
             // Push the configuration activities on top
             //noinspection SimplifyStreamApiCallChains: This warning is wrong
             this.startActivities(Stream.of(configurationActivities).toArray(Intent[]::new));
