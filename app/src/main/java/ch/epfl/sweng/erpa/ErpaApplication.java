@@ -14,6 +14,7 @@ import java.util.Set;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
@@ -63,7 +64,11 @@ public class ErpaApplication extends Application {
 
         // Service coordinators
         appScope.installModules(new TrivialProxifiedModules(appScope,
-                RemoteServicesProviderCoordinator.class
+            RemoteServicesProviderCoordinator.class
+        ));
+        // Service coordinators
+        appScope.installModules(new TrivialProxifiedModules(appScope,
+            LoggedUserCoordinator.class
         ));
     }
 }
