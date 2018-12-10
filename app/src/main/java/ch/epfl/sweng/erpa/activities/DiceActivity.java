@@ -1,10 +1,10 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -15,10 +15,10 @@ import butterknife.OnClick;
 
 import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 import ch.epfl.sweng.erpa.views.FlowLayout;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
 import java.util.ArrayList;
@@ -32,9 +32,8 @@ import processing.android.CompatUtils;
 import processing.android.PFragment;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.installDefaultNavigationMenuHandler;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
@@ -74,24 +73,25 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
 
     @Override protected void onResume() {
         super.onResume();
-        setUsernameInMenu(navigationView, optionalDependency.get(Username.class));
-        DataBindingUtil.setContentView(this, R.layout.activity_dice);
+        if (dependenciesNotReady()) return;
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //Handle navigationMenu interactions
-        DrawerLayout mDrawerLayout = findViewById(R.id.dice_drawer_layout);
-
-        NavigationView navigationView = findViewById(R.id.dice_navigation_view);
-        navigationView.setNavigationItemSelectedListener(
-                menuItem -> onNavigationItemMenuSelected(menuItem, mDrawerLayout, this));
-
-        //Handle navigationMenu interactions
-        addNavigationMenu(this, findViewById(R.id.dice_drawer_layout), findViewById(R.id.dice_navigation_view), up);
+        addNavigationMenu(this, findViewById(R.id.dice_drawer_layout), findViewById(R.id.dice_navigation_view), optionalDependency);
         setMenuInToolbar(this, findViewById(R.id.dice_toolbar));
-        getSupportActionBar().setTitle(R.string.title_dice_activity);
+        Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle(R.string.title_dice_activity));
 
         flowLayout = findViewById(R.id.dice_layout);
+        for (DieSketch die : allDice)
+            die.draw();
+    }
+
+    //Handle toolbar items clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.dice_drawer_layout));
+        return found || super.onOptionsItemSelected(item);
     }
 
     /**
@@ -138,12 +138,19 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     private void addAndShowDie(int dieType) {
         DieSketch dieSketch = new DieSketch(compressedDiceResourcesPath.get(dieType), ROTATION_SPEED);
         allDice.add(dieSketch);
+        showDie(dieSketch);
+    }
 
+    /**
+     * Shows a dieSketch
+     * @param die the dieSketch to show
+     */
+    private void showDie(DieSketch die) {
         FrameLayout frame = new FrameLayout(this);
         frame.setId(CompatUtils.getUniqueViewId());
         flowLayout.addView(frame);
 
-        PFragment fragment = new PFragment(dieSketch);
+        PFragment fragment = new PFragment(die);
         fragment.setView(frame, this);
     }
 }
