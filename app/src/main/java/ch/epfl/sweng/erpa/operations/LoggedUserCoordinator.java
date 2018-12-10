@@ -8,7 +8,6 @@ import com.annimon.stream.Exceptional;
 import com.annimon.stream.Objects;
 import com.annimon.stream.Optional;
 import com.annimon.stream.function.Consumer;
-import com.annimon.stream.function.Function;
 
 import java.lang.reflect.Method;
 
@@ -16,14 +15,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.activities.LoginActivity;
-import ch.epfl.sweng.erpa.adapters.AsyncTaskService;
 import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.model.UserSessionToken;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.services.UserManagementService;
 
-import static ch.epfl.sweng.erpa.adapters.AsyncTaskService.failIfNotFound;
+import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
 
 @Singleton
 public class LoggedUserCoordinator implements DependencyCoordinator<LoggedUser> {
