@@ -51,11 +51,11 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_my_account);
-        onResume();
     }
 
     @Override protected void onResume() {
         super.onResume();
+        if (dependenciesNotReady()) return;
 
         myListView = findViewById(R.id.myAccountLayout);
         initializeArrays();
@@ -73,10 +73,6 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
         collect.add(new Pair<>(new MyAccountButton(resources.getString(R.string.profileText),
                 UserProfileActivity.class, profileBundle, true, true),
                 context.getDrawable(R.drawable.ic_action_name)));
-
-        // TODO (@Anne) remove when proper authentication is implemented
-        // TODO (@Sapphie) Remove or handle gracefully
-        //Exceptional.of(() -> userManagementService.register(userProfile)).get();
 
         myAdapter = new MyAccountButtonAdapter(this, collect);
         myListView.setAdapter(myAdapter);
