@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.model.UserSessionToken;
 import ch.epfl.sweng.erpa.model.Username;
@@ -81,8 +80,9 @@ public class MyAccountActivityTest extends DependencyConfigurationAgnosticTest {
     }
 
     public void checkCorrectName(int position, int ressourceID) {
-        assertThat(((MyAccountActivity.MyAccountButtonData)
-            listView.getItemAtPosition(position)).getTextId(), is(ressourceID));
+        MyAccountActivity.MyAccountButtonData itemData =
+            (MyAccountActivity.MyAccountButtonData) listView.getItemAtPosition(position);
+        assertThat(itemData.getTextId(), is(ressourceID));
     }
 
     @Test

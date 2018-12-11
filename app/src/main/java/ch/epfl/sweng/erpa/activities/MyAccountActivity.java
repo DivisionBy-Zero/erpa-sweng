@@ -2,28 +2,42 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.MyAccountButton;
-import ch.epfl.sweng.erpa.model.MyAccountButtonAdapter;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 import ch.epfl.sweng.erpa.services.UserManagementService;
 import ch.epfl.sweng.erpa.util.Pair;
+import ch.epfl.sweng.erpa.util.Triplet;
+import lombok.Data;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
@@ -31,125 +45,131 @@ import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
+    private static Map<GameListActivity.GameListType, Integer> strIdForGameListType =
+        Collections.unmodifiableMap(new HashMap<GameListActivity.GameListType, Integer>() {{
+            put(GameListActivity.GameListType.PENDING_REQUEST, R.string.pendingRequestText);
+            put(GameListActivity.GameListType.CONFIRMED_GAMES, R.string.confirmedGamesText);
+            put(GameListActivity.GameListType.PAST_GAMES, R.string.pastGamesText);
+            put(GameListActivity.GameListType.HOSTED_GAMES, R.string.hostedGamesText);
+            put(GameListActivity.GameListType.PAST_HOSTED_GAMES, R.string.pastHostedGamesText);
+        }});
+
+    @BindView(R.id.myAccountLayout) ListView myListView;
+    @BindView(R.id.myAccountToolbar) Toolbar toolbar;
+    @BindView(R.id.my_account_drawer_layout) DrawerLayout myDrawerLayout;
+    @BindView(R.id.my_account_navigation_view) NavigationView myNavigationView;
+
     @Inject OptionalDependencyManager optionalDependency;
-    @Inject Username username;
     @Inject UserProfile userProfile;
-    @Inject UserManagementService ups;
+    @Inject Username username;
 
-    // TODO: (Anne) add Butterknife for better readability
-    private ListView myListView;
-    private ArrayAdapter myAdapter;
+    private static List<MyAccountButtonData> getAvailableButtonsData(boolean userIsPlayer, boolean userIsGm) {
+        Stream<GameListActivity.GameListType> targetListType = Stream.of(
+            new Triplet<>(GameListActivity.GameListType.PENDING_REQUEST, true, false),
+            new Triplet<>(GameListActivity.GameListType.CONFIRMED_GAMES, true, false),
+            new Triplet<>(GameListActivity.GameListType.PAST_GAMES, true, false),
+            new Triplet<>(GameListActivity.GameListType.HOSTED_GAMES, false, true),
+            new Triplet<>(GameListActivity.GameListType.PAST_HOSTED_GAMES, false, true))
+            .filter(t -> t.getSecond() == userIsPlayer || t.getThird() == userIsGm)
+            .map(Triplet::getFirst);
 
-    private Context context;
-    private Resources resources;
+        Stream<Integer> images = Stream.of(
+            R.drawable.ic_dice1,
+            R.drawable.ic_dice2,
+            R.drawable.ic_dice3,
+            R.drawable.ic_dice4,
+            R.drawable.ic_dice5,
+            R.drawable.ic_dice6
+        );
 
-    private List<MyAccountButton> myAccountButtonList;
-    private List<Drawable> myDrawablesList;
+        return Stream.zip(targetListType, images, Pair::new).map(p -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(GAME_LIST_ACTIVITY_CLASS_KEY, p.getFirst());
+            return new MyAccountButtonData(strIdForGameListType.get(p.getFirst()),
+                GameListActivity.class, bundle, p.getSecond());
+        }).collect(Collectors.toList());
+    }
+
+    private static MyAccountButtonData getMyProfileButtonData(String userUuid) {
+        Bundle bundle = new Bundle();
+        bundle.putString(UserManagementService.PROP_INTENT_USER, userUuid);
+        return new MyAccountButtonData(R.string.profileText, UserProfileActivity.class, bundle, R.drawable.ic_action_name);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_my_account);
+        ButterKnife.bind(this);
     }
 
-    @Override protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
         if (dependenciesNotReady()) return;
 
-        myListView = findViewById(R.id.myAccountLayout);
-        initializeArrays();
-
-        Stream<MyAccountButton> buttonStream = Stream.of(myAccountButtonList).filter(
-                b -> (b.getActiveForPlayer() == userProfile.getIsPlayer() ||
-                        b.getActiveForGM() == userProfile.getIsGm()));
-        Stream<Drawable> drawableStream = Stream.of(myDrawablesList);
-
-        List<Pair<MyAccountButton, Drawable>> collect = Stream.zip(buttonStream, drawableStream,
-                Pair::new).collect(Collectors.toList());
-
-        Bundle profileBundle = new Bundle();
-        profileBundle.putString(UserManagementService.PROP_INTENT_USER, username.getUserUuid());
-        collect.add(new Pair<>(new MyAccountButton(resources.getString(R.string.profileText),
-                UserProfileActivity.class, profileBundle, true, true),
-                context.getDrawable(R.drawable.ic_action_name)));
-
-        myAdapter = new MyAccountButtonAdapter(this, collect);
+        List<MyAccountButtonData> collect = getAvailableButtonsData(userProfile.getIsPlayer(), userProfile.getIsGm());
+        collect.add(getMyProfileButtonData(userProfile.getUuid()));
+        ArrayAdapter myAdapter = new MyAccountButtonAdapter(this, collect);
         myListView.setAdapter(myAdapter);
-        myListView.setOnItemClickListener((l, v, position, id) -> {
-            Intent intent = new Intent(this, collect.get(position).getFirst().getActivityClass());
+        myListView.setOnItemClickListener((pv, view, pos, idx) -> {
+            MyAccountButtonData source = ((MyAccountButtonHolder) view.getTag()).getSource();
+            Intent intent = new Intent(this, source.activityClass);
             intent.putExtra(UserManagementService.PROP_INTENT_USER, username.getUserUuid());
-            Bundle bundle = collect.get(position).getFirst().getBundle();
-            intent.putExtras(bundle);
+            intent.putExtras(source.getBundle());
             startActivity(intent);
         });
 
-        addNavigationMenu(this, findViewById(R.id.my_account_drawer_layout), findViewById(R.id.my_account_navigation_view), optionalDependency);
-        setMenuInToolbar(this, findViewById(R.id.myAccountToolbar));
-        getSupportActionBar().setTitle(R.string.titleMyAccountActivity);
-
+        addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
+        setMenuInToolbar(this, toolbar);
+        Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle(R.string.titleMyAccountActivity));
     }
 
-    //Handle toolbar items clicks
+    // Handle the toolbar items clicks
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.my_account_drawer_layout));
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), myDrawerLayout);
         return found || super.onOptionsItemSelected(item);
     }
 
-    private void initializeArrays() {
-        context = this.getApplicationContext();
-        resources = context.getResources();
-        Class activity = GameListActivity.class;
-        Bundle empty = new Bundle();
-        myAccountButtonList = Stream.of(
-                new MyAccountButton(resources.getString(R.string.pendingRequestText), activity,
-                        empty, true, false),
-                new MyAccountButton(resources.getString(R.string.confirmedGamesText), activity,
-                        empty, true, false),
-                new MyAccountButton(resources.getString(R.string.pastGamesText), activity, empty,
-                        true, false),
-                new MyAccountButton(resources.getString(R.string.hostedGamesText), activity, empty,
-                        false, true),
-                new MyAccountButton(resources.getString(R.string.pastHostedGamesText), activity,
-                        empty, false, true))
-                .map(b -> {
-                    Bundle bundle = new Bundle();
-                    GameListActivity.GameListType targetList;
-                    targetList = findTargetGameListType(b);
-                    bundle.putSerializable(GAME_LIST_ACTIVITY_CLASS_KEY, targetList);
-                    return new MyAccountButton(b.getText(), b.getActivityClass(),
-                            bundle,
-                            b.getActiveForPlayer(), b.getActiveForGM());
-                })
-                .collect(Collectors.toList());
+    static class MyAccountButtonAdapter extends ArrayAdapter<MyAccountButtonData> {
+        MyAccountButtonAdapter(Context context, List<MyAccountButtonData> buttonInformation) {
+            super(context, -1, buttonInformation);
+        }
 
-        myDrawablesList = Stream.of(
-                R.drawable.ic_dice1,
-                R.drawable.ic_dice2,
-                R.drawable.ic_dice3,
-                R.drawable.ic_dice4,
-                R.drawable.ic_dice5,
-                R.drawable.ic_dice6)
-                .map(context::getDrawable)
-                .collect(Collectors.toList());
+        @NonNull @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.my_account_button, parent, false);
+                convertView.setTag(new MyAccountButtonHolder(convertView, position, getItem(position)));
+            }
+            ((MyAccountButtonHolder) convertView.getTag()).populate();
+            return convertView;
+        }
     }
 
-    @android.support.annotation.NonNull
-    private GameListActivity.GameListType findTargetGameListType(MyAccountButton b) {
-        GameListActivity.GameListType targetList;
-        if (b.getText().equals(resources.getString(R.string.pendingRequestText))) {
-            targetList = GameListActivity.GameListType.PENDING_REQUEST;
-        } else if (b.getText().equals(resources.getString(R.string.confirmedGamesText))) {
-            targetList = GameListActivity.GameListType.CONFIRMED_GAMES;
-        } else if (b.getText().equals(resources.getString(R.string.pastGamesText))) {
-            targetList = GameListActivity.GameListType.PAST_GAMES;
-        } else if (b.getText().equals(resources.getString(R.string.hostedGamesText))) {
-            targetList = GameListActivity.GameListType.HOSTED_GAMES;
-        } else {
-            targetList = GameListActivity.GameListType.PAST_HOSTED_GAMES;
+    @Data
+    static class MyAccountButtonData {
+        @NonNull private Integer textId;
+        @NonNull private Class activityClass;
+        @NonNull private Bundle bundle;
+        @NonNull private Integer drawableResourceId;
+    }
+
+    @Data
+    static class MyAccountButtonHolder {
+        @BindView(R.id.buttonName) TextView text;
+        @BindView(R.id.buttonImage) ImageView image;
+        @NonNull View view;
+        @NonNull Integer position;
+        @NonNull MyAccountButtonData source;
+
+        void populate() {
+            ButterKnife.bind(this, view);
+            text.setText(source.getTextId());
+            image.setImageDrawable(view.getContext().getDrawable(source.getDrawableResourceId()));
         }
-        return targetList;
     }
 }
-
