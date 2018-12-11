@@ -220,7 +220,6 @@ public class CreateGameActivityTest extends DependencyConfigurationAgnosticTest 
         testClickItemMenu(R.id.menu_dice, DiceActivity.class.getName());
     }
 
-    @Test
     private void testClickItemMenu(int menuItemId, String className) {
         // Open Drawer to click on navigation.
         onView(withId(R.id.create_game_drawer_layout))
@@ -242,23 +241,11 @@ public class CreateGameActivityTest extends DependencyConfigurationAgnosticTest 
 
     @Test
     public void testPopupOnServerException() {
-        ServerException e = new ServerException(404, "owo");
+        String message = "owo";
+        ServerException e = new ServerException(500, message);
         intentsTestRule.getActivity().runOnUiThread(() -> intentsTestRule.getActivity().handleException(e));
-        onView(ViewMatchers.withText(StringContains.containsString("404"))).check(matches(isDisplayed()));
-        onView(ViewMatchers.withText(StringContains.containsString("Server"))).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testPopupOnUnkownServErr() {
-        ServerException e = new ServerException();
-        intentsTestRule.getActivity().runOnUiThread(() -> intentsTestRule.getActivity().handleException(e));
-        onView(withText(containsString("Unknown server")));
-    }
-
-    @Test
-    public void testUnknownError() {
-        ServerException e = new ServerException();
-        intentsTestRule.getActivity().runOnUiThread(() -> intentsTestRule.getActivity().handleException(e));
-        onView(withText(containsString("Unknown")));
+        onView(ViewMatchers.withText(StringContains.containsString("500"))).check(matches(isDisplayed()));
+        onView(ViewMatchers.withText(StringContains.containsString(message))).check(matches(isDisplayed()));
+        onView(ViewMatchers.withText(StringContains.containsString("Could not create game"))).check(matches(isDisplayed()));
     }
 }

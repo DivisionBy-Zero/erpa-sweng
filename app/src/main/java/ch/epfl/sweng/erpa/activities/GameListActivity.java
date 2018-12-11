@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
 import com.annimon.stream.function.BiConsumer;
 
 import java.util.Collections;
@@ -92,7 +93,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     protected void onResume() {
         super.onResume();
         if (dependenciesNotReady()) return;
-        loader.setVisibility(View.VISIBLE);
+        asyncFetchThreads = new HashMap<>();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
@@ -102,6 +103,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
         addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
         setMenuInToolbar(this, myToolbar);
+
         setToolbarText((GameListType) bundle.getSerializable(GAME_LIST_ACTIVITY_CLASS_KEY));
 
         ObservableAsyncList<Game> games = gameService.getAllGames(new GameService.StreamRefiner());
@@ -116,6 +118,11 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
             putExtraOnGameViewer(intent);
             startActivity(intent);
         }));
+    }
+
+    @Override protected void onStop() {
+        super.onStop();
+        Stream.of(asyncFetchThreads.values()).forEach(v -> v.cancel(true));
     }
 
     @Override
