@@ -108,6 +108,11 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         games.addObserver(this::updateGames);
         games.refreshDataAndReset();
 
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            stopFetchThreads();
+            games.refreshDataAndReset();
+        });
+
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(new GameListViewAdapter(gameService, games, (view, game) -> {
@@ -118,8 +123,13 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         }));
     }
 
-    @Override protected void onStop() {
+    @Override
+    protected void onStop() {
         super.onStop();
+        stopFetchThreads();
+    }
+
+    private void stopFetchThreads() {
         Stream.of(asyncFetchThreads.values()).forEach(v -> v.cancel(true));
     }
 
@@ -167,10 +177,10 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     public void updateGames(ObservableAsyncList updatedGames) {
-        Log.d("GameListType", "Player List update; Size: " + updatedGames.size());
-        if (updatedGames.isLoading()) {
-            loader.setVisibility(View.VISIBLE);
-        } else {
+        swipeRefreshLayout.setRefreshing(false);
+        loader.setVisibility(View.VISIBLE);
+        Log.d("GameList", "Game list update" + updatedGames.size());
+        if (!updatedGames.isLoading()) {
             loader.setVisibility(View.GONE);
         }
         Optional.ofNullable(mRecyclerView.getAdapter()).ifPresent(RecyclerView.Adapter::notifyDataSetChanged);
