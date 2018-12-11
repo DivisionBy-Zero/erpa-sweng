@@ -27,6 +27,10 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         addNavigationMenu(this, findViewById(R.id.main_drawer_layout), findViewById(R.id.main_navigation_view), optionalDependency);
     }
 
+    @Override protected void onResume() {
+        super.onResume();
+    }
+
     @OnClick(R.id.launch_storage_provider_greet)
     public void launchStorageProviderGreet(View view) {
         startActivity(new Intent(this, RemoteServiceGreeterActivity.class));
