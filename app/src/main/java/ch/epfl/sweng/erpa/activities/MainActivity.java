@@ -2,19 +2,27 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class MainActivity extends DependencyConfigurationAgnosticActivity {
+    @BindView(R.id.main_drawer_layout) DrawerLayout drawerLayout;
+    @BindView(R.id.main_navigation_view) NavigationView navigationView;
+
     @Inject OptionalDependencyManager optionalDependency;
 
     @Override
@@ -24,11 +32,13 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        addNavigationMenu(this, findViewById(R.id.main_drawer_layout), findViewById(R.id.main_navigation_view), optionalDependency);
+        addNavigationMenu(this, drawerLayout, navigationView, optionalDependency);
     }
 
     @Override protected void onResume() {
         super.onResume();
+        if (dependenciesNotReady()) return;
+        setUsernameInMenu(navigationView, optionalDependency.get(Username.class));
     }
 
     @OnClick(R.id.launch_storage_provider_greet)
