@@ -3,6 +3,9 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,8 +59,12 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.campaign) RadioButton campaignRadioButton;
     @BindView(R.id.create_game_name_field) EditText gameName;
     @BindView(R.id.description_field) EditText gameDescription;
+    @BindView(R.id.create_game_drawer_layout) DrawerLayout myDrawerLayout;
+    @BindView(R.id.create_game_navigation_view) NavigationView myNavigationView;
+    @BindView(R.id.create_game_toolbar) Toolbar activityToolbar;
     @BindView(R.id.difficulty_spinner) Spinner difficultySpinner;
     @BindView(R.id.layout_num_sessions) View numSessionsView;
+    @BindView(R.id.loading_panel_create_game) View loader;
     @BindView(R.id.max_num_player_field) EditText valueMax;
     @BindView(R.id.min_num_player_field) EditText valueMin;
     @BindView(R.id.num_session_field) EditText numSess;
@@ -65,7 +72,6 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.session_length_spinner) Spinner sessionLengthSpinner;
     @BindView(R.id.universe_field) EditText universeField;
     @BindView(R.id.universes_spinner) Spinner universesSpinner;
-    @BindView(R.id.loadingPanelCreateGame) View loader;
 
     @Inject GameService gameService;
     @Inject OptionalDependencyManager optionalDependency;
@@ -107,33 +113,27 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
             public void onNothingSelected(AdapterView<?> parentView) {
             }
         });
-
-        addNavigationMenu(this, findViewById(R.id.create_game_drawer_layout),
-            findViewById(R.id.create_game_navigation_view), optionalDependency);
-        setMenuInToolbar(this, findViewById(R.id.create_game_toolbar));
-        getSupportActionBar().setTitle(R.string.title_create_game_activity);
-
-        loader.setVisibility(View.GONE);
     }
 
-    // Handle toolbar items clicks
+    @Override protected void onResume() {
+        super.onResume();
+        addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
+        setMenuInToolbar(this, activityToolbar);
+        Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle("Create Game"));
+    }
+
+    // Handle myToolbar items clicks
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.create_game_drawer_layout));
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), myDrawerLayout);
         return found || super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-    }
-
-    // When Oneshot or Campaign checkboxes are checked, uncheck the other one
     @OnClick({R.id.oneshot, R.id.campaign})
     public void onOneShotOrCampaignSelected(View view) {
         numSessionsView.setVisibility((view.getId() == R.id.campaign) ? View.VISIBLE : View.GONE);
     }
 
-    //call when the user submit a game and check if no requested field is empty
     @OnClick(R.id.submit_button)
     public void submitGame(View view) {
         if (getErrorMessage().executeIfPresent(m -> createPopup(m, this)).isPresent())
@@ -164,14 +164,6 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
         }, this::handleException);
     }
 
-    Optional<String> getErrorMessage() {
-        if (!playerNumberIsValid()) return Optional.of(getString(R.string.invalidPlayerNumber));
-        if (!allObligFieldsFilled()) return Optional.of(getString(R.string.emptyFieldMessage));
-        if (!aRadioButtonIsChecked())
-            return Optional.of(getString(R.string.uncheckedCheckboxMessage));
-        return Optional.empty();
-    }
-
     private void launchGameViewer(Game g) {
         Intent intent = new Intent(this, GameListActivity.class);
         Bundle bundle = new Bundle();
@@ -184,6 +176,14 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
     void handleException(Throwable exc) {
         Log.e("createGamePost", "Could not create game", exc);
         createPopup("Could not create game: " + exc.getMessage(), this);
+    }
+
+    private Optional<String> getErrorMessage() {
+        if (!playerNumberIsValid()) return Optional.of(getString(R.string.invalidPlayerNumber));
+        if (!allObligFieldsFilled()) return Optional.of(getString(R.string.emptyFieldMessage));
+        if (!aRadioButtonIsChecked())
+            return Optional.of(getString(R.string.uncheckedCheckboxMessage));
+        return Optional.empty();
     }
 
     private boolean aRadioButtonIsChecked() {
@@ -199,5 +199,10 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
         int minPlayers = intValueFromEditText(valueMin).orElse(-1);
         int maxPlayers = intValueFromEditText(valueMax).orElse(-1);
         return (minPlayers > 0 && maxPlayers >= minPlayers);
+    }
+
+    // Required to inflate the fragment on this activity
+    @Override public void onFragmentInteraction(Uri uri) {
+
     }
 }
