@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.BiConsumer;
 
@@ -55,6 +56,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.game_viewer_activity_loading_panel) View panelLoader;
     @BindView(R.id.game_viewer_drawer_layout) DrawerLayout myDrawerLayout;
     @BindView(R.id.game_viewer_navigation_view) NavigationView myNavigationView;
+    @BindView(R.id.game_viewer_participants_loader) View participantsLoader;
     @BindView(R.id.gmTextView) TextView gmName;
     // @BindView(R.id.gmLoader) View gmLoader;
     @BindView(R.id.joinGameButton) Button joinGameButton;
@@ -150,12 +152,27 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
     @UiThread
     private void updateGameJoinRequests(List<PlayerJoinGameRequest> gameParticipantRequests) {
-        Log.d("GameViewer", "Updating game participants: " + gameParticipantRequests.toString());
+        Log.d("GV FetchParticipants", "Updating game participants: " + gameParticipantRequests.toString());
         PlayerJoinGameRequestAdapter adapter = (PlayerJoinGameRequestAdapter) playerListView.getAdapter();
-        adapter.joinGameRequests.addAll(gameParticipantRequests);
-        adapter.joinGameRequests.addAll(gameParticipantRequests);
-        adapter.joinGameRequests.addAll(gameParticipantRequests);
-        adapter.notifyDataSetChanged();
+        participantsLoader.setVisibility(View.GONE);
+        playerListView.setVisibility(View.VISIBLE);
+        optionalDependency.get(Username.class).map(Username::getUserUuid).flatMap(currentUserUuid ->
+            Stream.of(gameParticipantRequests)
+                .filter(reqs -> reqs.getUserUuid().equals(currentUserUuid)).findFirst()
+                .flatMap(currentUserRequest ->
+                    Stream.of(PlayerJoinGameRequest.RequestStatus.CONFIRMED,
+                        PlayerJoinGameRequest.RequestStatus.REJECTED,
+                        PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN)
+                        .filter(status -> status.equals(currentUserRequest.getRequestStatus())).findFirst()
+                ))
+            .executeIfPresent(s -> joinGameButton.setVisibility(View.GONE))
+            .executeIfAbsent(() -> joinGameButton.setVisibility(View.VISIBLE));
+
+        Optional.ofNullable(adapter)
+            .executeIfPresent(a -> a.joinGameRequests.addAll(gameParticipantRequests))
+            .executeIfPresent(RecyclerView.Adapter::notifyDataSetChanged)
+            .executeIfAbsent(() -> Log.e("GV FetchParticipants",
+                "Received participants response, but no adapter was found."));
     }
 
     @AllArgsConstructor
@@ -195,7 +212,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
                 asyncTaskService.run(() -> ups.getUsernameFromUserUuid(request.getUserUuid()).get(),
                     participantUsername -> gameJoinRequestUsernameTV.setText(participantUsername.getUsername()),
                     exc -> handleErrorRetrievingUserData(exc, request));
-                // gameJoinRequestStatusTV.setText(request.getRequestStatus().toString());
+                gameJoinRequestStatusTV.setText(Optional.ofNullable(request.getRequestStatus())
+                    .map(Object::toString).orElse("Unknown state"));
             }
 
             void handleErrorRetrievingUserData(Throwable exc, PlayerJoinGameRequest request) {
