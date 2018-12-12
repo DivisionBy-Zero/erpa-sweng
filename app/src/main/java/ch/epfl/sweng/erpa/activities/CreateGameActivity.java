@@ -154,7 +154,8 @@ public class CreateGameActivity extends DependencyConfigurationAgnosticActivity 
             findSessionLength(sessionLengthSpinner.getSelectedItem().toString()),
             gameDescription.getText().toString(),
             0.0,
-            0.0);
+            0.0,
+            Game.GameStatus.CREATED);
 
         loader.setVisibility(View.VISIBLE);
 

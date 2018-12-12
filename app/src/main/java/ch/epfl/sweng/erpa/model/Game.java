@@ -29,12 +29,14 @@ public class Game implements UuidObject {
     @NonNull private String description;
     @NonNull private Double locationLat;
     @NonNull private Double locationLon;
+    @NonNull private GameStatus gameStatus;
 
     public String getOneshotOrCampaign() {
         return isCampaign ? "Campaign" : "Oneshot";
     }
 
     public enum Difficulty {NOOB, CHILL, HARD}
+    public enum GameStatus {CREATED, CONFIRMED, CANCELED, IN_PROGRESS, FINISHED}
 
     public static String genGameUuid() {
         return GameService.UUID_PREFIX + UUID.randomUUID();

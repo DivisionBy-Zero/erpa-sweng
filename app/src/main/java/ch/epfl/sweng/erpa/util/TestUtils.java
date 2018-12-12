@@ -32,7 +32,7 @@ public class TestUtils {
             Optional.of(Integer.MIN_VALUE),
             Optional.of(Integer.MAX_VALUE),
             "Pepsi is Good",
-            0.0, 0.0
+            0.0, 0.0, Game.GameStatus.CREATED
         );
     }
 
