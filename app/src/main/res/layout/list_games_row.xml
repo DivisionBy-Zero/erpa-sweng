@@ -110,33 +110,51 @@
                 </android.support.constraint.ConstraintLayout>
             </LinearLayout>
 
-            <ProgressBar
-                android:id="@+id/currentNbPlayersProgressBar"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="22sp"
-                android:layout_height="22sp"
-                android:layout_gravity="right"
-                android:indeterminate="true"
-                android:maxHeight="@dimen/text_margin" />
-
-            <TextView
-                android:id="@+id/currentNbPlayersInfo"
-                style="@style/CardViewStyle.players"
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2/3"
-                android:textAlignment="viewEnd"
-                android:visibility="gone" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/maxNbPlayersInfo"
-                style="@style/CardViewStyle.players"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="2/3"
-                android:textAlignment="viewEnd"
-                android:visibility="visible" />
+                <ProgressBar
+                    android:id="@+id/currentNbPlayersProgressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
+                    android:indeterminate="true"
+                    android:maxHeight="@dimen/text_margin"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/nbPlayersSeparator" />
 
+                <TextView
+                    android:id="@+id/currentNbPlayersInfo"
+                    style="@style/CardViewStyle.players"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@+id/nbPlayersSeparator" />
+
+                <TextView
+                    android:id="@+id/nbPlayersSeparator"
+                    style="@style/CardViewStyle.players"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="/"
+                    app:layout_constraintEnd_toStartOf="@+id/maxNbPlayersInfo" />
+
+                <TextView
+                    android:id="@+id/maxNbPlayersInfo"
+                    style="@style/CardViewStyle.players"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="1dp"
+                    android:text="3-6"
+                    android:textAlignment="viewEnd"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_weight="1" />
+            </android.support.constraint.ConstraintLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </android.support.constraint.ConstraintLayout>
