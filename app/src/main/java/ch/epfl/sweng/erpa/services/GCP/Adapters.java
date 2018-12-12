@@ -26,7 +26,48 @@ class Adapters {
 
     @SuppressWarnings("unchecked")
     @RequiredArgsConstructor
-    public static class GameDifficultyTypeAdapter extends TypeAdapter<Game.Difficulty> {
+    private abstract static class AbstractDictBasedTypeAdapter<T, F> extends TypeAdapter<T> {
+        @NonNull final TypeAdapter<F> converter;
+        private final BiMap<F, T> translationTable = mkTranslationTable();
+
+        abstract BiMap<F, T> mkTranslationTable();
+
+        @Override public void write(JsonWriter out, T value) throws IOException {
+            converter.write(out, translationTable.inverse().get(value));
+        }
+
+        @Override public T read(JsonReader in) throws IOException {
+            return translationTable.get(converter.read(in));
+        }
+    }
+
+    public static class PlayerJoinRequestStatusTypeAdapter extends AbstractDictBasedTypeAdapter<PlayerJoinGameRequest.RequestStatus, Integer> {
+        public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
+            @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+                if (type.getRawType() == PlayerJoinGameRequest.RequestStatus.class) {
+                    return (TypeAdapter<T>) new PlayerJoinRequestStatusTypeAdapter(gson.getAdapter(Integer.class));
+                }
+                return null;
+            }
+        };
+
+        PlayerJoinRequestStatusTypeAdapter(TypeAdapter<Integer> converter) {
+            super(converter);
+        }
+
+        BiMap<Integer, PlayerJoinGameRequest.RequestStatus> mkTranslationTable() {
+            BiMap<Integer, PlayerJoinGameRequest.RequestStatus> result = HashBiMap.create();
+            result.put(1, PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN);
+            result.put(2, PlayerJoinGameRequest.RequestStatus.CONFIRMED);
+            result.put(3, PlayerJoinGameRequest.RequestStatus.REJECTED);
+            result.put(4, PlayerJoinGameRequest.RequestStatus.REMOVED);
+            result.put(5, PlayerJoinGameRequest.RequestStatus.HAS_QUIT);
+            return result;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static class GameDifficultyTypeAdapter extends AbstractDictBasedTypeAdapter<Game.Difficulty, Integer> {
         public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
             @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
                 if (type.getRawType() == Game.Difficulty.class) {
@@ -37,27 +78,43 @@ class Adapters {
             }
         };
 
-        @NonNull final TypeAdapter<Integer> intConverter;
-        private final BiMap<Integer, Game.Difficulty> integerDifficultyBiMap = constructDifficultyToIntegerBiMap();
+        GameDifficultyTypeAdapter(TypeAdapter<Integer> converter) {
+            super(converter);
+        }
 
-        private static BiMap<Integer, Game.Difficulty> constructDifficultyToIntegerBiMap() {
+        protected BiMap<Integer, Game.Difficulty> mkTranslationTable() {
             BiMap<Integer, Game.Difficulty> result = HashBiMap.create();
             result.put(10, Game.Difficulty.NOOB);
             result.put(20, Game.Difficulty.CHILL);
             result.put(30, Game.Difficulty.HARD);
             return result;
         }
+    }
 
-        @Override public void write(JsonWriter out, Game.Difficulty value) throws IOException {
-            //noinspection ConstantConditions
-            int intVal = integerDifficultyBiMap.inverse().get(value);
+    @SuppressWarnings("unchecked")
+    public static class GameStatusTypeAdapter extends AbstractDictBasedTypeAdapter<Game.GameStatus, Integer> {
+        public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
+            @Override public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+                if (type.getRawType() == Game.GameStatus.class) {
+                    return (TypeAdapter<T>) new GameStatusTypeAdapter(gson.getAdapter(Integer.class));
+                } else {
+                    return null;
+                }
+            }
+        };
 
-            intConverter.write(out, intVal);
+        GameStatusTypeAdapter(TypeAdapter<Integer> converter) {
+            super(converter);
         }
 
-        @Override public Game.Difficulty read(JsonReader in) throws IOException {
-            int intVal = intConverter.read(in);
-            return integerDifficultyBiMap.get(intVal);
+        protected BiMap<Integer, Game.GameStatus> mkTranslationTable() {
+            BiMap<Integer, Game.GameStatus> result = HashBiMap.create();
+            result.put(1, Game.GameStatus.CREATED);
+            result.put(2, Game.GameStatus.CONFIRMED);
+            result.put(3, Game.GameStatus.CANCELED);
+            result.put(4, Game.GameStatus.IN_PROGRESS);
+            result.put(5, Game.GameStatus.FINISHED);
+            return result;
         }
     }
 
