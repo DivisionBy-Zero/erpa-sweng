@@ -21,7 +21,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Name of Player"
+                android:text="..."
                 app:layout_constraintHorizontal_weight="1" />
 
             <TextView

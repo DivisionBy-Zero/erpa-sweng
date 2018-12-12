@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.BiConsumer;
@@ -40,7 +42,7 @@ import ch.epfl.sweng.erpa.operations.AsyncTaskService;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.UserManagementService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
@@ -56,16 +58,14 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.game_viewer_drawer_layout) DrawerLayout myDrawerLayout;
     @BindView(R.id.game_viewer_navigation_view) NavigationView myNavigationView;
     @BindView(R.id.game_viewer_participants_loader) View participantsLoader;
+    @BindView(R.id.game_list_swipe_refresh) SwipeRefreshLayout refreshLayout;
     @BindView(R.id.gmTextView) TextView gmName;
-    // @BindView(R.id.gmLoader) View gmLoader;
     @BindView(R.id.joinGameButton) Button joinGameButton;
     @BindView(R.id.oneShotOrCampaignTextView) TextView type;
     @BindView(R.id.sessionLengthTextView) TextView sessionLength;
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
     @BindView(R.id.titleTextView) TextView title;
     @BindView(R.id.universeTextView) TextView universe;
-
-    // @BindView(R.id.playersContainer) View playersContainer;
 
     @Inject GameService gs;
     @Inject OptionalDependencyManager optionalDependency;
@@ -83,6 +83,12 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         ButterKnife.bind(this);
         asyncTaskService = new AsyncTaskService();
         asyncTaskService.setResultConsumerContext(this::runOnUiThread);
+
+        refreshLayout.setOnRefreshListener(() -> {
+            refreshLayout.setRefreshing(false);
+            startActivity(getIntent());
+            finish();
+        });
     }
 
     @Override
@@ -97,17 +103,42 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
 
         addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
+        resetLoadersAndPanelsVisibilities();
 
-        contentPanel.setVisibility(View.GONE);
-        asyncTaskService.run(() -> gs.getGame(gameUuid), failIfNotFound(gameUuid, this::updateGameTVs));
-        asyncTaskService.run(() -> gs.getGameJoinRequests(gameUuid), this::updateGameJoinRequests);
+        asyncTaskService.run(() -> gs.getGame(gameUuid), failIfNotFound(gameUuid, game -> {
+            updateGameTVs(game);
+            asyncTaskService.run(() -> gs.getGameJoinRequests(gameUuid), gameParticipantRequests -> {
+                updateGameJoinRequests(gameParticipantRequests, game);
+            });
+        }));
 
         playerListView.setHasFixedSize(true);
         playerListView.setLayoutManager(new LinearLayoutManager(this));
         playerListView.setAdapter(new PlayerJoinGameRequestAdapter(
-            new ArrayList<>(), (view, playerJoinGameRequest) -> {
-            createPopup("Modifying Game Join requests is not yet implemented", this);
-        }));
+            new ArrayList<>(), this::onPlayerJoinRequestItemClick));
+    }
+
+    private void resetLoadersAndPanelsVisibilities() {
+        contentPanel.setVisibility(View.GONE);
+        joinGameButton.setVisibility(View.GONE);
+        participantsLoader.setVisibility(View.VISIBLE);
+        panelLoader.setVisibility(View.VISIBLE);
+    }
+
+    private void onPlayerJoinRequestItemClick(View view, PlayerJoinGameRequest request) {
+        if (currentUserIsGM) {
+            createPopup("Accepting Game Join requests is not yet implemented, sorry :(", this);
+            return;
+        }
+
+        boolean modifyingSelfRequest = optionalDependency.get(Username.class).map(Username::getUserUuid)
+            .filter(currentUserUuid -> request.getUserUuid().equals(currentUserUuid)).isPresent();
+
+        if (!modifyingSelfRequest) {
+            createPopup("Naughty naughty, you can't modify other people's requests!", this);
+        } else {
+            createPopup("I know you're super excited about it!", this);
+        }
     }
 
     @Override protected void onStop() {
@@ -150,34 +181,48 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     }
 
     @UiThread
-    private void updateGameJoinRequests(List<PlayerJoinGameRequest> gameParticipantRequests) {
+    private void updateGameJoinRequests(List<PlayerJoinGameRequest> gameParticipantRequests, Game game) {
         Log.d("GV FetchParticipants", "Updating game participants: " + gameParticipantRequests.toString());
         PlayerJoinGameRequestAdapter adapter = (PlayerJoinGameRequestAdapter) playerListView.getAdapter();
+        List<PlayerJoinGameRequest.RequestStatus> notAllowedToJoin = Stream.of(
+            PlayerJoinGameRequest.RequestStatus.CONFIRMED,
+            PlayerJoinGameRequest.RequestStatus.REJECTED,
+            PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN
+        ).collect(Collectors.toList());
+
         participantsLoader.setVisibility(View.GONE);
         playerListView.setVisibility(View.VISIBLE);
-        optionalDependency.get(Username.class).map(Username::getUserUuid).flatMap(currentUserUuid ->
-            Stream.of(gameParticipantRequests)
+
+        currentUserIsGM = optionalDependency.get(Username.class).map(Username::getUserUuid)
+            .filter(userUuid -> game.getGmUserUuid().equals(userUuid))
+            .isPresent();
+
+        if (!currentUserIsGM) {
+            joinGameButton.setVisibility(View.VISIBLE);
+        } else {
+            joinGameButton.setVisibility(View.GONE);
+        }
+
+        optionalDependency.get(Username.class).map(Username::getUserUuid).ifPresent(
+            currentUserUuid -> Stream.of(gameParticipantRequests)
                 .filter(reqs -> reqs.getUserUuid().equals(currentUserUuid)).findFirst()
-                .flatMap(currentUserRequest ->
-                    Stream.of(PlayerJoinGameRequest.RequestStatus.CONFIRMED,
-                        PlayerJoinGameRequest.RequestStatus.REJECTED,
-                        PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN)
-                        .filter(status -> status.equals(currentUserRequest.getRequestStatus())).findFirst()
-                ))
-            .executeIfPresent(s -> joinGameButton.setVisibility(View.GONE))
-            .executeIfAbsent(() -> joinGameButton.setVisibility(View.VISIBLE));
+                .filter(currentUserRequest ->
+                    notAllowedToJoin.contains(currentUserRequest.getRequestStatus()))
+                .executeIfPresent(s -> joinGameButton.setVisibility(View.GONE)));
 
         Optional.ofNullable(adapter)
-            .executeIfPresent(a -> a.joinGameRequests.addAll(gameParticipantRequests))
-            .executeIfPresent(RecyclerView.Adapter::notifyDataSetChanged)
+            .executeIfPresent(a -> {
+                a.joinGameRequests.addAll(gameParticipantRequests);
+                a.notifyDataSetChanged();
+            })
             .executeIfAbsent(() -> Log.e("GV FetchParticipants",
                 "Received participants response, but no adapter was found."));
     }
 
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     class PlayerJoinGameRequestAdapter extends RecyclerView.Adapter<PlayerJoinGameRequestAdapter.PlayerJoinGameRequestHolder> {
-        List<PlayerJoinGameRequest> joinGameRequests;
-        BiConsumer<View, PlayerJoinGameRequest> onViewElementClick;
+        @NonNull List<PlayerJoinGameRequest> joinGameRequests;
+        @NonNull BiConsumer<View, PlayerJoinGameRequest> onViewElementClick;
 
         @NonNull
         @Override
