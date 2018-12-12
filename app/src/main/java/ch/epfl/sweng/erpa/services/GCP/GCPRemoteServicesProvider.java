@@ -15,8 +15,6 @@ import java.util.NoSuchElementException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ch.epfl.sweng.erpa.adapters.GameDifficultyTypeAdapter;
-import ch.epfl.sweng.erpa.adapters.OptionalTypeAdapter;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import lombok.Getter;
 import okhttp3.ResponseBody;
@@ -31,8 +29,8 @@ public class GCPRemoteServicesProvider implements RemoteServicesProvider {
     private static final String API_URL = "https://erpa-sweng.appspot.com";
     // Public for debugging purposes :)
     public static Gson gson = new GsonBuilder()
-        .registerTypeAdapterFactory(OptionalTypeAdapter.FACTORY)
-        .registerTypeAdapterFactory(GameDifficultyTypeAdapter.FACTORY)
+        .registerTypeAdapterFactory(Adapters.OptionalTypeAdapter.FACTORY)
+        .registerTypeAdapterFactory(Adapters.GameDifficultyTypeAdapter.FACTORY)
         .create();
     @Getter @NonNull private static Retrofit retrofit = new Retrofit.Builder()
         .baseUrl(API_URL)
