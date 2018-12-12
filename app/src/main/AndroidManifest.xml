@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ch.epfl.sweng.erpa">
 
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+
     <application
         android:name=".ErpaApplication"
         android:allowBackup="true"
