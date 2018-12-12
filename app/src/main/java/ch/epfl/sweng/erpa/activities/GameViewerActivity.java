@@ -6,24 +6,22 @@ import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.BiConsumer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +39,7 @@ import ch.epfl.sweng.erpa.operations.AsyncTaskService;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.UserManagementService;
+import lombok.AllArgsConstructor;
 
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
@@ -51,7 +50,7 @@ import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
     @BindView(R.id.descriptionTextView) TextView description;
     @BindView(R.id.difficultyTextView) TextView difficulty;
-    @BindView(R.id.gameViewerPlayerListView) ListView playerListView;
+    @BindView(R.id.gameViewerPlayerListView) RecyclerView playerListView;
     @BindView(R.id.game_viewer_activity_content_panel) View contentPanel;
     @BindView(R.id.game_viewer_activity_loading_panel) View panelLoader;
     @BindView(R.id.game_viewer_drawer_layout) DrawerLayout myDrawerLayout;
@@ -65,6 +64,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.titleTextView) TextView title;
     @BindView(R.id.universeTextView) TextView universe;
 
+    // @BindView(R.id.playersContainer) View playersContainer;
+
     @Inject GameService gs;
     @Inject OptionalDependencyManager optionalDependency;
     @Inject UserManagementService ups;
@@ -72,30 +73,6 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     private String gameUuid;
     private Map<String, AsyncTask> asyncFetchThreads;
     private AsyncTaskService asyncTaskService;
-
-    /*Method for Setting the Height of the ListView dynamically.
-     Hack to fix the issue of not showing all the items of the ListView
-     when placed inside a ScrollView  */
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null)
-            return;
-
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int totalHeight = 0;
-        View view = null;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0)
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ConstraintLayout.LayoutParams.WRAP_CONTENT));
-
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +91,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         asyncFetchThreads = new HashMap<>();
         gameUuid = getIntent().getStringExtra(GameService.PROP_INTENT_GAME_UUID);
         if (gameUuid == null) {
-            Log.e(TAG, "GameViewerActivity: no game id passed with intent");
+            Log.e(TAG, "GameViewerActivity: No GameUuid passed with intent");
             finish();
         }
 
@@ -123,6 +100,13 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         contentPanel.setVisibility(View.GONE);
         asyncTaskService.run(() -> gs.getGame(gameUuid), failIfNotFound(gameUuid, this::updateGameTVs));
         asyncTaskService.run(() -> gs.getGameJoinRequests(gameUuid), this::updateGameJoinRequests);
+
+        playerListView.setHasFixedSize(true);
+        playerListView.setLayoutManager(new LinearLayoutManager(this));
+        playerListView.setAdapter(new PlayerJoinGameRequestAdapter(
+            new ArrayList<>(), (view, playerJoinGameRequest) -> {
+            createPopup("Modifying Game Join requests is not yet implemented", this);
+        }));
     }
 
     @Override protected void onStop() {
@@ -166,47 +150,48 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
     @UiThread
     private void updateGameJoinRequests(List<PlayerJoinGameRequest> gameParticipantRequests) {
-        playerListView.setAdapter(new PlayerJoinGameRequestAdapter(this,
-            gameParticipantRequests, (view, playerJoinGameRequest) -> {
-            createPopup("Modifying Game Join requests is not yet implemented", this);
-        }));
-        GameViewerActivity.setListViewHeightBasedOnChildren(playerListView);
+        Log.d("GameViewer", "Updating game participants: " + gameParticipantRequests.toString());
+        PlayerJoinGameRequestAdapter adapter = (PlayerJoinGameRequestAdapter) playerListView.getAdapter();
+        adapter.joinGameRequests.addAll(gameParticipantRequests);
+        adapter.joinGameRequests.addAll(gameParticipantRequests);
+        adapter.joinGameRequests.addAll(gameParticipantRequests);
+        adapter.notifyDataSetChanged();
     }
 
-    class PlayerJoinGameRequestAdapter extends ArrayAdapter<PlayerJoinGameRequest> {
-        private BiConsumer<View, PlayerJoinGameRequest> onViewElementClick;
+    @AllArgsConstructor
+    class PlayerJoinGameRequestAdapter extends RecyclerView.Adapter<PlayerJoinGameRequestAdapter.PlayerJoinGameRequestHolder> {
+        List<PlayerJoinGameRequest> joinGameRequests;
+        BiConsumer<View, PlayerJoinGameRequest> onViewElementClick;
 
-        PlayerJoinGameRequestAdapter(Context context,
-                                     List<PlayerJoinGameRequest> joinGameRequests,
-                                     BiConsumer<View, PlayerJoinGameRequest> onViewElementClick) {
-            super(context, -1, joinGameRequests);
-            this.onViewElementClick = onViewElementClick;
+        @NonNull
+        @Override
+        public PlayerJoinGameRequestHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+            Context context = parent.getContext();
+            View view = LayoutInflater.from(context).inflate(R.layout.game_viewer_player, parent, false);
+            return new PlayerJoinGameRequestHolder(view);
         }
 
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            View rowView = convertView;
-            if (rowView == null) {
-                Log.d("renderGameParticipant", "Element " + position);
-                rowView = LayoutInflater.from(getContext()).inflate(R.layout.game_viewer_player, parent, false);
-                rowView.setTag(new PlayerJoinGameRequestHolder(rowView, getItem(position), onViewElementClick));
-            }
-
-            return rowView;
+        public void onBindViewHolder(@NonNull PlayerJoinGameRequestHolder playerJoinGameRequestHolder, int i) {
+            playerJoinGameRequestHolder.populateHolder(joinGameRequests.get(i), onViewElementClick);
         }
 
-        class PlayerJoinGameRequestHolder {
+        @Override
+        public int getItemCount() {
+            return joinGameRequests.size();
+        }
+
+        class PlayerJoinGameRequestHolder extends RecyclerView.ViewHolder {
             @BindView(R.id.gameJoinRequestUsername) TextView gameJoinRequestUsernameTV;
             @BindView(R.id.gameJoinRequestStatus) TextView gameJoinRequestStatusTV;
 
-            PlayerJoinGameRequestHolder(View container, PlayerJoinGameRequest element,
-                                        BiConsumer<View, PlayerJoinGameRequest> onViewElemClick) {
-                ButterKnife.bind(this, container);
-                container.setOnClickListener(v -> onViewElemClick.accept(v, element));
-                populateHolder(element);
+            public PlayerJoinGameRequestHolder(@NonNull View itemView) {
+                super(itemView);
+                ButterKnife.bind(this, itemView);
             }
 
-            void populateHolder(PlayerJoinGameRequest request) {
+            void populateHolder(PlayerJoinGameRequest request, BiConsumer<View, PlayerJoinGameRequest> onItemViewClick) {
+                itemView.setOnClickListener(view -> onItemViewClick.accept(view, request));
                 asyncTaskService.run(() -> ups.getUsernameFromUserUuid(request.getUserUuid()).get(),
                     participantUsername -> gameJoinRequestUsernameTV.setText(participantUsername.getUsername()),
                     exc -> handleErrorRetrievingUserData(exc, request));
