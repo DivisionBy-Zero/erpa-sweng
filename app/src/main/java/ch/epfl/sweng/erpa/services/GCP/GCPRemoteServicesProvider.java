@@ -29,8 +29,10 @@ public class GCPRemoteServicesProvider implements RemoteServicesProvider {
     private static final String API_URL = "https://erpa-sweng.appspot.com";
     // Public for debugging purposes :)
     public static Gson gson = new GsonBuilder()
-        .registerTypeAdapterFactory(Adapters.OptionalTypeAdapter.FACTORY)
         .registerTypeAdapterFactory(Adapters.GameDifficultyTypeAdapter.FACTORY)
+        .registerTypeAdapterFactory(Adapters.GameStatusTypeAdapter.FACTORY)
+        .registerTypeAdapterFactory(Adapters.OptionalTypeAdapter.FACTORY)
+        .registerTypeAdapterFactory(Adapters.PlayerJoinRequestStatusTypeAdapter.FACTORY)
         .create();
     @Getter @NonNull private static Retrofit retrofit = new Retrofit.Builder()
         .baseUrl(API_URL)
