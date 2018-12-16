@@ -46,9 +46,9 @@ import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
-    public static final String GAME_LIST_ACTIVITY_CLASS_KEY = "Game list activity class key";
     public static final String GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY = "Game list viewer activity class key";
-    private static final Map<GameListType, Integer> stringIdForGameListType =
+    public static final String GAME_LIST_VIEWER_STREAM_REFINER_KEY = "Game list viewer activity stream refiner";
+    static final Map<GameListType, Integer> stringIdForGameListType =
         Collections.unmodifiableMap(new HashMap<GameListType, Integer>() {{
             put(GameListType.FIND_GAME, R.string.titleListGamesActivity);
             put(GameListType.PENDING_REQUEST, R.string.pendingRequestText);
@@ -57,7 +57,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
             put(GameListType.HOSTED_GAMES, R.string.hostedGamesText);
             put(GameListType.PAST_HOSTED_GAMES, R.string.pastHostedGamesText);
         }});
-    private static final Map<Game.Difficulty, Integer> colorIdForDifficulty =
+    static final Map<Game.Difficulty, Integer> colorIdForDifficulty =
         Collections.unmodifiableMap(new HashMap<Game.Difficulty, Integer>() {{
             put(Game.Difficulty.NOOB, R.color.noobDifficultyColor);
             put(Game.Difficulty.CHILL, R.color.chillDifficultyColor);
@@ -104,7 +104,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
         setMenuInToolbar(this, myToolbar);
 
-        setToolbarText((GameListType) bundle.getSerializable(GAME_LIST_ACTIVITY_CLASS_KEY));
+        setToolbarText((GameListType) bundle.getSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY));
 
         ObservableAsyncList<Game> games = gameService.getAllGames(new GameService.StreamRefiner());
         games.addObserver(this::updateGames);
@@ -172,7 +172,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     private void putExtraOnGameViewer(Intent intent) {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            GameListType gameListType = (GameListType) bundle.getSerializable(GAME_LIST_ACTIVITY_CLASS_KEY);
+            GameListType gameListType = (GameListType) bundle.getSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY);
             intent.putExtra(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, gameListType);
         }
     }

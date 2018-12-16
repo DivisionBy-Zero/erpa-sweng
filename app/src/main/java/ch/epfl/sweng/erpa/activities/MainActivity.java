@@ -15,7 +15,7 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
@@ -50,7 +50,7 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
     public void launchGameList(View view) {
         Intent intent = new Intent(this, GameListActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.FIND_GAME);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.FIND_GAME);
         intent.putExtras(bundle);
         startActivity(intent);
     }

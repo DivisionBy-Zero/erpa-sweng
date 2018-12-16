@@ -39,7 +39,7 @@ import ch.epfl.sweng.erpa.util.Pair;
 import ch.epfl.sweng.erpa.util.Triplet;
 import lombok.Data;
 
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
@@ -84,7 +84,7 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
 
         return Stream.zip(targetListType, images, Pair::new).map(p -> {
             Bundle bundle = new Bundle();
-            bundle.putSerializable(GAME_LIST_ACTIVITY_CLASS_KEY, p.getFirst());
+            bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, p.getFirst());
             return new MyAccountButtonData(strIdForGameListType.get(p.getFirst()),
                 GameListActivity.class, bundle, p.getSecond());
         }).collect(Collectors.toList());

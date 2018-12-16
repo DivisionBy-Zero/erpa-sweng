@@ -70,7 +70,7 @@ public class ActivityUtils {
                     break;
                 case R.id.menu_findGame:
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable(GameListActivity.GAME_LIST_ACTIVITY_CLASS_KEY,
+                    bundle.putSerializable(GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY,
                         GameListActivity.GameListType.FIND_GAME);
                     intent = new Intent(ctx, GameListActivity.class);
                     intent.putExtras(bundle);
