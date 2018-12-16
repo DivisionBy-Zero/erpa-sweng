@@ -16,6 +16,7 @@ import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import toothpick.Toothpick;
 
 public abstract class DependencyConfigurationAgnosticActivity extends AppCompatActivity {
+    public static final String REQUESTING_ACTIVITY_INTENT_KEY = "Parent " + Intent.class.getCanonicalName();
     @Inject DependencyConfigurationHelper dependencyConfigurationHelper;
 
     @Override

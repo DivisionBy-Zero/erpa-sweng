@@ -63,7 +63,6 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
             put(Game.Difficulty.CHILL, R.color.chillDifficultyColor);
             put(Game.Difficulty.HARD, R.color.hardDifficultyColor);
         }});
-    private static final int FILTER_ACTIVITY_CODE = 1;
 
     @BindView(R.id.game_list_activity_loading_panel) View loader;
     @BindView(R.id.game_list_drawer_layout) DrawerLayout myDrawerLayout;
@@ -78,6 +77,7 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
     private Map<String, AsyncTask> asyncFetchThreads = new HashMap<>();
     private AsyncTaskService asyncTaskService;
+    private Intent currentIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +94,9 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         super.onResume();
         if (dependenciesNotReady()) return;
         asyncFetchThreads = new HashMap<>();
+        currentIntent = getIntent();
 
-        Bundle bundle = getIntent().getExtras();
+        Bundle bundle = currentIntent.getExtras();
         if (bundle == null) {
             finish();
             return;
@@ -106,7 +107,10 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
 
         setToolbarText((GameListType) bundle.getSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY));
 
-        ObservableAsyncList<Game> games = gameService.getAllGames(new GameService.StreamRefiner());
+        GameService.StreamRefiner gameListRefiner = Optional.ofNullable(
+            (GameService.StreamRefiner) bundle.getSerializable(GAME_LIST_VIEWER_STREAM_REFINER_KEY))
+            .orElse(new GameService.StreamRefiner());
+        ObservableAsyncList<Game> games = gameService.getAllGames(gameListRefiner);
         games.addObserver(this::updateGames);
         games.refreshDataAndReset();
 
@@ -146,8 +150,9 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         int elementItem = item.getItemId();
         if (elementItem == R.id.menu_actionSearch) {
             Intent intent = new Intent(this, SortActivity.class);
-            Optional.ofNullable(getIntent().getExtras()).ifPresent(intent::putExtras);
-            startActivityForResult(intent, 0);
+            intent.putExtra(REQUESTING_ACTIVITY_INTENT_KEY, getIntent());
+            Optional.ofNullable(currentIntent.getExtras()).ifPresent(intent::putExtras);
+            startActivity(intent);
             return true;
         } else if (elementItem == android.R.id.home) {
             myDrawerLayout.openDrawer(GravityCompat.START);
@@ -162,15 +167,8 @@ public class GameListActivity extends DependencyConfigurationAgnosticActivity {
         Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle(toolbarTextId));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            //TODO(@Ryker) add sorting using the data from data
-        }
-    }
-
     private void putExtraOnGameViewer(Intent intent) {
-        Bundle bundle = getIntent().getExtras();
+        Bundle bundle = currentIntent.getExtras();
         if (bundle != null) {
             GameListType gameListType = (GameListType) bundle.getSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY);
             intent.putExtra(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, gameListType);
