@@ -99,6 +99,7 @@ ext {
     depVersionSnakeYaml = "1.23"
     depVersionToothpick = "1.1.3"
     depVersionProcessing = "4.0.3"
+    depVersionRoom = "1.1.1"
 }
 
 dependencies {
@@ -116,10 +117,12 @@ dependencies {
     androidTestImplementation "com.android.support.test:rules:${depVersionAndroidTest}"
     androidTestImplementation "com.android.support.test:runner:${depVersionAndroidTest}"
     androidTestImplementation "org.mockito:mockito-android:${depVersionMockito}"
+    annotationProcessor "android.arch.persistence.room:compiler:${depVersionRoom}"
     annotationProcessor "com.github.stephanenicolas.toothpick:toothpick-compiler:${depVersionToothpick}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${depVersionButterknife}"
     annotationProcessor "org.projectlombok:lombok:${depVersionLombok}"
     compileOnly "org.projectlombok:lombok:${depVersionLombok}"
+    implementation "android.arch.persistence.room:runtime:${depVersionRoom}"
     implementation "at.favre.lib:bcrypt:${depVersionBcrypt}"
     implementation "com.amdelamar:jhash:${depVersionJhash}"
     implementation "com.android.support.constraint:constraint-layout:${depVersionToothpick}"
@@ -140,6 +143,7 @@ dependencies {
     implementation "org.p5android:processing-core:${depVersionProcessing}"
     implementation "org.yaml:snakeyaml:${depVersionSnakeYaml}"
     testAnnotationProcessor "com.github.stephanenicolas.toothpick:toothpick-compiler:${depVersionToothpick}"
+    testImplementation "android.arch.persistence.room:testing:${depVersionRoom}"
     testImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${depVersionToothpick}"
     testImplementation "junit:junit:${depVersionJunit}"
     testImplementation "org.powermock:powermock-api-mockito2:${depVersionPowermock}"
