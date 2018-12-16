@@ -1,15 +1,10 @@
 package ch.epfl.sweng.erpa.services.dummy;
 
-import com.annimon.stream.Optional;
-
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
-import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
@@ -25,12 +20,11 @@ public class DummyRemoteServicesProvider implements RemoteServicesProvider {
     private ArrayList<UserProfile> userList;
 
     @Inject public DummyRemoteServicesProvider() {
-        UserProfile defaultUser = new UserProfile("user|5b915f75-0ff0-43f8-90bf-f9e92533f926",
-                null, null,
-                UserProfile.Experience.Casual, false, true);
+        UserProfile defaultUser = new UserProfile("user|5b915f75-0ff0-43f8-90bf-f9e92533f926", false, true);
         userList = new ArrayList<>();
         userList.add(defaultUser);
     }
+
     @Override
     public String getFriendlyProviderName() {
         return "Dummy Remote Provider";

@@ -63,7 +63,7 @@ public class SignupActivity extends DependencyConfigurationAgnosticActivity {
         inputPanel.setVisibility(View.GONE);
         progressLoader.setVisibility(View.VISIBLE);
 
-        UserProfile newUser = new UserProfile("", null, null, null, isGm, isPlayer);
+        UserProfile newUser = new UserProfile("", isGm, isPlayer);
         signUpTask = loggedUserCoordinator.trySignUp(asyncTaskService, username, password, newUser, this::finish,
             exception -> {
                 inputPanel.setVisibility(View.VISIBLE);

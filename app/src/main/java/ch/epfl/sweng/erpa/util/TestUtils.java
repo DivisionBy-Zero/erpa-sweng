@@ -40,13 +40,8 @@ public class TestUtils {
         );
     }
 
-    public static UserProfile getUserProfile(String uid) {
-        return new UserProfile(uid,
-            "Sapphie",
-            "",
-            UserProfile.Experience.Expert,
-            false,
-            true);
+    public static UserProfile getUserProfile(String userUuid) {
+        return new UserProfile(userUuid, false, true);
     }
 
     public static <T extends UuidObject> void populateUUIDObjects(List<T> list, DataService<T> ds, Function<String, T> genfct) {
