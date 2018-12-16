@@ -117,7 +117,6 @@ dependencies {
     androidTestImplementation "com.android.support.test:rules:${depVersionAndroidTest}"
     androidTestImplementation "com.android.support.test:runner:${depVersionAndroidTest}"
     androidTestImplementation "org.mockito:mockito-android:${depVersionMockito}"
-    annotationProcessor "android.arch.persistence.room:compiler:${depVersionRoom}"
     annotationProcessor "com.github.stephanenicolas.toothpick:toothpick-compiler:${depVersionToothpick}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${depVersionButterknife}"
     annotationProcessor "org.projectlombok:lombok:${depVersionLombok}"
@@ -151,6 +150,8 @@ dependencies {
         exclude group: 'org.hamcrest'
     }
     testImplementation "org.powermock:powermock-module-junit4:${depVersionPowermock}"
+
+    annotationProcessor "android.arch.persistence.room:compiler:${depVersionRoom}"
 }
 
 tasks.withType(Test) {

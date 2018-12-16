@@ -22,7 +22,7 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Game implements UuidObject {
-    @PrimaryKey @NonNull private String uuid;
+    @android.support.annotation.NonNull @PrimaryKey @NonNull private String uuid = "";
     @ForeignKey(entity = UserProfile.class, parentColumns = "uuid", childColumns = "gm_user_uuid")
     @NonNull private String gmUserUuid;
 
