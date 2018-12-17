@@ -21,7 +21,6 @@ import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.operations.DependencyConfigurationHelper;
 import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.util.TestUtils;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
@@ -32,8 +31,6 @@ import toothpick.registries.MemberInjectorRegistryLocator;
 import static ch.epfl.sweng.erpa.ErpaApplication.RES_APPLICATION_SCOPE;
 import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
-import static ch.epfl.sweng.erpa.util.TestUtils.numTests;
-import static ch.epfl.sweng.erpa.util.TestUtils.populateUUIDObjects;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
@@ -56,18 +53,14 @@ public class DummyGameServiceTest {
             bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
             bind(DependencyConfigurationHelper.class).to(DependencyConfigurationHelper.class);
             bind(Map.class).withName(RES_DEPENDENCY_COORDINATORS)
-                    .toInstance(new HashMap<Class, DependencyCoordinator>());
+                .toInstance(new HashMap<Class, DependencyCoordinator>());
         }});
         underTest = scope.getInstance(DummyGameService.class);
     }
+
     @After
     public void cleanUp() {
         underTest.removeGames();
-    }
-
-    @Test
-    public void testConstant() {
-        assertEquals(DummyGameService.SAVED_GAME_DATA_FOLDER, underTest.dataFolder());
     }
 
     @Test
@@ -77,12 +70,20 @@ public class DummyGameServiceTest {
         underTest.updateGame(g);
         res = underTest.getGame(g.getUuid());
         assertTrue(res.isPresent());
-        assertEquals(g,res.get());
+        assertEquals(g, res.get());
     }
+
     @Test
     public void testAllAdded() {
-        List<Game> games = new ArrayList<>(numTests);
-        populateUUIDObjects(games, underTest,TestUtils::getGame);
+        List<Game> games = new ArrayList<>();
+        for (int i = 0; i < 100; ++i) {
+            Game up = getGame("Game " + Integer.toString(i));
+            games.add(underTest.createGame(up));
+        }
+
+        for (Game game : games)
+            assertTrue(underTest.getGame(game.getUuid()).isPresent());
+
         assertTrue(underTest.getAllGames(new GameService.StreamRefiner()).containsAll(games));
     }
 }
