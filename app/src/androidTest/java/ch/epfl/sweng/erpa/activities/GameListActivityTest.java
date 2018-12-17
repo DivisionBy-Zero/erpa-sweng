@@ -3,7 +3,6 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.rule.ActivityTestRule;
@@ -33,28 +32,18 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering;
-import ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria;
 
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering.ASCENDING;
-import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.Ordering.DESCENDING;
-import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria.DIFFICULTY;
-import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria.DISTANCE;
-import static ch.epfl.sweng.erpa.services.GameService.StreamRefiner.SortCriteria.MAX_NUMBER_OF_PLAYERS;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -131,32 +120,12 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
             activity.setSupportActionBar(toolbar);
             resources = activity.getResources();
         });
-        Intents.init();
-    }
-
-    @After
-    public void tearDown() {
-        Intents.release();
-    }
-
-    private int getItemCount(@NonNull RecyclerView view) {
-        return view.getLayoutManager().getItemCount();
     }
 
     @Test
-    public void testMinNumberOfCardsDisplayed() {
+    public void testCardsDisplayed() {
         RecyclerView view = activity.findViewById(R.id.game_list_recycler_view);
-        // magic number fits example in createListData in GameListActivity
-        assertThat(5, lessThan(getItemCount(view)));
-    }
-
-    @Test
-    public void testMaxNumberOfCardsDisplayed() {
-        RecyclerView view = activity.findViewById(R.id.game_list_recycler_view);
-        int itemCount = getItemCount(view);
-
-        // magic number fits example in createListData in GameListActivity
-        assertTrue(itemCount <= 25);
+        assertTrue(view.getLayoutManager().getItemCount() > 1);
     }
 
     @Test
@@ -194,195 +163,23 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
 
     @Test
     public void testClick() {
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
-
-        activity.<RecyclerView>findViewById(R.id.game_list_recycler_view)
-            .getLayoutManager()
-            .getChildAt(0).callOnClick();
+        Intents.init();
+        activity.<RecyclerView>findViewById(R.id.game_list_recycler_view).getLayoutManager()
+            .getChildAt(0)
+            .callOnClick();
         intended(hasComponent(GameViewerActivity.class.getName()));
-    }
-
-    @Test
-    public void StreamRefinerToBuilder() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-            .sortBy(DISTANCE, ASCENDING)
-            .build();
-        assertEquals(sr, sr.toBuilder().build());
-    }
-
-    @Test
-    public void modifyStreamRefinerWithToBuilder() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-            .sortBy(DISTANCE, ASCENDING)
-            .build();
-        sr = sr.toBuilder().clearCriteria().build();
-        assertEquals(0, sr.getSortCriterias().size());
-    }
-
-    @Test
-    public void sortByWithNoCriterias() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder().build();
-        assertEquals(0, sr.getSortCriterias().size());
-    }
-
-    @Test
-    public void sortByWithOneCriteria() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .build();
-        assertEquals(1, sr.getSortCriterias().size());
-        assertEquals(new TreeMap<SortCriteria, Ordering>() {{
-            put(DIFFICULTY, ASCENDING);
-        }}, sr.getSortCriterias());
-    }
-
-    @Test
-    public void sortByWithAllCriterias() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-            .sortBy(DISTANCE, ASCENDING)
-            .build();
-        assertEquals(sr.getSortCriterias().size(), 3);
-        assertEquals(new TreeMap<SortCriteria, Ordering>() {{
-            put(DIFFICULTY, ASCENDING);
-            put(MAX_NUMBER_OF_PLAYERS, DESCENDING);
-            put(DISTANCE, ASCENDING);
-        }}, sr.getSortCriterias());
-    }
-
-    @Test
-    public void conflictingSortByCriteriaTakesLast() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DISTANCE, DESCENDING)
-            .sortBy(DIFFICULTY, ASCENDING)
-            .sortBy(DISTANCE, ASCENDING)
-            .build();
-        assertEquals(2, sr.getSortCriterias().size());
-        assertEquals(new TreeMap<SortCriteria, Ordering>() {{
-            put(DIFFICULTY, ASCENDING);
-            put(DISTANCE, ASCENDING);
-        }}, sr.getSortCriterias());
-    }
-
-    @Test
-    public void removeASortCriteria() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-            .sortBy(DISTANCE, ASCENDING)
-            .removeOneCriteria(DIFFICULTY)
-            .build();
-        assertEquals(sr.getSortCriterias().size(), 2);
-        assertEquals(new TreeMap<SortCriteria, Ordering>() {{
-            put(MAX_NUMBER_OF_PLAYERS, DESCENDING);
-            put(DISTANCE, ASCENDING);
-        }}, sr.getSortCriterias());
-    }
-
-    @Test
-    public void removeAnAbsentSortCriteria() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .removeOneCriteria(DISTANCE)
-            .build();
-        assertEquals(1, sr.getSortCriterias().size());
-    }
-
-    @Test
-    public void removeAllSortCriteria() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .sortBy(DIFFICULTY, ASCENDING)
-            .sortBy(MAX_NUMBER_OF_PLAYERS, DESCENDING)
-            .clearCriteria()
-            .build();
-        assertEquals(0, sr.getSortCriterias().size());
-    }
-
-    @Test
-    public void filterByWithNoGameFilter() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder().build();
-        assertEquals(0, sr.getGameFilters().size());
-    }
-
-    @Test
-    public void filterByWithOneGameFilter() {
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .filterBy(g -> true)
-            .build();
-        assertEquals(1, sr.getGameFilters().size());
-    }
-
-    @Test
-    public void filterByWithRedundantGameFilter() {
-        GameService.StreamRefiner.GameFilter gameFilter = g -> true;
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .filterBy(gameFilter)
-            .filterBy(gameFilter)
-            .build();
-        assertEquals("Failed", 1, sr.getGameFilters().size());
-    }
-
-    @Test
-    public void removeAGameFilter() {
-        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayers() > 4;
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .filterBy(gameFilter)
-            .removeOneFilter(gameFilter)
-            .build();
-        assertEquals(0, sr.getGameFilters().size());
-    }
-
-    @Test
-    public void removeAnAbsentGameFilter() {
-        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayers() > 4;
-        GameService.StreamRefiner.GameFilter absGameFilter = g -> false;
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .filterBy(gameFilter)
-            .removeOneFilter(absGameFilter)
-            .build();
-        assertEquals(1, sr.getGameFilters().size());
-    }
-
-    @Test
-    public void removeAllGameFilters() {
-        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayers() > 4;
-        GameService.StreamRefiner.GameFilter absGameFilter = g -> false;
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .filterBy(gameFilter)
-            .filterBy(absGameFilter)
-            .clearFilters()
-            .build();
-        assertEquals(0, sr.getGameFilters().size());
-    }
-
-    @Test
-    public void removeAllRefinements() {
-        GameService.StreamRefiner.GameFilter gameFilter = g -> g.getMaxPlayers() > 4;
-        GameService.StreamRefiner.GameFilter absGameFilter = g -> false;
-        GameService.StreamRefiner sr = GameService.StreamRefiner.builder()
-            .filterBy(gameFilter)
-            .sortBy(DIFFICULTY, DESCENDING)
-            .filterBy(absGameFilter)
-            .sortBy(DISTANCE, ASCENDING)
-            .sortBy(MAX_NUMBER_OF_PLAYERS, ASCENDING)
-            .clearRefinements()
-            .build();
-        assertEquals(0, sr.getGameFilters().size());
-        assertEquals(0, sr.getSortCriterias().size());
+        Intents.release();
     }
 
     @Test
     public void testSearchItemSelected() throws Throwable {
+        Intents.init();
         intentsTestRule.runOnUiThread(() -> {
             MenuItem item = toolbar.getMenu().findItem(R.id.menu_actionSearch);
             activity.onOptionsItemSelected(item);
         });
         intended(hasComponent(SortActivity.class.getName()));
+        Intents.release();
     }
 
     @Test
