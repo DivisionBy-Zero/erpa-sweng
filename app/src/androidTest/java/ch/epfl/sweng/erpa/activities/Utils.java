@@ -6,10 +6,16 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.PlayerJoinGameRequest;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.services.GCP.ServerException;
+import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -46,5 +52,16 @@ class Utils {
             }
         }
         return ret;
+    }
+
+    static void joinUserToGame(String gameUuid, Username u2, GameService gameService,
+                               PlayerJoinGameRequest.RequestStatus confirmed) throws IOException, ServerException {
+        String previousUserUuid = DummyGameService.currentUserUuid;
+        PlayerJoinGameRequest joinRequest;
+        DummyGameService.currentUserUuid = u2.getUserUuid();
+        joinRequest = gameService.joinGame(gameUuid);
+        joinRequest.setRequestStatus(confirmed);
+        gameService.updateGameJoinRequest(gameUuid, joinRequest);
+        DummyGameService.currentUserUuid = previousUserUuid;
     }
 }

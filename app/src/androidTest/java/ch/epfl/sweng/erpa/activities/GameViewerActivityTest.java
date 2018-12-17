@@ -28,7 +28,6 @@ import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.UserManagementService;
-import ch.epfl.sweng.erpa.services.dummy.database.DummyGameService;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -84,17 +83,8 @@ public class GameViewerActivityTest extends DependencyConfigurationAgnosticTest 
         gameService.updateGame(emptyOptGame);
 
         String gameUuid = game.getUuid();
-        PlayerJoinGameRequest joinRequest;
-        // Join Ryker
-        DummyGameService.currentUserUuid = u1.getUserUuid();
-        joinRequest = gameService.joinGame(gameUuid);
-        joinRequest.setRequestStatus(PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN);
-        gameService.updateGameJoinRequest(gameUuid, joinRequest);
-        // Join Ivan
-        DummyGameService.currentUserUuid = u2.getUserUuid();
-        joinRequest = gameService.joinGame(gameUuid);
-        joinRequest.setRequestStatus(PlayerJoinGameRequest.RequestStatus.CONFIRMED);
-        gameService.updateGameJoinRequest(gameUuid, joinRequest);
+        Utils.joinUserToGame(gameUuid, u1, gameService, PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN);
+        Utils.joinUserToGame(gameUuid, u2, gameService, PlayerJoinGameRequest.RequestStatus.CONFIRMED);
 
         registerCurrentlyLoggedUser(loggedUserCoordinator, currentUser);
 
