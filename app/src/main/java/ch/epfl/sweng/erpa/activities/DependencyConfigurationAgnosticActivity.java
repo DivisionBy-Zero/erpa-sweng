@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.operations.DependencyConfigurationHelper;
 import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
+import toothpick.Scope;
 import toothpick.Toothpick;
 
 public abstract class DependencyConfigurationAgnosticActivity extends AppCompatActivity {
@@ -22,7 +23,7 @@ public abstract class DependencyConfigurationAgnosticActivity extends AppCompatA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Toothpick.inject(this, Toothpick.openScopes(getApplication(), this));
+        Toothpick.inject(this, getScope());
 
         List<Class> unconfiguredDependencies =
                 dependencyConfigurationHelper.getNotConfiguredDependenciesForInstance(this);
@@ -44,6 +45,10 @@ public abstract class DependencyConfigurationAgnosticActivity extends AppCompatA
             this.startActivities(Stream.of(configurationActivities).toArray(Intent[]::new));
             this.finish();
         }
+    }
+
+    protected Scope getScope() {
+        return Toothpick.openScopes(getApplication(), this);
     }
 
     public boolean dependenciesNotReady() {

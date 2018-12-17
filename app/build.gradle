@@ -92,6 +92,7 @@ ext {
     depVersionJunit = "4.12"
     depVersionLombok = "1.16.20" // github.com/rzwitserloot/lombok/issues/1727
     depVersionMockito = "2.22.0"
+    depVersionPowermock = "1.7.4"
     depVersionRetroLambda = "3.2.5"
     depVersionRetrofit = "2.4.0"
     depVersionRetrolambdaLombokAst = "0.2.3.a2"
@@ -141,7 +142,11 @@ dependencies {
     testAnnotationProcessor "com.github.stephanenicolas.toothpick:toothpick-compiler:${depVersionToothpick}"
     testImplementation "com.github.stephanenicolas.toothpick:toothpick-testing:${depVersionToothpick}"
     testImplementation "junit:junit:${depVersionJunit}"
-    testImplementation "org.mockito:mockito-core:${depVersionMockito}"
+    testImplementation "org.powermock:powermock-api-mockito2:${depVersionPowermock}"
+    testImplementation("org.powermock:powermock-core:${depVersionPowermock}"){
+        exclude group: 'org.hamcrest'
+    }
+    testImplementation "org.powermock:powermock-module-junit4:${depVersionPowermock}"
 }
 
 tasks.withType(Test) {
