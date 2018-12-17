@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="192dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/secondaryColor"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/login_sentence"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/menu_logged_user_panel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/you_are_logged_as" />
+        android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/account_pic_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ic_account_pic"
-        android:contentDescription="Account picture"
-        app:layout_constraintTop_toBottomOf="@id/login_sentence"/>
+        <ImageView
+            android:id="@+id/menu_account_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_account_pic"
+            android:contentDescription="Account picture" />
 
-    <TextView
-        android:id="@+id/username_menu_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        app:layout_constraintLeft_toRightOf="@id/account_pic_menu"
-        app:layout_constraintTop_toBottomOf="@id/login_sentence" />
+        <TextView
+            android:id="@+id/menu_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:text="@Username"
+            app:layout_constraintLeft_toRightOf="@id/menu_account_pic" />
 
+    </android.support.constraint.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

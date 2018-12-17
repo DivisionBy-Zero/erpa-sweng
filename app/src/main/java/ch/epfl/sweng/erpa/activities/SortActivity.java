@@ -2,13 +2,18 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+
+import com.annimon.stream.Optional;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.services.GameService;
+
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_STREAM_REFINER_KEY;
 
 public class SortActivity extends DependencyConfigurationAgnosticActivity {
 
@@ -23,7 +28,7 @@ public class SortActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     @OnClick({R.id.diffAsc, R.id.diffDesc, R.id.maxNumPlayerAsc, R.id.maxNumPlayerDesc,
-              R.id.distAsc, R.id.distDesc, R.id.dateAsc, R.id.dateDesc})
+        R.id.distAsc, R.id.distDesc, R.id.dateAsc, R.id.dateDesc})
     public void onCheckBoxClicked(CheckBox checkBox) {
         CheckBox checkBox1 = findViewById(R.id.dateAsc);
         GameService.StreamRefiner.SortCriteria criteria = GameService.StreamRefiner.SortCriteria.DATE;
@@ -81,12 +86,12 @@ public class SortActivity extends DependencyConfigurationAgnosticActivity {
 
     @OnClick(R.id.sortButton)
     public void onClickSortButton(View view) {
-        Bundle bundle = getIntent().getExtras();
-        Intent intent = new Intent(this, GameListActivity.class);
-        intent.putExtras(bundle);
-        intent.putExtra("result", streamRefinerBuilder);
-        setResult(RESULT_OK, intent);
-        startActivity(intent);
+        Optional.ofNullable(getIntent().getParcelableExtra(REQUESTING_ACTIVITY_INTENT_KEY))
+            .map(x -> (Intent) x).executeIfPresent(parentIntent -> {
+            parentIntent.putExtra(GAME_LIST_VIEWER_STREAM_REFINER_KEY, streamRefinerBuilder.build());
+            startActivity(parentIntent);
+        }).executeIfAbsent(() -> Log.e("Sort click", "Could not find parent activity intent"));
+        finish();
     }
 }
 

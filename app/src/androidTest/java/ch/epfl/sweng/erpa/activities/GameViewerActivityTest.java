@@ -3,146 +3,173 @@ package ch.epfl.sweng.erpa.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewAssertion;
+import android.support.test.espresso.intent.Intents;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
+import com.google.common.primitives.Ints;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import ch.epfl.sweng.erpa.ErpaApplication;
+import javax.inject.Inject;
+
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
-import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
+import ch.epfl.sweng.erpa.model.PlayerJoinGameRequest;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
-import toothpick.Scope;
-import toothpick.Toothpick;
-import toothpick.configuration.Configuration;
-import toothpick.registries.FactoryRegistryLocator;
-import toothpick.registries.MemberInjectorRegistryLocator;
+import ch.epfl.sweng.erpa.services.UserManagementService;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.assertion.ViewAssertions.selectedDescendantsMatch;
+import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
-import static org.hamcrest.core.StringContains.containsString;
+import static junit.framework.TestCase.assertTrue;
 
-@RunWith(AndroidJUnit4.class)
-public class GameViewerActivityTest {
-    @Rule public final ActivityTestRule<GameViewerActivity> activityTestRule = new ActivityTestRule<>(GameViewerActivity.class, false, false);
-    private Game game = getGame("hewwo");
-    private Game emptyOptGame = getGame("empty");
+@RunWith(MockitoJUnitRunner.class)
+public class GameViewerActivityTest extends DependencyConfigurationAgnosticTest {
+    @Rule public final ActivityTestRule<GameViewerActivity> activityTestRule =
+        new ActivityTestRule<>(GameViewerActivity.class, false, false);
+    @Inject GameService gameService;
+    @Inject LoggedUserCoordinator loggedUserCoordinator;
+    @Inject UserManagementService userManagementService;
+    private Username u1, u2, gm, currentUser;
+    private Game game, emptyOptGame;
+    private GameViewerActivity activity;
+
+    private static boolean gameViewerActivityAsyncVisualElementsReady(GameViewerActivity activity, int... except) {
+        return Stream.of(activity.gmName, activity.playerListView, activity.joinGameButton)
+            .filterNot(v1 -> Ints.contains(except, v1.getId()))
+            .map(View::getVisibility)
+            .allMatch(v -> v == View.VISIBLE);
+    }
 
     @Before
-    public void prepare() {
-        Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
-        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
-        ErpaApplication application = scope.getInstance(ErpaApplication.class);
+    public void prepare() throws Throwable {
+        super.prepare();
 
-        Toothpick.reset(scope);
-        application.installModules(scope);
-        scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
-                DummyRemoteServicesProvider.class
-        );
-        emptyOptGame.setNumberSessions(Optional.empty());
+        gm = registerUsername(userManagementService, "Sapphie");
+        u1 = registerUsername(userManagementService, "Ryker");
+        u2 = registerUsername(userManagementService, "Ivan");
+        currentUser = registerUsername(userManagementService, "Anne");
+
+        game = getGame("Game" + System.currentTimeMillis());
+        game.setGmUserUuid(gm.getUserUuid());
+
+        emptyOptGame = getGame("empty");
+        emptyOptGame.setGmUserUuid(gm.getUserUuid());
+        emptyOptGame.setNumberOfSessions(Optional.empty());
         emptyOptGame.setSessionLengthInMinutes(Optional.empty());
-        scope.getInstance(GameService.class).saveGame(game);
-        scope.getInstance(GameService.class).saveGame(emptyOptGame);
 
-        Intent i = new Intent();
-        i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
+        gameService.updateGame(game);
+        gameService.updateGame(emptyOptGame);
+
+        String gameUuid = game.getUuid();
+        Utils.joinUserToGame(gameUuid, u1, gameService, PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN);
+        Utils.joinUserToGame(gameUuid, u2, gameService, PlayerJoinGameRequest.RequestStatus.CONFIRMED);
+
+        registerCurrentlyLoggedUser(loggedUserCoordinator, currentUser);
+
+        Intents.init();
+        launchActivityForGame(gameUuid);
+    }
+
+    @After
+    public void teardown() {
+        Intents.release();
+    }
+
+    private void launchActivityForGame(String gameUuid) {
+        Intent gameViewerActivityLaunchIntent = new Intent();
+        gameViewerActivityLaunchIntent.putExtra(GameService.PROP_INTENT_GAME_UUID, gameUuid);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.HOSTED_GAMES);
-        i.putExtras(bundle);
-        activityTestRule.launchActivity(i);
-
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.HOSTED_GAMES);
+        gameViewerActivityLaunchIntent.putExtras(bundle);
+        activityTestRule.launchActivity(gameViewerActivityLaunchIntent);
+        activity = activityTestRule.getActivity();
     }
 
     @Test
-    public void testHasIntent() {
-        assert (activityTestRule.getActivity().getIntent().hasExtra(GameService.PROP_INTENT_GAME));
+    public void activityHasGameUuidIntent() {
+        assertTrue(activity.getIntent().hasExtra(GameService.PROP_INTENT_GAME_UUID));
     }
 
     @Test
-    public void testDescription() {
+    public void visibleTVsHaveCorrectText() {
         onView(withId(R.id.descriptionTextView)).check(matches(withText(game.getDescription())));
-    }
-
-
-    @Test
-    public void testGmName() {
-        onView(withId(R.id.gmTextView)).check(matches(withText(game.getGmUuid())));
-    }
-
-    @Test
-    public void testUniverse() {
         onView(withId(R.id.universeTextView)).check(matches(withText(game.getUniverse())));
-    }
-
-    @Test
-    public void testTitle() {
-        onView(withId(R.id.titleTextView)).check(matches(withText(game.getName())));
-    }
-
-    @Test
-    public void testDifficulty() {
+        onView(withId(R.id.titleTextView)).check(matches(withText(game.getTitle())));
         onView(withId(R.id.difficultyTextView)).check(matches(withText(game.getDifficulty().toString())));
-    }
-
-    @Test
-    public void testType() {
-        onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getOneshotOrCampaign().toString())));
-    }
-
-    @Test
-    public void testSessionLength() {
+        onView(withId(R.id.oneShotOrCampaignTextView)).check(matches(withText(game.getOneshotOrCampaign())));
         onView(withId(R.id.sessionLengthTextView)).check(matches(withText(game.getSessionLengthInMinutes().get().toString())));
+        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberOfSessions().get().toString())));
+
+        while (!gameViewerActivityAsyncVisualElementsReady(activity))
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+
+        onView(withId(R.id.gmTextView)).check(matches(withText(gm.getUsername())));
+        onView(withId(R.id.gameViewerPlayerListView))
+            .check(matches(isDisplayed()))
+            .check(selectedDescendantsMatch(withText(u1.getUsername()), isDisplayed()))
+            .check(selectedDescendantsMatch(withText(u2.getUsername()), isDisplayed()));
+        onView(withId(R.id.joinGameButton)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void testNumSessions() {
-        onView(withId(R.id.sessionNumberTextView)).check(matches(withText(game.getNumberSessions().get().toString())));
-    }
-
-    @Test
-    public void testEmptyNumSessions() {
-        Intent iOld = activityTestRule.getActivity().getIntent();
+    public void visibleTVsOnEmptySessionsOrLength() {
         activityTestRule.finishActivity();
-        Intent i = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.PAST_GAMES);
-        i.putExtras(bundle);
-        i.putExtra(GameService.PROP_INTENT_GAME, emptyOptGame.getGameUuid());
-        activityTestRule.launchActivity(i);
+        launchActivityForGame(emptyOptGame.getUuid());
         onView(withId(R.id.sessionNumberTextView)).check(matches(withText("Unspecified")));
         onView(withId(R.id.sessionLengthTextView)).check(matches(withText("Unspecified")));
-        activityTestRule.finishActivity();
-        activityTestRule.launchActivity(iOld);
     }
 
     @Test
     public void testClickOnJoinGameButton() {
-        Intent iOld = activityTestRule.getActivity().getIntent();
-        activityTestRule.finishActivity();
-        Intent i = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
-        i.putExtras(bundle);
-        i.putExtra(GameService.PROP_INTENT_GAME, game.getGameUuid());
-        activityTestRule.launchActivity(i);
+        while (!gameViewerActivityAsyncVisualElementsReady(activity))
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+
         onView(withId(R.id.joinGameButton)).perform(click());
+        intended(hasComponent(JoinGameActivity.class.getName()));
+        intended(hasExtra(JoinGameActivity.GAME_UUID_KEY, game.getUuid()));
+    }
+
+    @Test
+    public void testJoinButtonHiddenIfGM() {
+        registerCurrentlyLoggedUser(loggedUserCoordinator, gm);
+        restartActivityAndCheckJoinButtonIsHidden();
+    }
+
+    @Test
+    public void testJoinButtonHiddenIfJoinRequestSent() {
+        registerCurrentlyLoggedUser(loggedUserCoordinator, u1);
+        restartActivityAndCheckJoinButtonIsHidden();
+    }
+
+    private void restartActivityAndCheckJoinButtonIsHidden() {
         activityTestRule.finishActivity();
-        activityTestRule.launchActivity(iOld);
+        launchActivityForGame(game.getUuid());
+        while (!gameViewerActivityAsyncVisualElementsReady(activity, R.id.joinGameButton))
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+
+        onView(withId(R.id.joinGameButton))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
     }
 }

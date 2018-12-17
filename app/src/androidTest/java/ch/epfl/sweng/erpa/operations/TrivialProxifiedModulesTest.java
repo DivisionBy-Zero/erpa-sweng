@@ -16,7 +16,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import ch.epfl.sweng.erpa.ErpaApplication;
+import ch.epfl.sweng.erpa.activities.DependencyConfigurationAgnosticTest;
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
 import ch.epfl.sweng.erpa.operations.helpers.TestDependencyAbstractClass;
@@ -40,27 +43,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
 @MediumTest
-public class TrivialProxifiedModulesTest {
-    Scope scope;
-
-    @Before
-    public void prepare() {
-        Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
-        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
-        ErpaApplication application = scope.getInstance(ErpaApplication.class);
-
-        Toothpick.reset(scope);
-        scope.installModules(new ErpaApplicationModule(application, scope));
-
-        scope.installModules(new Module() {{
-            bind(Scope.class).withName(RES_APPLICATION_SCOPE).toInstance(scope);
-            bind(DependencyConfigurationHelper.class).to(DependencyConfigurationHelper.class);
-            bind(Map.class).withName(RES_DEPENDENCY_COORDINATORS)
-                    .toInstance(new HashMap<Class, DependencyCoordinator>());
-        }});
-    }
+public class TrivialProxifiedModulesTest extends DependencyConfigurationAgnosticTest {
+    @Inject Scope scope;
 
     @Test
     public void testBindsSimpleInstance() throws Throwable {

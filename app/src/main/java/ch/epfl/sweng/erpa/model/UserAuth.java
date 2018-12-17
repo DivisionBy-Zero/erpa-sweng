@@ -1,12 +1,15 @@
 package ch.epfl.sweng.erpa.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
 
 @Data
-@ToString(exclude = "accessToken")
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserAuth {
-    @NonNull private String uid;
-    @NonNull private String accessToken;
+    @NonNull private String userUuid;
+    @NonNull private String publicKey;
+    @NonNull private String authenticationStrategy = "Grenouille";
 }

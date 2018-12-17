@@ -1,41 +1,51 @@
 package ch.epfl.sweng.erpa.activities;
 
 import android.app.Instrumentation;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.runner.AndroidJUnit4;
 import android.widget.ListView;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.MyAccountButton;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.util.Pair;
+import ch.epfl.sweng.erpa.model.UserSessionToken;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.LoggedUser;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class MyAccountActivityTest {
-
+@RunWith(AndroidJUnit4.class)
+public class MyAccountActivityTest extends DependencyConfigurationAgnosticTest {
+    @Rule
+    public final IntentsTestRule<MyAccountActivity> intentsTestRule = new IntentsTestRule<>(MyAccountActivity.class, false, false);
     private ListView listView;
     private Resources systemResources;
     private UserProfile userProfile;
     private Instrumentation instrumentation;
 
-    @Rule
-    public final IntentsTestRule<MyAccountActivity> intentsTestRule = new IntentsTestRule<>(
-            MyAccountActivity.class);
-
     @Before
-    public void setTestVariables() {
+    public void prepare() throws Throwable {
+        super.prepare();
+        String userUuid = "UserUuid";
+        UserSessionToken userSessionToken = new UserSessionToken(userUuid, userUuid);
+        userProfile = UserProfile.builder().uuid(userUuid).isGm(true).isPlayer(true).build();
+        scope.getInstance(LoggedUserCoordinator.class).setCurrentLoggedUser(
+            new LoggedUser(userSessionToken, userProfile, new Username(userUuid, userUuid)));
+
+        intentsTestRule.launchActivity(new Intent());
         systemResources = intentsTestRule.getActivity().getResources();
         listView = intentsTestRule.getActivity().findViewById(R.id.myAccountLayout);
-        userProfile = intentsTestRule.getActivity().userProfile;
         instrumentation = InstrumentationRegistry.getInstrumentation();
     }
 
@@ -70,9 +80,9 @@ public class MyAccountActivityTest {
     }
 
     public void checkCorrectName(int position, int ressourceID) {
-        Pair pair = (Pair) listView.getItemAtPosition(position);
-        assertThat(((MyAccountButton) pair.getFirst()).getText(),
-                is(systemResources.getString(ressourceID)));
+        MyAccountActivity.MyAccountButtonData itemData =
+            (MyAccountActivity.MyAccountButtonData) listView.getItemAtPosition(position);
+        assertThat(itemData.getTextId(), is(ressourceID));
     }
 
     @Test
@@ -116,7 +126,7 @@ public class MyAccountActivityTest {
         instrumentation.runOnMainSync(() -> {
             int position = myPosition;
             listView.performItemClick(listView.getChildAt(position), position,
-                    listView.getAdapter().getItemId(position));
+                listView.getAdapter().getItemId(position));
         });
     }
 }

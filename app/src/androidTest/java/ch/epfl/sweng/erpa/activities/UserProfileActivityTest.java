@@ -4,112 +4,95 @@ import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 
-import org.junit.Before;
+import com.annimon.stream.Stream;
+import com.google.common.primitives.Ints;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ch.epfl.sweng.erpa.ErpaApplication;
+import java.io.IOException;
+
+import javax.inject.Inject;
+
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
-import ch.epfl.sweng.erpa.services.UserProfileService;
-import ch.epfl.sweng.erpa.services.dummy.DummyRemoteServicesProvider;
-import toothpick.Scope;
-import toothpick.Toothpick;
-import toothpick.configuration.Configuration;
-import toothpick.registries.FactoryRegistryLocator;
-import toothpick.registries.MemberInjectorRegistryLocator;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
+import ch.epfl.sweng.erpa.services.GCP.ServerException;
+import ch.epfl.sweng.erpa.services.UserManagementService;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withSubstring;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static ch.epfl.sweng.erpa.util.TestUtils.getUserProfile;
 import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.AllOf.allOf;
 
 @RunWith(AndroidJUnit4.class)
-public class UserProfileActivityTest {
+public class UserProfileActivityTest extends DependencyConfigurationAgnosticTest {
     @Rule public ActivityTestRule<UserProfileActivity> activityTestRule =
-            new ActivityTestRule<>(UserProfileActivity.class, false, false);
+        new ActivityTestRule<>(UserProfileActivity.class, false, false);
 
-    private UserProfileService ups;
-    private UserProfile userProfile = getUserProfile("hey");
+    @Inject LoggedUserCoordinator loggedUserCoordinator;
+    @Inject UserManagementService userManagementService;
+    @Inject UserProfile userProfile;
+    @Inject Username username;
 
-    @Before
-    public void prepare() {
-        Toothpick.setConfiguration(Configuration.forDevelopment().enableReflection());
-        FactoryRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.FactoryRegistry());
-        MemberInjectorRegistryLocator.setRootRegistry(new ch.epfl.sweng.erpa.smoothie.MemberInjectorRegistry());
-        Scope scope = Toothpick.openScope(InstrumentationRegistry.getTargetContext().getApplicationContext());
-        ErpaApplication application = scope.getInstance(ErpaApplication.class);
-
-        Toothpick.reset(scope);
-        application.installModules(scope);
-        scope.getInstance(RemoteServicesProviderCoordinator.class).bindRemoteServicesProvider(
-                DummyRemoteServicesProvider.class
-        );
-        ups = scope.getInstance(UserProfileService.class);
-
-        Intent i = new Intent();
-        i.putExtra(UserProfileService.PROP_INTENT_USER, userProfile.getUuid());
-        ups.saveUserProfile(userProfile);
-        activityTestRule.launchActivity(i);
+    private static boolean activityAsyncVisualElementsReady(UserProfileActivity activity, int... except) {
+        return Stream.of(activity.usernameTV, activity.experienceTV)
+            .filterNot(v1 -> Ints.contains(except, v1.getId()))
+            .map(View::getVisibility)
+            .allMatch(v -> v == View.VISIBLE);
     }
 
     @Test
-    public void testIntent() {
-        assertTrue(activityTestRule.getActivity().getIntent().hasExtra(UserProfileService.PROP_INTENT_USER));
+    public void testIntent() throws Throwable {
+        launchActivity("user", true, true);
+        assertTrue(activityTestRule.getActivity().getIntent().hasExtra(UserManagementService.PROP_INTENT_USER));
     }
 
     @Test
-    public void testUsername() {
-        onView(withId(R.id.usernameTextView)).check(matches(withText(userProfile.getUsername())));
+    public void testUsername() throws Throwable {
+        launchActivity("user", true, true);
+        onView(withId(R.id.usernameTextView)).check(matches(withSubstring("@" + username.getUsername())));
     }
 
     @Test
-    public void testExperience() {
-        onView(withId(R.id.experienceTextView)).check(matches(withText(userProfile.getXp().toString())));
+    public void testGM() throws IOException, ServerException {
+        launchActivity("-3", true, false);
+        onView(withId(R.id.playerOrGMTextView)).check(matches(withText(R.string.user_profile_gm_only)));
     }
 
     @Test
-    public void testGM() {
-        String testUuid = "-3";
-        relaunchActivity(testUuid, true, false);
-        onView(withId(R.id.playerOrGMTextView)).check(matches(withText("Game master")));
+    public void testPlayer() throws IOException, ServerException {
+        launchActivity("-4", false, true);
+        onView(withId(R.id.playerOrGMTextView)).check(matches(withText(R.string.user_profile_player_only)));
     }
 
     @Test
-    public void testPlayer() {
-        String testUuid = "-4";
-        relaunchActivity(testUuid, false, true);
-        onView(withId(R.id.playerOrGMTextView)).check(matches(withText("Player")));
+    public void testGmAndPlayer() throws IOException, ServerException {
+        launchActivity("-5", true, true);
+        onView(withId(R.id.playerOrGMTextView)).check(matches(withText(R.string.user_profile_player_and_gm)));
     }
 
     @Test
-    public void testGmAndPlayer() {
-        String testUuid = "-5";
-        relaunchActivity(testUuid, true, true);
-        onView(withId(R.id.playerOrGMTextView)).check(
-                matches(allOf(
-                        withText(containsString("Player")),
-                        withText(containsString("Game master")))));
+    public void testNeitherGmNorPlayer() throws IOException, ServerException {
+        launchActivity("-6", false, false);
+        onView(withId(R.id.playerOrGMTextView)).check(matches(withText(R.string.user_profile_neither_player_nor_gm)));
     }
 
-    @Test
-    public void testNeitherGmNorPlayer() {
-        String testUuid = "-6";
-        relaunchActivity(testUuid, false, false);
-        onView(withId(R.id.playerOrGMTextView)).check(matches(withText("")));
-    }
+    private void launchActivity(String usernameStr, boolean isGm, boolean isPlayer) throws IOException, ServerException {
+        registerCurrentlyLoggedUser(loggedUserCoordinator, registerUsername(userManagementService, usernameStr));
+        userProfile.setIsGm(isGm);
+        userProfile.setIsPlayer(isPlayer);
+        userManagementService.registerUserProfile(userProfile);
+        Intent intent = new Intent().putExtra(UserManagementService.PROP_INTENT_USER, username.getUserUuid());
+        activityTestRule.launchActivity(intent);
 
-    private void relaunchActivity(String id, boolean isGm, boolean isPlayer) {
-        activityTestRule.finishActivity();
-        UserProfile gmProfile = new UserProfile(id, "Sapphie", "", UserProfile.Experience.Casual, isGm, isPlayer);
-        ups.saveUserProfile(gmProfile);
-        activityTestRule.launchActivity((new Intent()).putExtra(UserProfileService.PROP_INTENT_USER, id));
+        while (!activityAsyncVisualElementsReady(activityTestRule.getActivity()))
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
     }
 }

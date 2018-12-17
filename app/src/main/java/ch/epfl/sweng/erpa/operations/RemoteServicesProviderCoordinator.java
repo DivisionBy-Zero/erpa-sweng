@@ -45,6 +45,7 @@ public class RemoteServicesProviderCoordinator implements DependencyCoordinator<
     @Inject SharedPreferences sharedPreferences;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<RemoteServicesProvider> currentProvider = Optional.empty();
+    private final Intent configurationIntent;
 
     @Inject
     public RemoteServicesProviderCoordinator(@Named(ErpaApplication.RES_APPLICATION_SCOPE) Scope scope, Context appCtx) {
@@ -52,6 +53,7 @@ public class RemoteServicesProviderCoordinator implements DependencyCoordinator<
         Toothpick.inject(this, scope);
         REMOTE_PROVIDER_KEY = appCtx.getString(R.string.prop_key_remote_provider);
         rspClassFromApplicationPreferences().ifPresent(this::bindRemoteServicesProvider);
+        configurationIntent = new Intent(applicationContext, SelectRemoteServicesProviderActivity.class);
     }
 
     public void bindRemoteServicesProvider(@Nullable Class<? extends RemoteServicesProvider> rspClass) {
@@ -107,7 +109,7 @@ public class RemoteServicesProviderCoordinator implements DependencyCoordinator<
 
     @Override
     public Intent dependencyConfigurationIntent() {
-        return new Intent(applicationContext, SelectRemoteServicesProviderActivity.class);
+        return configurationIntent;
     }
 
     @Override

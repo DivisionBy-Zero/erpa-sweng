@@ -30,6 +30,7 @@ public class RemoteServiceGreeterActivity extends DependencyConfigurationAgnosti
     @Override
     protected void onResume() {
         super.onResume();
+        if (dependenciesNotReady()) return;
         tw1.setText(String.format("Hello %s!", remoteServicesProvider.getFriendlyProviderName()));
         tw2.setText(String.format("Hello %s", remoteServicesProvider.getFriendlyProviderDescription()));
     }

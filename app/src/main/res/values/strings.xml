@@ -21,10 +21,8 @@
     <!-- Login error messages-->
     <string name="noNameMessage">No username</string>
     <string name="noPassMessage">No password</string>
-    <string name="incorrectLogin">Username or password is incorrect</string>
     <string name="passwords_not_match">The password do not match</string>
     <string name="not_select_GM_or_player">Are you a GM and/or a player</string>
-    <string name="username_in_use">Username is already in user. Please change your username</string>
 
     <!-- Submit error messages -->
     <string name="emptyFieldMessage">All the fields with a * should be filled</string>
@@ -61,10 +59,13 @@
     <string name="sort">Sort</string>
     <string name="sort_by_distance">Sort by distance:</string>
 
-    <!-- Player Adapter string-->
-    <string name="playerX">Player %1$d:</string>
-
-    <!-- Menu string-->
+    <!-- Menu strings-->
     <string name="you_are_logged_as">You are logged as:</string>
+
+    <!-- User Profile strings-->
+    <string name="user_profile_player_and_gm">Player and Game master</string>
+    <string name="user_profile_player_only">Player</string>
+    <string name="user_profile_gm_only">Game master</string>
+    <string name="user_profile_neither_player_nor_gm">You\'re neither a Player nor a Game Master</string>
 
 </resources>

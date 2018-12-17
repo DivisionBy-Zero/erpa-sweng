@@ -1,204 +1,265 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiConsumer;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.listeners.ListLikeOnClickListener;
 import ch.epfl.sweng.erpa.model.Game;
-import ch.epfl.sweng.erpa.model.GameAdapter;
-import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.model.ObservableAsyncList;
+import ch.epfl.sweng.erpa.operations.AsyncTaskService;
+import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 import ch.epfl.sweng.erpa.services.GameService;
-import ch.epfl.sweng.erpa.services.UserProfileService;
+import lombok.AllArgsConstructor;
+import toothpick.Scope;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
-
-    public static final String GAME_LIST_ACTIVTIY_CLASS_KEY = "Game list activity class key";
     public static final String GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY = "Game list viewer activity class key";
+    public static final String GAME_LIST_VIEWER_STREAM_REFINER_KEY = "Game list viewer activity stream refiner";
+    static final Map<GameListType, Integer> stringIdForGameListType =
+        Collections.unmodifiableMap(new HashMap<GameListType, Integer>() {{
+            put(GameListType.FIND_GAME, R.string.titleListGamesActivity);
+            put(GameListType.PENDING_REQUEST, R.string.pendingRequestText);
+            put(GameListType.CONFIRMED_GAMES, R.string.confirmedGamesText);
+            put(GameListType.PAST_GAMES, R.string.pastGamesText);
+            put(GameListType.HOSTED_GAMES, R.string.hostedGamesText);
+            put(GameListType.PAST_HOSTED_GAMES, R.string.pastHostedGamesText);
+        }});
+    static final Map<Game.Difficulty, Integer> colorIdForDifficulty =
+        Collections.unmodifiableMap(new HashMap<Game.Difficulty, Integer>() {{
+            put(Game.Difficulty.NOOB, R.color.noobDifficultyColor);
+            put(Game.Difficulty.CHILL, R.color.chillDifficultyColor);
+            put(Game.Difficulty.HARD, R.color.hardDifficultyColor);
+        }});
 
-    @Inject public GameService gameService;
-    @Inject UserProfile up;
+    @BindView(R.id.game_list_activity_loading_panel) View loader;
+    @BindView(R.id.game_list_drawer_layout) DrawerLayout myDrawerLayout;
+    @BindView(R.id.game_list_navigation_view) NavigationView myNavigationView;
+    @BindView(R.id.game_list_recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.game_list_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.game_list_toolbar) Toolbar myToolbar;
 
-    @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
-    private List<Game> games;
-    private Toolbar toolbar;
-    private GameList gameList = GameList.FIND_GAME;
-    private Bundle bundle;
+    @Inject GameService gameService;
+    @Inject OptionalDependencyManager optionalDependency;
+    @Inject Scope scope;
+
+    private Map<String, AsyncTask> asyncFetchThreads = new HashMap<>();
+    private AsyncTaskService asyncTaskService;
+    private Intent currentIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (dependenciesNotReady()) return;
-       setContentView(R.layout.activity_game_list);
+        setContentView(R.layout.activity_game_list);
         ButterKnife.bind(this);
+        asyncTaskService = new AsyncTaskService();
+        asyncTaskService.setResultConsumerContext(this::runOnUiThread);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (dependenciesNotReady()) return;
-        Intent myIntent = getIntent();
-        bundle = myIntent.getExtras();
+        asyncFetchThreads = new HashMap<>();
+        currentIntent = getIntent();
 
-        toolbar = findViewById(R.id.game_list_toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        if (bundle != null) {
-            gameList = (GameList) bundle.getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY);
-            setToolbarText(gameList);
+        Bundle bundle = currentIntent.getExtras();
+        if (bundle == null) {
+            finish();
+            return;
         }
 
-        games = new ArrayList<>(gameService.getAll());
-        // TODO(@Roos) remove when FIXME is fixed
-        createListData();
+        addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
+        setMenuInToolbar(this, myToolbar);
+
+        setToolbarText((GameListType) bundle.getSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY));
+
+        GameService.StreamRefiner gameListRefiner = Optional.ofNullable(
+            (GameService.StreamRefiner) bundle.getSerializable(GAME_LIST_VIEWER_STREAM_REFINER_KEY))
+            .orElse(new GameService.StreamRefiner());
+        ObservableAsyncList<Game> games = gameService.getAllGames(gameListRefiner);
+        games.addObserver(this::updateGames);
+        games.refreshDataAndReset();
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            stopFetchThreads();
+            games.refreshDataAndReset();
+        });
 
         mRecyclerView.setHasFixedSize(true);
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-
-        ListLikeOnClickListener listener = (view, position) -> {
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(new GameListViewAdapter(gameService, games, (view, game) -> {
             Intent intent = new Intent(this, GameViewerActivity.class);
-            intent.putExtra(GameService.PROP_INTENT_GAME, games.get(position).getGameUuid());
+            intent.putExtra(GameService.PROP_INTENT_GAME_UUID, game.getUuid());
             putExtraOnGameViewer(intent);
             startActivity(intent);
-        };
+        }));
+    }
 
-        RecyclerView.Adapter mAdapter = new GameAdapter(games, listener);
-        mRecyclerView.setAdapter(mAdapter);
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopFetchThreads();
+    }
 
-        addNavigationMenu(this, findViewById(R.id.game_list_drawer_layout), findViewById(R.id.game_list_navigation_view), up);
-        setMenuInToolbar(this, toolbar);
-
-        // TODO(@Roos) uncomment when FIXME is fixed
-//        createListData();
+    private void stopFetchThreads() {
+        Stream.of(asyncFetchThreads.values()).forEach(v -> v.cancel(true));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_appbar, menu);
-        setToolbarText(gameList);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.game_list_drawer_layout));
-        return found || onOptionItemViewSelected(item.getItemId());
+        int elementItem = item.getItemId();
+        if (elementItem == R.id.menu_actionSearch) {
+            Intent intent = new Intent(this, SortActivity.class);
+            intent.putExtra(REQUESTING_ACTIVITY_INTENT_KEY, getIntent());
+            Optional.ofNullable(currentIntent.getExtras()).ifPresent(intent::putExtras);
+            startActivity(intent);
+            return true;
+        } else if (elementItem == android.R.id.home) {
+            myDrawerLayout.openDrawer(GravityCompat.START);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-
-    // Handle action bar menu item clicks
-    public boolean onOptionItemViewSelected(int menuItemId) {
-        bundle = getIntent().getExtras();
-        Intent intent;
-        switch (menuItemId) {
-            case R.id.menu_actionSearch:
-                intent = new Intent(this, SortActivity.class);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 1);
-                return true;
-            default:
-        }
-        return super.onOptionsItemSelected(findViewById(menuItemId));
-    }
-
-    // FIXME(@Roos) list doesn't appear correctly the first time it's rendered
-    private void createListData() {
-        if (games.isEmpty()) {
-            Game.GameBuilder gb = Game.builder()
-                    .description("")
-                    .gmUuid("")
-                    .minPlayer(1)
-                    .name("test")
-                    .numberSessions(Optional.empty())
-                    .oneshotOrCampaign(Game.OneshotOrCampaign.ONESHOT)
-                    .playersUuid(new HashSet<>())
-                    .sessionLengthInMinutes(Optional.empty())
-                    .universe("DnD");
-            for (int i = 0; i < new Random().nextInt(20) + 5; i++) {
-                gb.difficulty(Game.Difficulty.values()[new Random().nextInt(3)])
-                        .gameUuid(Integer.toString(i))
-                        .maxPlayer(new Random().nextInt(6) + 1);
-                games.add(gb.build());
-                gameService.saveGame(gb.build());
-            }
-//            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    protected void setToolbarText(GameList gameList) {
-        @StringRes int id = R.string.title_example_for_toolbar_activity;
-        switch (gameList) {
-            case FIND_GAME:
-                id = R.string.titleListGamesActivity;
-                break;
-            case PENDING_REQUEST:
-                id = R.string.pendingRequestText;
-                break;
-            case CONFIRMED_GAMES:
-                id = R.string.confirmedGamesText;
-                break;
-            case PAST_GAMES:
-                id = R.string.pastGamesText;
-                break;
-            case HOSTED_GAMES:
-                id = R.string.hostedGamesText;
-                break;
-            case PAST_HOSTED_GAMES:
-                id = R.string.pastHostedGamesText;
-                break;
-            default:
-        }
-        getSupportActionBar().setTitle(id);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (resultCode == RESULT_OK) {
-            //TODO(@Ryker) add sorting using the data from data
-        }
+    protected void setToolbarText(GameListType gameListType) {
+        @StringRes int toolbarTextId = Optional.ofNullable(stringIdForGameListType.get(gameListType))
+            .orElse(R.string.title_example_for_toolbar_activity);
+        Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle(toolbarTextId));
     }
 
     private void putExtraOnGameViewer(Intent intent) {
-        Bundle bundle = getIntent().getExtras();
+        Bundle bundle = currentIntent.getExtras();
         if (bundle != null) {
-            GameList gameList = (GameList) bundle.getSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY);
-            intent.putExtra(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, gameList);
+            GameListType gameListType = (GameListType) bundle.getSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY);
+            intent.putExtra(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, gameListType);
         }
     }
 
-    public enum GameList {FIND_GAME, PENDING_REQUEST, CONFIRMED_GAMES, PAST_GAMES, HOSTED_GAMES, PAST_HOSTED_GAMES}
+    public void updateGames(ObservableAsyncList updatedGames) {
+        swipeRefreshLayout.setRefreshing(false);
+        loader.setVisibility(View.VISIBLE);
+        Log.d("GameList", "Game list update" + updatedGames.size());
+        if (!updatedGames.isLoading()) {
+            loader.setVisibility(View.GONE);
+        }
+        Optional.ofNullable(mRecyclerView.getAdapter()).ifPresent(RecyclerView.Adapter::notifyDataSetChanged);
+    }
+
+    public enum GameListType {FIND_GAME, PENDING_REQUEST, CONFIRMED_GAMES, PAST_GAMES, HOSTED_GAMES, PAST_HOSTED_GAMES}
+
+    @AllArgsConstructor
+    class GameListViewAdapter extends RecyclerView.Adapter<GameListViewAdapter.GameListViewElementHolder> {
+        private GameService gameService;
+        private ObservableAsyncList<Game> games;
+        private BiConsumer<View, Game> onItemClickListener;
+
+        @NonNull
+        @Override
+        public GameListViewElementHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+            Context context = parent.getContext();
+            View view = LayoutInflater.from(context).inflate(R.layout.list_games_row, parent, false);
+            return new GameListViewElementHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull GameListViewElementHolder gameHolder, int i) {
+            gameHolder.configureItemViewport(games.get(i), onItemClickListener);
+        }
+
+        @Override
+        public int getItemCount() {
+            return games.size();
+        }
+
+        class GameListViewElementHolder extends RecyclerView.ViewHolder {
+            @BindView(R.id.difficultyBanner) TextView difficultyTV;
+            @BindView(R.id.gameTitle) TextView titleTV;
+            @BindView(R.id.location) TextView locationTV;
+            @BindView(R.id.universeName) TextView universeTV;
+            @BindView(R.id.currentNbPlayersProgressBar) View nbPlayersProgress;
+            @BindView(R.id.currentNbPlayersInfo) TextView nbPlayersTV;
+            @BindView(R.id.maxNbPlayersInfo) TextView maxPlayersTV;
+
+            GameListViewElementHolder(View itemView) {
+                super(itemView);
+                ButterKnife.bind(this, itemView);
+            }
+
+            void configureItemViewport(Game game, BiConsumer<View, Game> onItemViewClick) {
+                difficultyTV.setText(game.getDifficulty().toString());
+                int colorId = colorIdForDifficulty.get(game.getDifficulty());
+                difficultyTV.setBackgroundColor(getResources().getColor(colorId));
+                titleTV.setText(game.getTitle());
+                locationTV.setText("Lausanne"); // TODO(@Roos): Get location from location services
+                universeTV.setText(game.getUniverse());
+                int maxPlayers = game.getMaxPlayers();
+                int minPlayers = game.getMinPlayers();
+                String maxPlayersString = (maxPlayers == minPlayers) ?
+                    Integer.toString(maxPlayers) : minPlayers + "-" + maxPlayers;
+                maxPlayersTV.setText(maxPlayersString);
+
+                itemView.setOnClickListener(view -> onItemViewClick.accept(view, game));
+
+                String gameUuid = game.getUuid();
+                if (asyncFetchThreads.containsKey(gameUuid))
+                    return;
+                asyncFetchThreads.put(gameUuid, asyncTaskService.run(
+                    () -> gameService.getGameJoinRequests(gameUuid),
+                    joinGameRequests -> {
+                        Log.d("postFetchGamePlayers", joinGameRequests.toString());
+                        nbPlayersTV.setText(Integer.toString(joinGameRequests.size()));
+                        nbPlayersTV.setVisibility(View.VISIBLE);
+                        nbPlayersProgress.setVisibility(View.GONE);
+                        asyncFetchThreads.remove(gameUuid);
+                    }, exc -> this.handleErrorsRetrievingPlayerJoinGameRequests(exc, game)));
+            }
+
+            void handleErrorsRetrievingPlayerJoinGameRequests(Throwable exc, Game game) {
+                String errorMessage = "Could not retrieve Game with UUID " + game.getUuid();
+                nbPlayersTV.setText(errorMessage);
+                nbPlayersProgress.setVisibility(View.GONE);
+                Log.e("renderGameParticipant", errorMessage, exc);
+            }
+        }
+    }
 }

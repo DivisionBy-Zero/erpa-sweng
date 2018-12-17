@@ -4,26 +4,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.UserProfile;
-import ch.epfl.sweng.erpa.services.UserProfileService;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 
-import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_ACTIVTIY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onNavigationItemMenuSelected;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
 public class MainActivity extends DependencyConfigurationAgnosticActivity {
+    @BindView(R.id.main_drawer_layout) DrawerLayout drawerLayout;
+    @BindView(R.id.main_navigation_view) NavigationView navigationView;
 
-    @Inject UserProfile up;
+    @Inject OptionalDependencyManager optionalDependency;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,13 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        addNavigationMenu(this, findViewById(R.id.main_drawer_layout), findViewById(R.id.main_navigation_view), up);
+        addNavigationMenu(this, drawerLayout, navigationView, optionalDependency);
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (dependenciesNotReady()) return;
+        setUsernameInMenu(navigationView, optionalDependency.get(Username.class));
     }
 
     @OnClick(R.id.launch_storage_provider_greet)
@@ -44,7 +50,7 @@ public class MainActivity extends DependencyConfigurationAgnosticActivity {
     public void launchGameList(View view) {
         Intent intent = new Intent(this, GameListActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(GAME_LIST_ACTIVTIY_CLASS_KEY, GameListActivity.GameList.FIND_GAME);
+        bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, GameListActivity.GameListType.FIND_GAME);
         intent.putExtras(bundle);
         startActivity(intent);
     }

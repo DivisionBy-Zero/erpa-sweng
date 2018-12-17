@@ -2,49 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="wrap_content">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
 
-        <ch.epfl.sweng.erpa.views.FlowLayout
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/gameViewerPlayerFlowLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintHorizontal_weight="1">
 
             <TextView
-                android:id="@+id/playerTextView"
+                android:id="@+id/gameJoinRequestUsername"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Player1: "
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:text="..."
+                app:layout_constraintHorizontal_weight="1" />
 
             <TextView
-                android:id="@+id/playerGameViewer"
+                android:id="@+id/gameJoinRequestStatus"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Player1"
+                android:text="Status"
                 app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@id/playerTextView" />
-
-            <Button
-                android:id="@+id/buttonRemovePlayer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/text_margin"
-                android:layout_marginTop="@dimen/fab_margin"
-                android:layout_marginRight="@dimen/fab_margin"
-                android:text="Remove"
-                android:textSize="@dimen/button_text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@id/playerGameViewer" />
-        </ch.epfl.sweng.erpa.views.FlowLayout>
+                app:layout_constraintStart_toEndOf="@id/gameJoinRequestUsername" />
+        </android.support.constraint.ConstraintLayout>
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>

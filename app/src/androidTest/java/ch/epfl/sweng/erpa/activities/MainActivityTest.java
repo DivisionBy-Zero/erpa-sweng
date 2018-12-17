@@ -11,6 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.model.UserSessionToken;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.LoggedUser;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
@@ -18,7 +23,7 @@ import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
+public class MainActivityTest extends DependencyConfigurationAgnosticTest {
     @Rule
     public final IntentsTestRule<MainActivity> intentsTestRule = new IntentsTestRule<>(MainActivity.class);
 
@@ -36,6 +41,12 @@ public class MainActivityTest {
 
     @Test
     public void testCanLaunchMyAccount() {
+        String userUuid = "UserUuid";
+        UserSessionToken userSessionToken = new UserSessionToken(userUuid, userUuid);
+        UserProfile userProfile = UserProfile.builder().uuid(userUuid).isGm(true).isPlayer(true).build();
+        scope.getInstance(LoggedUserCoordinator.class).setCurrentLoggedUser(
+            new LoggedUser(userSessionToken, userProfile, new Username(userUuid, userUuid)));
+
         onView(ViewMatchers.withId(R.id.launch_my_account_button)).perform(ViewActions.click());
         intended(hasComponent(MyAccountActivity.class.getName()));
     }
