@@ -1,6 +1,5 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -8,71 +7,61 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Exceptional;
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiConsumer;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.Game;
+import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 import ch.epfl.sweng.erpa.services.GameService;
+import ch.epfl.sweng.erpa.services.UserManagementService;
 
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static ch.epfl.sweng.erpa.activities.Utils.testClickItemMenu;
+import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
-    @Rule
-    public final ActivityTestRule<GameListActivity> intentsTestRule =
+    private final static BiConsumer<Integer, Class> testMenuItem = (id, cls) ->
+        testClickItemMenu(R.id.game_list_drawer_layout, R.id.game_list_navigation_view, id, cls.getName());
+    @Rule public final ActivityTestRule<GameListActivity> intentsTestRule =
         new ActivityTestRule<>(GameListActivity.class, false, false);
 
     @Inject GameService gameService;
-    private Toolbar toolbar;
+    @Inject LoggedUserCoordinator loggedUserCoordinator;
+    @Inject UserManagementService userManagementService;
     private Resources resources;
     private GameListActivity activity;
-
-    static List<View> getViewChildrensRecursive(ViewGroup parent) {
-        if (parent == null) return new ArrayList<>();
-        List<View> ret = new ArrayList<>();
-        if (parent.getChildCount() > 0) {
-            for (int i = 0; i < parent.getChildCount(); ++i) {
-                View v = parent.getChildAt(i);
-                if (ViewGroup.class.isAssignableFrom(v.getClass())) {
-                    ViewGroup vg = (ViewGroup) v;
-                    ret.addAll(getViewChildrensRecursive(vg));
-                } else {
-                    ret.add(v);
-                }
-            }
-        }
-        return ret;
-    }
 
     static Intent intentForGameListType(GameListActivity.GameListType type) {
         Bundle bundle = new Bundle();
@@ -83,39 +72,26 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
     }
 
     private static void populateGameList(GameService gameService, int nbGames) {
-        for (int i = 0; i < nbGames; i++) {
-            Game g = Game.builder()
-                .description("Lorem ipsum")
-                .difficulty(Game.Difficulty.CHILL)
-                .uuid(String.valueOf(i))
-                .maxPlayers(5)
-                .gmUserUuid("Empress Sapphie")
-                .title("The lost pepsi " + Integer.toString(i))
-                .minPlayers(1)
-                .universe("DnD")
-                .isCampaign(true)
-                .numberOfSessions(Optional.of(3))
-                .sessionLengthInMinutes(Optional.of(550))
-                .locationLat(0.0)
-                .locationLon(0.0)
-                .gameStatus(Game.GameStatus.CREATED)
-                .build();
-            Exceptional.of(() -> {
-                gameService.createGame(g);
-                return null;
-            }).getOrThrowRuntimeException();
-        }
+        Exceptional.of(() -> {
+            for (int i = 0; i < nbGames; i++) {
+                gameService.createGame(getGame("The lost pepsi " + Integer.toString(i)));
+            }
+            return null;
+        }).getOrThrowRuntimeException();
         assertEquals(nbGames, gameService.getAllGames(new GameService.StreamRefiner()).size());
     }
 
     @Before
     public void prepare() throws Throwable {
         super.prepare();
+        Username currentUser = registerUsername(userManagementService, "Isa");
+        registerCurrentlyLoggedUser(loggedUserCoordinator, currentUser);
+
         gameService.removeGames();
         populateGameList(gameService, 10);
+
         intentsTestRule.launchActivity(intentForGameListType(GameListActivity.GameListType.FIND_GAME));
         activity = intentsTestRule.getActivity();
-        toolbar = activity.findViewById(R.id.game_list_toolbar);
         resources = activity.getResources();
         Intents.init();
     }
@@ -136,7 +112,7 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
         RecyclerView recyclerView = activity.findViewById(R.id.game_list_recycler_view);
         View view = recyclerView.getLayoutManager().getChildAt(0);
         CardView firstCard = view.findViewById(R.id.cardview);
-        List<View> vs = getViewChildrensRecursive(firstCard);
+        List<View> vs = Utils.getViewChildrensRecursive(firstCard);
         vs.add(view.findViewById(R.id.difficultyBanner));
         Set<String> textFieldsText = Stream.of(vs)
             .filter(v -> TextView.class.isAssignableFrom(v.getClass()))
@@ -197,10 +173,22 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
     }
 
     @Test
-    public void testMenuButtonSelected() throws Throwable {
-        intentsTestRule.runOnUiThread(() -> {
-            DrawerLayout drawerLayout = activity.findViewById(R.id.game_list_drawer_layout);
-            onOptionItemSelectedUtils(android.R.id.home, drawerLayout);
-        });
+    public void testClickOnFindGameMenu() {
+        testMenuItem.accept(R.id.menu_findGame, GameListActivity.class);
+    }
+
+    @Test
+    public void testClickOnCreateGameMenu() {
+        testMenuItem.accept(R.id.menu_createGame, CreateGameActivity.class);
+    }
+
+    @Test
+    public void testClickOnMyAccountMenu() {
+        testMenuItem.accept(R.id.menu_myAccount, MyAccountActivity.class);
+    }
+
+    @Test
+    public void testClickOnDiceMenu() {
+        testMenuItem.accept(R.id.menu_dice, DiceActivity.class);
     }
 }

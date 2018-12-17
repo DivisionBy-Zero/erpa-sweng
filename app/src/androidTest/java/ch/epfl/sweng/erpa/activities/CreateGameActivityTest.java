@@ -2,15 +2,13 @@ package ch.epfl.sweng.erpa.activities;
 
 import android.content.res.Resources;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.contrib.DrawerActions;
-import android.support.test.espresso.contrib.NavigationViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
-import android.view.Gravity;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.annimon.stream.function.BiConsumer;
 
 import org.hamcrest.core.StringContains;
 import org.junit.Before;
@@ -34,12 +32,12 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.contrib.DrawerMatchers.isClosed;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
+import static ch.epfl.sweng.erpa.activities.Utils.testClickItemMenu;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -47,9 +45,10 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class CreateGameActivityTest extends DependencyConfigurationAgnosticTest {
-    @Rule
-    public final IntentsTestRule<CreateGameActivity> intentsTestRule = new IntentsTestRule<>(
-        CreateGameActivity.class);
+    private final static BiConsumer<Integer, Class> testMenuItem = (id, cls) ->
+        testClickItemMenu(R.id.create_game_drawer_layout, R.id.create_game_navigation_view, id, cls.getName());
+    @Rule public final IntentsTestRule<CreateGameActivity> intentsTestRule =
+        new IntentsTestRule<>(CreateGameActivity.class);
     @Inject LoggedUserCoordinator loggedUserCoordinator;
     @Inject UserManagementService userManagementService;
     private Resources systemResources;
@@ -201,34 +200,22 @@ public class CreateGameActivityTest extends DependencyConfigurationAgnosticTest 
 
     @Test
     public void testClickOnFindGameMenu() {
-        testClickItemMenu(R.id.menu_findGame, GameListActivity.class.getName());
+        testMenuItem.accept(R.id.menu_findGame, GameListActivity.class);
     }
 
     @Test
     public void testClickOnCreateGameMenu() {
-        testClickItemMenu(R.id.menu_createGame, CreateGameActivity.class.getName());
+        testMenuItem.accept(R.id.menu_createGame, CreateGameActivity.class);
     }
 
     @Test
     public void testClickOnMyAccountMenu() {
-        testClickItemMenu(R.id.menu_myAccount, MyAccountActivity.class.getName());
+        testMenuItem.accept(R.id.menu_myAccount, MyAccountActivity.class);
     }
 
     @Test
     public void testClickOnDiceMenu() {
-        testClickItemMenu(R.id.menu_dice, DiceActivity.class.getName());
-    }
-
-    private void testClickItemMenu(int menuItemId, String className) {
-        // Open Drawer to click on navigation.
-        onView(withId(R.id.create_game_drawer_layout))
-            .check(matches(isClosed(Gravity.LEFT))) // Left Drawer should be closed.
-            .perform(DrawerActions.open()); // Open Drawer
-
-        // Start the screen of your activity.
-        onView(withId(R.id.create_game_navigation_view))
-            .perform(NavigationViewActions.navigateTo(menuItemId));
-        intended(hasComponent(className));
+        testMenuItem.accept(R.id.menu_dice, DiceActivity.class);
     }
 
     @Test
