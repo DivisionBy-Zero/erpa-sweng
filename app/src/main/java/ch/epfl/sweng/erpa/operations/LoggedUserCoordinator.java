@@ -28,8 +28,10 @@ public class LoggedUserCoordinator implements DependencyCoordinator<LoggedUser> 
     @Inject Context ctx;
     @Inject UserManagementService ups;
     private Optional<LoggedUser> currentLoggedUser = Optional.empty();
+    private final Intent configurationIntent;
 
-    @Inject public LoggedUserCoordinator() {
+    @Inject public LoggedUserCoordinator(Context ctx) {
+        configurationIntent = new Intent(ctx, LoginActivity.class);
     }
 
     private static <A> Consumer<A> failIfNull(String message, Consumer<A> next) {
@@ -41,7 +43,7 @@ public class LoggedUserCoordinator implements DependencyCoordinator<LoggedUser> 
     }
 
     @Override public Intent dependencyConfigurationIntent() {
-        return new Intent(ctx, LoginActivity.class);
+        return configurationIntent;
     }
 
     public void setCurrentLoggedUser(LoggedUser up) {

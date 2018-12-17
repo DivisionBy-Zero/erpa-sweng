@@ -45,6 +45,7 @@ public abstract class DependencyConfigurationAgnosticActivity extends AppCompatA
                     .orElseThrow(() -> new IllegalArgumentException(
                         "Cannot find Configurator for class " + depCls.getName())))
                 .map(DependencyCoordinator::dependencyConfigurationIntent)
+                .distinct()
                 .map(i -> i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME))
                 .collect(Collectors.toList());
 
