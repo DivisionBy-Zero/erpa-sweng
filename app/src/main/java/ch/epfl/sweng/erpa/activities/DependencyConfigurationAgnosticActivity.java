@@ -25,18 +25,28 @@ public abstract class DependencyConfigurationAgnosticActivity extends AppCompatA
         super.onCreate(savedInstanceState);
         Toothpick.inject(this, getScope());
 
+        enqueueAndFinishIfUnconfiguredDependencies();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        enqueueAndFinishIfUnconfiguredDependencies();
+    }
+
+    private void enqueueAndFinishIfUnconfiguredDependencies() {
         List<Class> unconfiguredDependencies =
-                dependencyConfigurationHelper.getNotConfiguredDependenciesForInstance(this);
+            dependencyConfigurationHelper.getNotConfiguredDependenciesForInstance(this);
 
         if (!unconfiguredDependencies.isEmpty()) {
             List<Intent> configurationActivities = Stream.of(unconfiguredDependencies)
-                    .map(depCls -> dependencyConfigurationHelper
-                            .getDependencyConfiguratorForClass(depCls)
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "Cannot find Configurator for class " + depCls.getName())))
-                    .map(DependencyCoordinator::dependencyConfigurationIntent)
-                    .map(i -> i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME))
-                    .collect(Collectors.toList());
+                .map(depCls -> dependencyConfigurationHelper
+                    .getDependencyConfiguratorForClass(depCls)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Cannot find Configurator for class " + depCls.getName())))
+                .map(DependencyCoordinator::dependencyConfigurationIntent)
+                .map(i -> i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME))
+                .collect(Collectors.toList());
 
             // Push ourselves on the top of the call stack
             this.startActivity(getIntent());
@@ -53,10 +63,5 @@ public abstract class DependencyConfigurationAgnosticActivity extends AppCompatA
 
     public boolean dependenciesNotReady() {
         return isFinishing();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 }
