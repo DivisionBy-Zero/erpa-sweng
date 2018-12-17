@@ -50,6 +50,12 @@ import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
+    static List<PlayerJoinGameRequest.RequestStatus> userJoinRequestStatusThatShouldHideTheJoinButton = Stream.of(
+        PlayerJoinGameRequest.RequestStatus.CONFIRMED,
+        PlayerJoinGameRequest.RequestStatus.REJECTED,
+        PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN
+    ).collect(Collectors.toList());
+
     @BindView(R.id.descriptionTextView) TextView description;
     @BindView(R.id.difficultyTextView) TextView difficulty;
     @BindView(R.id.gameViewerPlayerListView) RecyclerView playerListView;
@@ -66,7 +72,6 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
     @BindView(R.id.titleTextView) TextView title;
     @BindView(R.id.universeTextView) TextView universe;
-
     @Inject GameService gs;
     @Inject OptionalDependencyManager optionalDependency;
     @Inject UserManagementService ups;
@@ -184,11 +189,6 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     private void updateGameJoinRequests(List<PlayerJoinGameRequest> gameParticipantRequests, Game game) {
         Log.d("GV FetchParticipants", "Updating game participants: " + gameParticipantRequests.toString());
         PlayerJoinGameRequestAdapter adapter = (PlayerJoinGameRequestAdapter) playerListView.getAdapter();
-        List<PlayerJoinGameRequest.RequestStatus> notAllowedToJoin = Stream.of(
-            PlayerJoinGameRequest.RequestStatus.CONFIRMED,
-            PlayerJoinGameRequest.RequestStatus.REJECTED,
-            PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN
-        ).collect(Collectors.toList());
 
         participantsLoader.setVisibility(View.GONE);
         playerListView.setVisibility(View.VISIBLE);
@@ -205,9 +205,9 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
         optionalDependency.get(Username.class).map(Username::getUserUuid).ifPresent(
             currentUserUuid -> Stream.of(gameParticipantRequests)
-                .filter(reqs -> reqs.getUserUuid().equals(currentUserUuid)).findFirst()
-                .filter(currentUserRequest ->
-                    notAllowedToJoin.contains(currentUserRequest.getRequestStatus()))
+                .filter(requests -> requests.getUserUuid().equals(currentUserUuid)).findFirst()
+                .map(PlayerJoinGameRequest::getRequestStatus)
+                .filter(userJoinRequestStatusThatShouldHideTheJoinButton::contains)
                 .executeIfPresent(s -> joinGameButton.setVisibility(View.GONE)));
 
         Optional.ofNullable(adapter)
