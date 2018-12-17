@@ -83,7 +83,7 @@ public class LazyAsyncStreamTest {
             this.max = 0;
         }
 
-        @Override protected void loadAhead(int from) {
+        @Override public void loadAhead(int from) {
             for (int i = 0; i < chunks && elements.size() < max; i++) {
                 elements.add(new Object());
             }
