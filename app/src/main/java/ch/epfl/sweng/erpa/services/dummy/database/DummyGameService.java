@@ -1,30 +1,25 @@
 package ch.epfl.sweng.erpa.services.dummy.database;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.Consumer;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.io.IOException;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.ObservableAsyncList;
 import ch.epfl.sweng.erpa.model.PlayerJoinGameRequest;
+import ch.epfl.sweng.erpa.services.LazyAsyncStream;
 import ch.epfl.sweng.erpa.services.GCP.ServerException;
 import ch.epfl.sweng.erpa.services.GameService;
 
@@ -94,49 +89,17 @@ public class DummyGameService extends DummyDataService<Game> implements GameServ
 
     @Override
     public ObservableAsyncList<Game> getAllGames(StreamRefiner sr) {
-        return new ListToObservableListAdapter<Game>(this::getAll);
+        return new ListBackedLazyAsyncStream(new ArrayList<>(getAll()));
     }
 
-    private static class ListToObservableListAdapter<T> extends AbstractList<T> implements ObservableAsyncList<T> {
-        private final List<T> l;
-        private final Provider<Collection<T>> collectionProvider;
-
-        ListToObservableListAdapter(Provider<Collection<T>> l) {
-            this.l = new ArrayList<>(l.get());
-            collectionProvider = l;
+    static class ListBackedLazyAsyncStream extends LazyAsyncStream<Game> {
+        public ListBackedLazyAsyncStream(List games) {
+            super(games.size());
+            this.elements.addAll(games);
         }
 
-        @Override public T get(int idx) {
-            return l.get(idx);
-        }
-
-        @Override public int size() {
-            return l.size();
-        }
-
-        @Override public boolean isLoading() {
-            return false;
-        }
-
-        @Override public void updateObservers() {
-            // Nothing
-        }
-
-        @Override public void addObserver(Consumer<ObservableAsyncList<T>> o) {
-            // This class issues no updates, thus, no observers are needed
-        }
-
-        @Override public boolean containsAll(@NonNull Collection<?> collection) {
-            return l.containsAll(collection);
-        }
-
-        @Override public void refreshDataAndReset() {
-            l.clear();
-            l.addAll(collectionProvider.get());
-            Log.d("refreshDataAndReset", l.size() + "");
-            for (T t : l) {
-                Log.d("refreshDataAndReset", t.toString());
-            }
+        @Override public void loadAhead(int from) {
+            updateObservers();
         }
     }
 }

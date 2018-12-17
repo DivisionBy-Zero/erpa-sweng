@@ -1,4 +1,4 @@
-package ch.epfl.sweng.erpa.services.GCP;
+package ch.epfl.sweng.erpa.services;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -17,15 +17,14 @@ import ch.epfl.sweng.erpa.operations.AsyncTaskService;
 import lombok.Getter;
 
 public abstract class LazyAsyncStream<T> extends AbstractList<T> implements Iterable<T>, ObservableAsyncList<T> {
+    protected final List<T> elements;
+    protected final int chunks;
     private final List<Consumer<ObservableAsyncList<T>>> observers = new ArrayList<>();
-    final List<T> elements;
-    final int chunks;
+    protected AsyncTaskService asyncTaskService = new AsyncTaskService();
 
-    AsyncTaskService asyncTaskService = new AsyncTaskService();
+    @Getter protected boolean loading = true;
 
-    @Getter boolean loading = true;
-
-    LazyAsyncStream(int chunks) {
+    public LazyAsyncStream(int chunks) {
         assert chunks > 0;
         this.elements = new ArrayList<>();
         this.chunks = chunks;
@@ -35,7 +34,7 @@ public abstract class LazyAsyncStream<T> extends AbstractList<T> implements Iter
         this(100);
     }
 
-    abstract void loadAhead(int from);
+    public abstract void loadAhead(int from);
 
     @Override public void updateObservers() {
         Log.d("updateObservers", "Updating Observers");

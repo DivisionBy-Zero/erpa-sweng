@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.epfl.sweng.erpa.model.Game;
+import ch.epfl.sweng.erpa.services.LazyAsyncStream;
 import retrofit2.Call;
 
 public class LazyGameStream extends LazyAsyncStream<Game> {
@@ -19,7 +20,7 @@ public class LazyGameStream extends LazyAsyncStream<Game> {
         loadAhead(0);
     }
 
-    @Override protected void loadAhead(int from) {
+    @Override public void loadAhead(int from) {
         Log.d("GCP Games look ahead", "Loading " + chunks + " elements starting at " + from);
         Call<List<Game>> call = gi.getGames(queries, from, chunks);
         this.loading = true;

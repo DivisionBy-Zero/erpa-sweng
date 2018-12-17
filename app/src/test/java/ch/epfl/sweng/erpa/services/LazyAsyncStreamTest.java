@@ -1,9 +1,10 @@
-package ch.epfl.sweng.erpa.services.GCP;
+package ch.epfl.sweng.erpa.services;
 
 import org.junit.Test;
 
 import java.util.Iterator;
 
+import ch.epfl.sweng.erpa.services.LazyAsyncStream;
 import ch.epfl.sweng.erpa.util.TestUtils;
 
 import static junit.framework.TestCase.assertEquals;
