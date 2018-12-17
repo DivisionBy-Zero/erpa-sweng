@@ -1,5 +1,6 @@
 package ch.epfl.sweng.erpa.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -23,7 +24,6 @@ import com.annimon.stream.Exceptional;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -103,7 +103,7 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
             Exceptional.of(() -> {
                 gameService.createGame(g);
                 return null;
-            }).get();
+            }).getOrThrowRuntimeException();
         }
         assertEquals(nbGames, gameService.getAllGames(new GameService.StreamRefiner()).size());
     }
@@ -111,15 +111,18 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
     @Before
     public void prepare() throws Throwable {
         super.prepare();
-        intentsTestRule.launchActivity(intentForGameListType(GameListActivity.GameListType.FIND_GAME));
-        activity = intentsTestRule.getActivity();
         gameService.removeGames();
         populateGameList(gameService, 10);
-        intentsTestRule.runOnUiThread(() -> {
-            toolbar = activity.findViewById(R.id.game_list_toolbar);
-            activity.setSupportActionBar(toolbar);
-            resources = activity.getResources();
-        });
+        intentsTestRule.launchActivity(intentForGameListType(GameListActivity.GameListType.FIND_GAME));
+        activity = intentsTestRule.getActivity();
+        toolbar = activity.findViewById(R.id.game_list_toolbar);
+        resources = activity.getResources();
+        Intents.init();
+    }
+
+    @After
+    public void tearDown() {
+        Intents.release();
     }
 
     @Test
@@ -163,31 +166,15 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
 
     @Test
     public void testClick() {
-        Intents.init();
-        activity.<RecyclerView>findViewById(R.id.game_list_recycler_view).getLayoutManager()
-            .getChildAt(0)
-            .callOnClick();
+        View cardView;
+        do {
+            cardView = activity.<RecyclerView>findViewById(R.id.game_list_recycler_view)
+                .getLayoutManager().getChildAt(0);
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        } while (cardView == null);
+
+        cardView.callOnClick();
         intended(hasComponent(GameViewerActivity.class.getName()));
-        Intents.release();
-    }
-
-    @Test
-    public void testSearchItemSelected() throws Throwable {
-        Intents.init();
-        intentsTestRule.runOnUiThread(() -> {
-            MenuItem item = toolbar.getMenu().findItem(R.id.menu_actionSearch);
-            activity.onOptionsItemSelected(item);
-        });
-        intended(hasComponent(SortActivity.class.getName()));
-        Intents.release();
-    }
-
-    @Test
-    public void testMenuButtonSelected() throws Throwable {
-        intentsTestRule.runOnUiThread(() -> {
-            DrawerLayout drawerLayout = activity.findViewById(R.id.game_list_drawer_layout);
-            onOptionItemSelectedUtils(android.R.id.home, drawerLayout);
-        });
     }
 
     @Test
@@ -198,6 +185,22 @@ public class GameListActivityTest extends DependencyConfigurationAgnosticTest {
             assertEquals(resources.getString(R.string.hostedGamesText), actionBar.getTitle());
             activity.setToolbarText(GameListActivity.GameListType.PAST_HOSTED_GAMES);
             assertEquals(resources.getString(R.string.pastHostedGamesText), actionBar.getTitle());
+        });
+    }
+
+    @Test
+    public void testSearchItemSelected() {
+        onView(withId(R.id.menu_actionSearch))
+            .check(matches(isDisplayed()))
+            .perform(click());
+        intended(hasComponent(SortActivity.class.getName()));
+    }
+
+    @Test
+    public void testMenuButtonSelected() throws Throwable {
+        intentsTestRule.runOnUiThread(() -> {
+            DrawerLayout drawerLayout = activity.findViewById(R.id.game_list_drawer_layout);
+            onOptionItemSelectedUtils(android.R.id.home, drawerLayout);
         });
     }
 }
