@@ -2,6 +2,7 @@ package ch.epfl.sweng.erpa.services.GCP;
 
 import android.util.Log;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,11 @@ public class LazyGameStream extends LazyAsyncStream<Game> {
     private final Map<String, String> queries;
 
     public LazyGameStream(int chunks, Map<String, String> queries) {
-        super(chunks);
+        this(chunks, queries, Collections.emptyList());
+    }
+
+    public LazyGameStream(int chunks, Map<String, String> queries, List<Game> initialContent) {
+        super(chunks, initialContent);
         this.gi = GCPRemoteServicesProvider.getRetrofit().create(GCPApi.GameInterface.class);
         this.queries = queries;
         loadAhead(0);

@@ -1,5 +1,10 @@
 package ch.epfl.sweng.erpa.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.PrimaryKey;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +15,17 @@ import lombok.NonNull;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity(tableName = "player_join_game_request")
 public class PlayerJoinGameRequest {
-    @NonNull private String joinRequestId;
+    @android.support.annotation.NonNull @ColumnInfo(name = "id") @PrimaryKey @NonNull private String joinRequestId = "";
+
+    @ColumnInfo(name = "request_status")
     @NonNull private RequestStatus requestStatus;
+
+    @ForeignKey(entity = Game.class, parentColumns = "uuid", childColumns = "game_uuid")
     @NonNull private String gameUuid;
+
+    @ForeignKey(entity = UserProfile.class, parentColumns = "uuid", childColumns = "user_uuid")
     @NonNull private String userUuid;
 
     public enum RequestStatus {REQUEST_TO_JOIN, CONFIRMED, REJECTED, REMOVED, HAS_QUIT}
