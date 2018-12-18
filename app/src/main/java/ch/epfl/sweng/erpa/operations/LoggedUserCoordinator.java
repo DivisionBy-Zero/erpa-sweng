@@ -3,6 +3,7 @@ package ch.epfl.sweng.erpa.operations;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Base64;
 
 import com.annimon.stream.Exceptional;
 import com.annimon.stream.Objects;
@@ -21,14 +22,12 @@ import ch.epfl.sweng.erpa.model.UserSessionToken;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.services.UserManagementService;
 
-import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
-
 @Singleton
 public class LoggedUserCoordinator implements DependencyCoordinator<LoggedUser> {
+    private final Intent configurationIntent;
     @Inject Context ctx;
     @Inject UserManagementService ups;
     private Optional<LoggedUser> currentLoggedUser = Optional.empty();
-    private final Intent configurationIntent;
 
     @Inject public LoggedUserCoordinator(Context ctx) {
         configurationIntent = new Intent(ctx, LoginActivity.class);
@@ -66,56 +65,41 @@ public class LoggedUserCoordinator implements DependencyCoordinator<LoggedUser> 
     public AsyncTask<Void, Void, Exceptional<String>> trySignUp(
         AsyncTaskService ts, String username, String password, UserProfile profile,
         Runnable successCallback, Consumer<Throwable> errorHandler) {
-        // @formatter:off Think of this like a scala query with the arrows graphically reversed...
-        AsyncTaskService.Runner<String> signUp = ts.create(() -> ups.registerNewUsername(username),
-            failIfNull("Could not register username",
-            userUuid -> ts.run(() -> {
-                profile.setUuid(userUuid);
-                // TODO(@Roos): Use the UserAuthDerivation function when it's implemented
-                return new UserAuth(userUuid, userUuid, "");
-            }, failIfNull("The provided password is invalid",
-            userAuth -> ts.run(() -> {
-                // TODO(@Roos): Call the GetSessionToken endpoint with the password info
-                ups.registerAuth(userAuth);
-                return ups.registerUserProfile(profile);
-            }, failIfNull("Could not finish registration",
-            userProfile -> {
-                this.tryLogin(ts, username, password, successCallback, errorHandler);
-            }))))));
-        // @formatter:on
-        signUp.setThrowableConsumer(errorHandler);
-        signUp.execute();
-        return signUp;
+        return ts.run(() -> {
+            String userUuid = ups.registerNewUsername(username);
+            profile.setUuid(userUuid);
+            String base64PublicKey = Base64.encodeToString(CryptoGrenouille
+                .ed25519KeyPairFromPassphraseAndUserUuid(password, userUuid)
+                .getPublic().getEncoded(), Base64.NO_WRAP);
+            UserAuth userAuth = new UserAuth(userUuid, base64PublicKey, CryptoGrenouille.AUTH_STRATEGY_NAME);
+            ups.registerAuth(userAuth);
+            ups.registerUserProfile(profile);
+            this.tryLogin(ts, username, password, successCallback, errorHandler);
+            return null;
+        }, o -> {
+        }, errorHandler);
     }
 
-    public AsyncTask<Void, Void, Exceptional<String>> tryLogin(AsyncTaskService ts,
-                                                               String usernameText, String passwordText,
-                                                               Runnable successCallback,
-                                                               Consumer<Throwable> errorHandler) {
-        // @formatter:off Think of this like a scala query with the arrows graphically reversed...
-        AsyncTaskService.Runner<String> login = ts.create(() -> ups.getUuidForUsername(usernameText),
-            failIfNull(String.format("Could not retrieve UserUUID for username '%s'", usernameText),
-            userUuid -> ts.run(() -> {
-                // TODO(@Roos): Call the GetSessionToken endpoint with the password info
-                return new UserSessionToken(userUuid, userUuid);
-            },
-            userSessionToken -> ts.run(() -> ups.getUsernameFromUserUuid(userUuid), failIfNotFound(userUuid,
-            (Username username) -> ts.run(() -> ups.getUserProfile(userUuid), failIfNotFound(userUuid,
-            (UserProfile userProfile) -> {
-                this.publishLoggedUser(username, userSessionToken, userProfile);
-                successCallback.run();
-            })))))));
-        // @formatter:on
-        login.setThrowableConsumer(errorHandler);
-        login.execute();
-        return login;
+    public AsyncTask<Void, Void, Exceptional<String>> tryLogin(
+        AsyncTaskService ts, String usernameText, String password,
+        Runnable successCallback, Consumer<Throwable> errorHandler) {
+        return ts.run(() -> {
+            String userUuid = ups.getUuidForUsername(usernameText);
+            String b64AuthChallenge = ups.getBase64AuthenticationChallenge(userUuid);
+            String challengeResponse = new CryptoGrenouille(password, userUuid).signBase64Encoded(b64AuthChallenge);
+            UserSessionToken userSessionToken = ups.getSessionToken(userUuid, challengeResponse);
+            Username username = ups.getUsernameFromUserUuid(userUuid).get();
+            UserProfile userProfile = ups.getUserProfile(userUuid).get();
+            this.publishLoggedUser(username, userSessionToken, userProfile);
+            return null;
+        }, o -> successCallback.run(), errorHandler);
     }
 
     private void publishLoggedUser(Username username, UserSessionToken userSessionToken, UserProfile userProfile) {
         setCurrentLoggedUser(new LoggedUser(userSessionToken, userProfile, username));
     }
 
-    private void logout() {
+    public void logout() {
         unsetCurrentLoggedUser();
     }
 }
