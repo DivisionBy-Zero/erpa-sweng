@@ -68,8 +68,8 @@ public class SignupActivity extends DependencyConfigurationAgnosticActivity {
             exception -> {
                 inputPanel.setVisibility(View.VISIBLE);
                 progressLoader.setVisibility(View.GONE);
-                createPopup("Could not create account: " + exception.getMessage(), this);
                 Log.e("tryLogin", "Could not create account", exception);
+                createPopup("Could not create account: " + exception.getMessage(), this);
             });
     }
 
