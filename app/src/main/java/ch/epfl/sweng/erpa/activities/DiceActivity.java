@@ -74,7 +74,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     @Override protected void onResume() {
         super.onResume();
         if (dependenciesNotReady()) return;
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.dice_toolbar);
         setSupportActionBar(toolbar);
 
         //Handle navigationMenu interactions

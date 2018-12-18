@@ -51,16 +51,6 @@
             app:layout_constraintVertical_bias="0.222" />
 
         <Button
-            android:id="@+id/launchDiceAnimation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:onClick="launchDiceAnimation"
-            android:text="@string/title_activity_dice_animation"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/launch_my_account_button" />
-
-        <Button
             android:id="@+id/launch_storage_provider_greet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
