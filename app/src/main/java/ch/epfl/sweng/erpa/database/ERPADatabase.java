@@ -43,13 +43,20 @@ public abstract class ERPADatabase extends RoomDatabase {
     @Dao
     public interface UsernameDao {
         @Query("SELECT * FROM username WHERE username LIKE :username")
-        Username getUserName(String username);
+        Username getUsername(String username);
+
+        @Query("select * from username where user_uuid like :userUuid")
+        Username getUsernameFromUuid(String userUuid);
+
+        @Insert void insertAll(Username... usernames);
     }
 
     @Dao
     public interface UserProfileDao {
         @Query("SELECT * FROM user_profile where uuid LIKE :uuid")
         UserProfile getUserProfile(String uuid);
+
+        @Insert void insertAll(UserProfile... userProfiles);
     }
 
     @Dao

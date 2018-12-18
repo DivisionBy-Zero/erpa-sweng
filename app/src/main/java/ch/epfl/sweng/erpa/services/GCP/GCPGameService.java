@@ -68,4 +68,9 @@ public class GCPGameService implements GameService {
         return GCPRemoteServicesProvider.executeAndThrowOnError(
             gameInterface.joinGame(gameUuid, mkAuthHeader())).body();
     }
+
+    @Override
+    public ObservableAsyncList<Game> getAllGames(StreamRefiner sr, List<Game> initialCapacity) {
+        return new LazyGameStream(10, sr.toStringMap(), initialCapacity);
+    }
 }

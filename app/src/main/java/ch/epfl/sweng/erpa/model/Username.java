@@ -16,6 +16,7 @@ import lombok.NonNull;
 @Entity
 public class Username {
     @ForeignKey(entity = UserProfile.class, parentColumns = "uuid", childColumns = "user_uuid")
+    @ColumnInfo(name = "user_uuid")
     @NonNull private String userUuid;
     @ColumnInfo
     @android.support.annotation.NonNull @PrimaryKey @NonNull private String username = "";

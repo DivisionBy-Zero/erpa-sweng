@@ -49,6 +49,11 @@ public class DummyGameService implements GameService {
     }
 
     @Override
+    public ObservableAsyncList<Game> getAllGames(StreamRefiner sr, List<Game> initialCapacity) {
+        return this.getAllGames(sr);
+    }
+
+    @Override
     public Optional<Game> getGame(String gameUuid) {
         return Optional.ofNullable(games.get(gameUuid));
     }

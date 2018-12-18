@@ -24,13 +24,16 @@ public abstract class LazyAsyncStream<T> extends AbstractList<T> implements Iter
 
     @Getter protected boolean loading = true;
 
-    public LazyAsyncStream(int chunks) {
+    public LazyAsyncStream(int chunks, List<T> initialContent) {
         assert chunks > 0;
-        this.elements = new ArrayList<>();
+        this.elements = new ArrayList<>(initialContent);
         this.chunks = chunks;
     }
+    public LazyAsyncStream(int chunks) {
+        this(chunks, Collections.emptyList());
+    }
 
-    LazyAsyncStream() {
+    protected LazyAsyncStream() {
         this(100);
     }
 

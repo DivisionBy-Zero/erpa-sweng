@@ -79,6 +79,8 @@ public interface GameService {
      */
     PlayerJoinGameRequest joinGame(String gameUuid) throws IOException, ServerException;
 
+    ObservableAsyncList<Game> getAllGames(StreamRefiner sr, List<Game> initialCapacity);
+
     @NoArgsConstructor
     @Getter
     class StreamRefiner implements Serializable {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ch.epfl.sweng.erpa.database.CachingRemoteServicesProvider;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.modules.ErpaApplicationModule;
 import ch.epfl.sweng.erpa.modules.TrivialProxifiedModules;
@@ -36,7 +37,8 @@ public class ErpaApplication extends Application {
     // Remote Service Providers
     private final Set<Class<? extends RemoteServicesProvider>> remoteServicesProviders = Stream.of(
             DummyRemoteServicesProvider.class,
-            GCPRemoteServicesProvider.class
+            GCPRemoteServicesProvider.class,
+            CachingRemoteServicesProvider.class
     ).collect(Collectors.toSet());
 
     List<Game> sampleListOfGames = new ArrayList<>();
