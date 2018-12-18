@@ -7,11 +7,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +24,6 @@ import android.widget.TextView;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.annimon.stream.function.BiConsumer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,13 +48,12 @@ import lombok.RequiredArgsConstructor;
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
     static List<PlayerJoinGameRequest.RequestStatus> userJoinRequestStatusThatShouldHideTheJoinButton = Stream.of(
-        PlayerJoinGameRequest.RequestStatus.CONFIRMED,
-        PlayerJoinGameRequest.RequestStatus.REJECTED,
-        PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN
+            PlayerJoinGameRequest.RequestStatus.CONFIRMED,
+            PlayerJoinGameRequest.RequestStatus.REJECTED,
+            PlayerJoinGameRequest.RequestStatus.REQUEST_TO_JOIN
     ).collect(Collectors.toList());
 
     @BindView(R.id.descriptionTextView) TextView description;
@@ -119,8 +119,48 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
         playerListView.setHasFixedSize(true);
         playerListView.setLayoutManager(new LinearLayoutManager(this));
-        playerListView.setAdapter(new PlayerJoinGameRequestAdapter(
-            new ArrayList<>(), this::onPlayerJoinRequestItemClick));
+        playerListView.setAdapter(new PlayerJoinGameRequestAdapter(new ArrayList<>()));
+
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                PlayerJoinGameRequest request = ((PlayerJoinGameRequestAdapter.PlayerJoinGameRequestHolder) viewHolder).request;
+                boolean currentUserIsRequestUser = optionalDependency.get(Username.class).map(Username::getUserUuid)
+                        .filter(userUuid -> request.getUserUuid().equals(userUuid))
+                        .isPresent();
+                onSwipedDirection(direction, request, currentUserIsRequestUser);
+            }
+        };
+
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(playerListView);
+    }
+
+
+    public void onSwipedDirection(int direction, PlayerJoinGameRequest request, Boolean currentUserIsRequestUser) {
+
+        if (currentUserIsGM) {
+            if (direction == ItemTouchHelper.LEFT)
+                changePlayerStatus(request, PlayerJoinGameRequest.RequestStatus.REMOVED);
+            else if (direction == ItemTouchHelper.RIGHT)
+                changePlayerStatus(request, PlayerJoinGameRequest.RequestStatus.CONFIRMED);
+        }
+        if (currentUserIsRequestUser && direction == ItemTouchHelper.LEFT) {
+            changePlayerStatus(request, PlayerJoinGameRequest.RequestStatus.HAS_QUIT);
+        }
+
+    }
+
+    private void changePlayerStatus(PlayerJoinGameRequest request, PlayerJoinGameRequest.RequestStatus status) {
+        request.setRequestStatus(status);
+        asyncTaskService.run(() -> gs.updateGameJoinRequest(request.getGameUuid(), request), updatedRequest -> {
+        }, exc -> {
+        });
     }
 
     private void resetLoadersAndPanelsVisibilities() {
@@ -128,22 +168,6 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         joinGameButton.setVisibility(View.GONE);
         participantsLoader.setVisibility(View.VISIBLE);
         panelLoader.setVisibility(View.VISIBLE);
-    }
-
-    private void onPlayerJoinRequestItemClick(View view, PlayerJoinGameRequest request) {
-        if (currentUserIsGM) {
-            createPopup("Accepting Game Join requests is not yet implemented, sorry :(", this);
-            return;
-        }
-
-        boolean modifyingSelfRequest = optionalDependency.get(Username.class).map(Username::getUserUuid)
-            .filter(currentUserUuid -> request.getUserUuid().equals(currentUserUuid)).isPresent();
-
-        if (!modifyingSelfRequest) {
-            createPopup("Naughty naughty, you can't modify other people's requests!", this);
-        } else {
-            createPopup("I know you're super excited about it!", this);
-        }
     }
 
     @Override protected void onStop() {
@@ -162,11 +186,11 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     private void updateGameTVs(Game game) {
         String gmUserUuid = game.getGmUserUuid();
         asyncFetchThreads.put(gmUserUuid, asyncTaskService.run(
-            () -> ups.getUsernameFromUserUuid(gmUserUuid).map(Username::getUsername),
-            failIfNotFound(gmUserUuid, gm -> {
-                gmName.setVisibility(View.VISIBLE);
-                gmName.setText(gm);
-            })
+                () -> ups.getUsernameFromUserUuid(gmUserUuid).map(Username::getUsername),
+                failIfNotFound(gmUserUuid, gm -> {
+                    gmName.setVisibility(View.VISIBLE);
+                    gmName.setText(gm);
+                })
         ));
 
         contentPanel.setVisibility(View.VISIBLE);
@@ -194,8 +218,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         playerListView.setVisibility(View.VISIBLE);
 
         currentUserIsGM = optionalDependency.get(Username.class).map(Username::getUserUuid)
-            .filter(userUuid -> game.getGmUserUuid().equals(userUuid))
-            .isPresent();
+                .filter(userUuid -> game.getGmUserUuid().equals(userUuid))
+                .isPresent();
 
         if (!currentUserIsGM) {
             joinGameButton.setVisibility(View.VISIBLE);
@@ -204,25 +228,24 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
 
         optionalDependency.get(Username.class).map(Username::getUserUuid).ifPresent(
-            currentUserUuid -> Stream.of(gameParticipantRequests)
-                .filter(requests -> requests.getUserUuid().equals(currentUserUuid)).findFirst()
-                .map(PlayerJoinGameRequest::getRequestStatus)
-                .filter(userJoinRequestStatusThatShouldHideTheJoinButton::contains)
-                .executeIfPresent(s -> joinGameButton.setVisibility(View.GONE)));
+                currentUserUuid -> Stream.of(gameParticipantRequests)
+                        .filter(requests -> requests.getUserUuid().equals(currentUserUuid)).findFirst()
+                        .map(PlayerJoinGameRequest::getRequestStatus)
+                        .filter(userJoinRequestStatusThatShouldHideTheJoinButton::contains)
+                        .executeIfPresent(s -> joinGameButton.setVisibility(View.GONE)));
 
         Optional.ofNullable(adapter)
-            .executeIfPresent(a -> {
-                a.joinGameRequests.addAll(gameParticipantRequests);
-                a.notifyDataSetChanged();
-            })
-            .executeIfAbsent(() -> Log.e("GV FetchParticipants",
-                "Received participants response, but no adapter was found."));
+                .executeIfPresent(a -> {
+                    a.joinGameRequests.addAll(gameParticipantRequests);
+                    a.notifyDataSetChanged();
+                })
+                .executeIfAbsent(() -> Log.e("GV FetchParticipants",
+                        "Received participants response, but no adapter was found."));
     }
 
     @RequiredArgsConstructor
     class PlayerJoinGameRequestAdapter extends RecyclerView.Adapter<PlayerJoinGameRequestAdapter.PlayerJoinGameRequestHolder> {
         @NonNull List<PlayerJoinGameRequest> joinGameRequests;
-        @NonNull BiConsumer<View, PlayerJoinGameRequest> onViewElementClick;
 
         @NonNull
         @Override
@@ -234,7 +257,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
 
         @Override
         public void onBindViewHolder(@NonNull PlayerJoinGameRequestHolder playerJoinGameRequestHolder, int i) {
-            playerJoinGameRequestHolder.populateHolder(joinGameRequests.get(i), onViewElementClick);
+            playerJoinGameRequestHolder.populateHolder(joinGameRequests.get(i));
         }
 
         @Override
@@ -243,21 +266,23 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
 
         class PlayerJoinGameRequestHolder extends RecyclerView.ViewHolder {
+            @BindView(R.id.game_join_request_constraint_layout) ConstraintLayout gameJoinRequestConstraintLayout;
             @BindView(R.id.gameJoinRequestUsername) TextView gameJoinRequestUsernameTV;
             @BindView(R.id.gameJoinRequestStatus) TextView gameJoinRequestStatusTV;
+            private PlayerJoinGameRequest request;
 
             public PlayerJoinGameRequestHolder(@NonNull View itemView) {
                 super(itemView);
                 ButterKnife.bind(this, itemView);
             }
 
-            void populateHolder(PlayerJoinGameRequest request, BiConsumer<View, PlayerJoinGameRequest> onItemViewClick) {
-                itemView.setOnClickListener(view -> onItemViewClick.accept(view, request));
+            void populateHolder(PlayerJoinGameRequest request) {
+                this.request = request;
                 asyncTaskService.run(() -> ups.getUsernameFromUserUuid(request.getUserUuid()).get(),
-                    participantUsername -> gameJoinRequestUsernameTV.setText(participantUsername.getUsername()),
-                    exc -> handleErrorRetrievingUserData(exc, request));
+                        participantUsername -> gameJoinRequestUsernameTV.setText(participantUsername.getUsername()),
+                        exc -> handleErrorRetrievingUserData(exc, request));
                 gameJoinRequestStatusTV.setText(Optional.ofNullable(request.getRequestStatus())
-                    .map(Object::toString).orElse("Unknown state"));
+                        .map(Object::toString).orElse("Unknown state"));
             }
 
             void handleErrorRetrievingUserData(Throwable exc, PlayerJoinGameRequest request) {
