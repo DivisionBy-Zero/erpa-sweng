@@ -50,7 +50,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     private ArrayList<DieSketch> allDice = new ArrayList<>();
 
     /**
-     * Map from die type to filename
+     * Map from number of faces to filename
      */
     private static final Map<Integer, String> compressedDiceResourcesPath =
             Collections.unmodifiableMap(new HashMap<Integer, String>() {{
@@ -95,7 +95,7 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     /**
-     * Checks if any die is rolling else rolls all dice
+     * If no die is rolling, rolls all dice
      * @param view not used
      */
     @OnClick(R.id.rollButton)
@@ -121,22 +121,22 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
     }
 
     /**
-     * Add a die on the FlowLayout if there is place depending on which button is pressed
-     * @param view The button that has been pressed, needs to be cast to Button
+     * If there is place left for another die, add the die corresponding to the pressed button
+     * @param button The button that has been pressed
      */
-    public void addAndUpdateDie(View view) {
+    //I need to cast the view to button because if I don't do it android doesn't recognize it as an onClick function
+    public void addAndUpdateDie(View button) {
         if (allDice.size() < MAX_DICE_NUMBER) {
-            Button button = (Button) view;
-            addAndShowDie(Integer.parseInt(button.getText().toString().substring(1)));
+            addAndShowDie(Integer.parseInt(((Button) button).getText().toString().substring(1)));
         }
     }
 
     /**
-     * Add a button of type dieType on the layout
-     * @param dieType The die type to show
+     * Add a die of with numberOfFaces faces on the layout
+     * @param numberOfFaces The number of faces of the die to show
      */
-    private void addAndShowDie(int dieType) {
-        DieSketch dieSketch = new DieSketch(compressedDiceResourcesPath.get(dieType), ROTATION_SPEED);
+    private void addAndShowDie(int numberOfFaces) {
+        DieSketch dieSketch = new DieSketch(compressedDiceResourcesPath.get(numberOfFaces), ROTATION_SPEED);
         allDice.add(dieSketch);
         showDie(dieSketch);
     }
