@@ -12,15 +12,15 @@ import processing.core.PShape;
 
 public class DieSketch extends PApplet {
 
+    private float factor;
+    private int numberOfFaces;
+    private String fileName;
+
     private float angleX = 0;
     private float angleY = 0;
     private float angleZ = 0.5f;
     private PShape die = null;
-    private float factor;
-    private int dieValue;
-    private String fileName;
-    private float iX = 0.1f;
-    private float iZ = 0.1f;
+    private float delta = 0.1f;
     private boolean rolling  = false;
     private int rollLength = Integer.MAX_VALUE;
     private int rollStarted  = millis();
@@ -30,7 +30,7 @@ public class DieSketch extends PApplet {
     private final int MINIMUM_ROLL_TIME = 1000;
 
     /**
-     * Map from die type to filename
+     * Map from filename to number of faces
      */
     private static final Map<String, Integer> compressedDiceResourcesPath =
             Collections.unmodifiableMap(new HashMap<String, Integer>() {{
@@ -43,7 +43,7 @@ public class DieSketch extends PApplet {
 
     public DieSketch(String fileName, float factor) {
         super();
-        this.dieValue = compressedDiceResourcesPath.get(fileName);
+        this.numberOfFaces = compressedDiceResourcesPath.get(fileName);
         this.fileName = fileName;
         this.factor = factor;
     }
@@ -58,7 +58,7 @@ public class DieSketch extends PApplet {
 
         if (die == null)
             throw new RuntimeException("Cannot get object");
-        iX = 0.1f;
+        delta = 0.1f;
     }
 
     public void draw() {
@@ -79,7 +79,6 @@ public class DieSketch extends PApplet {
         }
 
         if (rolling) {
-            iZ = iX;
             rotatingDie();
         } else
             staticDie();
@@ -93,8 +92,8 @@ public class DieSketch extends PApplet {
         rotateX(angleX * factor);
         rotateZ(angleZ * factor);
 
-        angleX = checkAndIncrementAngle(angleX, iX);
-        angleZ = checkAndIncrementAngle(angleZ, iZ);
+        angleX = incrementAngle(angleX, delta);
+        angleZ = incrementAngle(angleZ, delta);
     }
 
     private void staticDie() {
@@ -104,7 +103,7 @@ public class DieSketch extends PApplet {
     }
 
     private void setResult() {
-        Triplet<Float, Float, Float> rotation = diceRotationTranslationTable.get(dieValue).get(rng.nextInt(dieValue) + 1);
+        Triplet<Float, Float, Float> rotation = diceRotationTranslationTable.get(numberOfFaces).get(rng.nextInt(numberOfFaces) + 1);
         angleX = rotation.getFirst() * PI;
         angleY = rotation.getSecond() * PI;
         angleZ = rotation.getThird() * PI;
@@ -120,7 +119,7 @@ public class DieSketch extends PApplet {
         return rolling;
     }
 
-    private float checkAndIncrementAngle(float angle, float increment) {
+    private float incrementAngle(float angle, float increment) {
         return (angle + increment) % 4;
     }
 
