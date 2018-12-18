@@ -31,13 +31,16 @@ public class Game implements UuidObject {
     @ColumnInfo(name = "max_players") @NonNull private Integer maxPlayers;
     @ColumnInfo @NonNull private Difficulty difficulty;
     @ColumnInfo @NonNull private String universe;
-    @ColumnInfo @NonNull private Boolean isCampaign;
-    @ColumnInfo @NonNull private Optional<Integer> numberOfSessions;
-    @ColumnInfo @NonNull private Optional<Integer> sessionLengthInMinutes;
+    @ColumnInfo(name = "is_campaign") @NonNull private Boolean isCampaign;
+    @ColumnInfo(name = "number_of_sessions") @NonNull private Optional<Integer> numberOfSessions;
+
+    @ColumnInfo(name = "session_length_in_minutes") @NonNull
+    private Optional<Integer> sessionLengthInMinutes;
+
     @ColumnInfo @NonNull private String description;
-    @ColumnInfo @NonNull private Double locationLat;
-    @ColumnInfo @NonNull private Double locationLon;
-    @ColumnInfo @NonNull private GameStatus gameStatus;
+    @ColumnInfo(name = "location_lat") @NonNull private Double locationLat;
+    @ColumnInfo(name = "location_lon") @NonNull private Double locationLon;
+    @ColumnInfo(name = "game_status") @NonNull private GameStatus gameStatus;
 
     public String getOneshotOrCampaign() {
         return isCampaign ? "Campaign" : "Oneshot";

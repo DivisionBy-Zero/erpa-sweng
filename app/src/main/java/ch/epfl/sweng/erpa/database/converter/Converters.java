@@ -66,9 +66,6 @@ public class Converters {
         return result;
     }
 
-    /**
-     * Builds a conversion map for the GameStatus enum
-     */
     private static BiMap<Integer, Game.GameStatus> genGameStatusConversionMap() {
         BiMap<Integer, Game.GameStatus> result = HashBiMap.create();
         result.put(10, Game.GameStatus.CANCELED);
@@ -80,9 +77,6 @@ public class Converters {
         return result;
     }
 
-    /**
-     * Builds a conversion map for the RequestStatus enum
-     */
     private static BiMap<Integer, PlayerJoinGameRequest.RequestStatus> genRequestStatusConversionMap() {
         BiMap<Integer, PlayerJoinGameRequest.RequestStatus> result = HashBiMap.create();
         result.put(10, PlayerJoinGameRequest.RequestStatus.CONFIRMED);
