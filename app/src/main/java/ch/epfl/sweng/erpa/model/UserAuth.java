@@ -13,13 +13,14 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(tableName = "user_auth")
 public class UserAuth {
     @ForeignKey(entity = UserProfile.class, parentColumns = "uuid", childColumns = "user_uuid")
     @NonNull private String userUuid;
 
     @PrimaryKey @ColumnInfo(name = "public_key")
     @android.support.annotation.NonNull @NonNull private String publicKey = "";
+
     @ColumnInfo(name = "authentication_strategy")
     @NonNull private String authenticationStrategy = "Grenouille";
 }

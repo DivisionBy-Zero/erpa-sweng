@@ -15,9 +15,9 @@ import lombok.NonNull;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(tableName = "player_join_game_request")
 public class PlayerJoinGameRequest {
-    @android.support.annotation.NonNull @PrimaryKey @NonNull private String joinRequestId = "";
+    @android.support.annotation.NonNull @ColumnInfo(name = "id") @PrimaryKey @NonNull private String joinRequestId = "";
 
     @ColumnInfo(name = "request_status")
     @NonNull private RequestStatus requestStatus;
