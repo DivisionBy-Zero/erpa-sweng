@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
 from werkzeug.exceptions import HTTPException
+import base64
 import logging
 import os
 
@@ -39,38 +40,6 @@ def with_operations(f):
     return with_context(mk_ops)(f)
 
 
-@with_operations
-def get_default_user(ops):
-    """
-    This SHALL be removed when the authentication service is implemented.
-
-    Returns a “default” properly registered user.
-    """
-    def_username = "Lavoisier"
-    try:
-        def_user_uuid = ops.get_user_uuid_from_username(def_username)
-    except KeyError:
-        def_user_uuid = ops.register_username(def_username)
-        ops.register_user_auth(UserAuth(
-            user_uuid=def_user_uuid,
-            public_key=def_user_uuid
-            ))
-    try:
-        return ops.get_user(def_user_uuid)
-    except KeyError:
-        def_user = User(uuid=def_user_uuid, is_gm=True, is_player=True)
-        return ops.register_user(def_user)
-
-
-@with_operations
-def get_user_from_authorization_header(auth_header: str,
-                                       ops) -> Optional[User]:
-    """
-    Retrieves the identified user from based on the authorization header.
-    """
-    return ops.get_authenticated_user(auth_header)
-
-
 def with_operations_and_maybe_user(f):
     """
     Injects an operations service and the identified user (or null if N/A) in
@@ -79,9 +48,8 @@ def with_operations_and_maybe_user(f):
     @contextmanager
     @with_operations
     def register_user(ops):
-        # TODO(@Roos): Remove when the auth system is complete
         auth_header = request.headers.get('Authorization')
-        user = (get_user_from_authorization_header(auth_header)
+        user = (ops.get_authenticated_user(auth_header)
                 if auth_header else None)
 
         yield (ops, user)
@@ -244,14 +212,31 @@ def register_user_auth(ops):
     """Register a new user auth."""
     user_auth = retrieve_post_data(UserAuth)
     ops.register_user_auth(user_auth)
-    # TODO(@Roos): Remove when the auth system is complete
-    ops.register_session_token(user_auth.user_uuid,
-                               session_token_str=user_auth.user_uuid)
     return '', 200
 
 
+@app.route('/auth/challenge/<user_uuid>')
+@with_operations
+def get_challenge(ops, user_uuid: str = None):
+    """Creates and returns a base64-encoded authentication challenge
+    for the specified user_uuid."""
+    challenge = ops.gen_auth_challenge_for_user(user_uuid)
+    challenge_str = challenge.user_challenge.encode('UTF-8')
+    return base64.b64encode(challenge_str).decode('UTF-8')
+
+
+@app.route('/auth/challenge/<user_uuid>', methods=['POST'])
+@with_operations
+def get_session_token_from_challenge(ops, user_uuid: str = None):
+    """Verifies an authentication challenge and returns a session token in case
+    of success."""
+    response = request.data.decode('UTF-8').strip()
+    token = ops.session_token_from_signed_challenge(user_uuid, response)
+    return send_object(token)
+
+
 @app.route('/users', methods=['POST'])
-@with_operations  # TODO: Authenticate the user
+@with_operations
 def register_user(ops):
     """Register a User Profile to the specified user.uuid."""
     return send_object(ops.register_user(retrieve_post_data(User)))
