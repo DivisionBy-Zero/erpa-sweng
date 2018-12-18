@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.model.UserSessionToken;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.services.GCP.ServerException;
 
@@ -26,4 +27,8 @@ public interface UserManagementService {
     UserProfile saveUserProfile(UserProfile up) throws IOException, ServerException;
 
     UserProfile registerUserProfile(UserProfile up) throws IOException, ServerException;
+
+    String getBase64AuthenticationChallenge(String userUuid) throws IOException, ServerException;
+
+    UserSessionToken getSessionToken(String userUuid, String challengeResponse) throws IOException, ServerException;
 }

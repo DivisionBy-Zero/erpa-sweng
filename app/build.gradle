@@ -134,6 +134,7 @@ dependencies {
     implementation "com.kosprov.jargon2:jargon2-native-ri-backend:${depVersionJargon2}"
     implementation "com.kosprov.jargon2:jargon2-native-ri-backend:${depVersionJargon2}"
     implementation "com.linkedin.dexmaker:dexmaker:${depVersionDexmaker}"
+    implementation "com.squareup.retrofit2:converter-scalars:${depVersionRetrofit}"
     implementation "com.squareup.retrofit2:converter-gson:${depVersionRetrofit}"
     implementation "com.squareup.retrofit2:retrofit:${depVersionRetrofit}"
     implementation "net.i2p.crypto:eddsa:${depVersionCryptoEddsa}"
