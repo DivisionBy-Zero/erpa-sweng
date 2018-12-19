@@ -184,6 +184,54 @@ public interface GameService {
                 return Optional.of(new Pair<>("title_query", titleQuery));
             }
         }
+
+        public static class WithPlayerPending implements GameFilter, Serializable {
+            public final String playerUuid;
+
+            public WithPlayerPending(String playerUuid) {
+                this.playerUuid = playerUuid;
+            }
+
+            @Override public Boolean apply(Game game) {
+                throw new UnsupportedOperationException("Cannot filter, requires a Game Service operation.");
+            }
+
+            @Override public Optional<Pair<String, String>> queryParams() {
+                return Optional.of(new Pair<>("player_pending", playerUuid));
+            }
+        }
+
+        public static class WithPlayerConfirmed implements GameFilter, Serializable {
+            public final String playerUuid;
+
+            public WithPlayerConfirmed(String playerUuid) {
+                this.playerUuid = playerUuid;
+            }
+
+            @Override public Boolean apply(Game game) {
+                throw new UnsupportedOperationException("Cannot filter, requires a Game Service operation.");
+            }
+
+            @Override public Optional<Pair<String, String>> queryParams() {
+                return Optional.of(new Pair<>("player_confirmed", playerUuid));
+            }
+        }
+
+        public static class WithGameStatus implements GameFilter, Serializable {
+            public final Game.GameStatus gameStatus;
+
+            public WithGameStatus(Game.GameStatus gameStatus) {
+                this.gameStatus = gameStatus;
+            }
+
+            @Override public Boolean apply(Game game) {
+                return gameStatus.equals(game.getGameStatus());
+            }
+
+            @Override public Optional<Pair<String, String>> queryParams() {
+                return Optional.of(new Pair<>("game_status", gameStatus.toString()));
+            }
+        }
     }
 
     @AllArgsConstructor
