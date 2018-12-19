@@ -199,10 +199,13 @@ class TestOperations(unittest.TestCase):
 
     @with_operations_and_user
     def test_get_games(self, ops, user):
-        for i in range(0, 100):
+        for i in range(0, 10):
             ops.create_game(mk_game(difficulty=i), user)
 
-        stored_games = ops.get_games()
+        stored_games = ops.get_games(refinements={'sort_difficulty': 'desc'})
+        stored_games_r = ops.get_games(refinements={'sort_difficulty': 'asc'})
+        self.assertEqual([g.uuid for g in stored_games[::-1]],
+                         [g.uuid for g in stored_games_r])
 
         self.assertIsNotNone(stored_games)
         self.assertTrue(len(stored_games) > 0)

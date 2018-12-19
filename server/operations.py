@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import List, Optional, Set
+from typing import Dict, List, Optional, Set
 import base64
 
 from datetime import datetime
@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from contexts import with_context_using_instance
 from crypto import Crypto
+from game_refiner import refine_queries
 from models import Game, GameStatus, User, UserAuth, UserAuthChallenge, \
     UserSessionToken, UserUuid, Username, \
     PlayerJoinGameRequest, PlayerInGameStatus
@@ -96,9 +97,13 @@ class Operations:
         return existing_game
 
     @with_session
-    def get_games(self, session: Session) -> List[Game]:
-        games = session.query(Game).limit(30).all()
-        return games
+    def get_games(self, session: Session,
+                  page_start: int = 0, page_length: int = 20,
+                  refinements: Dict[str, str] = dict()) -> List[Game]:
+        return (refine_queries(session.query(Game), refinements)
+                .offset(page_start)
+                .limit(page_length)
+                ).all()
 
     @with_session
     def get_game_participants(self, game_uuid: str, user: Optional[User],
