@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
@@ -105,9 +106,23 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     private Optional<GameService.StreamRefiner> getRefinerFromGameListType(GameListActivity.GameListType listType) {
         Map<GameListActivity.GameListType, GameService.StreamRefiner> gameListTypeStreamRefinerMap =
             Collections.unmodifiableMap(new HashMap<GameListActivity.GameListType, GameService.StreamRefiner>() {{
+                put(GameListActivity.GameListType.PENDING_REQUEST,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithPlayerPending(username.getUserUuid())).build());
+                put(GameListActivity.GameListType.CONFIRMED_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithPlayerConfirmed(username.getUserUuid())).build());
+                put(GameListActivity.GameListType.PAST_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithPlayerConfirmed(username.getUserUuid()))
+                        .filterBy(new GameService.StreamRefiner.WithGameStatus(Game.GameStatus.FINISHED)).build());
                 put(GameListActivity.GameListType.HOSTED_GAMES,
-                    new GameService.StreamRefinerBuilder().filterBy(
-                        new GameService.StreamRefiner.WithGameMaster(username.getUserUuid())).build());
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithGameMaster(username.getUserUuid())).build());
+                put(GameListActivity.GameListType.PAST_HOSTED_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithGameMaster(username.getUserUuid()))
+                        .filterBy(new GameService.StreamRefiner.WithGameStatus(Game.GameStatus.FINISHED)).build());
             }});
         return Optional.ofNullable(gameListTypeStreamRefinerMap.get(listType));
     }
