@@ -11,18 +11,18 @@ import retrofit2.Call;
 
 public class LazyGameStream extends LazyAsyncStream<Game> {
     private final GCPApi.GameInterface gi;
-    private final Map<String, String> queries;
+    private final Map<String, String> refinements;
 
-    public LazyGameStream(int chunks, Map<String, String> queries) {
+    public LazyGameStream(int chunks, Map<String, String> refinements) {
         super(chunks);
         this.gi = GCPRemoteServicesProvider.getRetrofit().create(GCPApi.GameInterface.class);
-        this.queries = queries;
+        this.refinements = refinements;
         loadAhead(0);
     }
 
     @Override public void loadAhead(int from) {
         Log.d("GCP Games look ahead", "Loading " + chunks + " elements starting at " + from);
-        Call<List<Game>> call = gi.getGames(queries, from, chunks);
+        Call<List<Game>> call = gi.getGames(refinements, from, chunks);
         this.loading = true;
         this.updateObservers();
 
