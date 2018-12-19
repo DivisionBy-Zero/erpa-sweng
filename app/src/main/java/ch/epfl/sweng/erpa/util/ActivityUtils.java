@@ -22,6 +22,7 @@ import ch.epfl.sweng.erpa.activities.CreateGameActivity;
 import ch.epfl.sweng.erpa.activities.DiceActivity;
 import ch.epfl.sweng.erpa.activities.GameListActivity;
 import ch.epfl.sweng.erpa.activities.MyAccountActivity;
+import ch.epfl.sweng.erpa.activities.SelectRemoteServicesProviderActivity;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 
@@ -77,6 +78,9 @@ public class ActivityUtils {
                     break;
                 case R.id.menu_dice:
                     intent = new Intent(ctx, DiceActivity.class);
+                    break;
+                case R.id.menu_rsp:
+                    intent = new Intent(ctx, SelectRemoteServicesProviderActivity.class);
                     break;
                 default:
                     intent = new Intent(ctx, MyAccountActivity.class);

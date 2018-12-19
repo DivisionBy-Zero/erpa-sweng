@@ -29,4 +29,10 @@
         android:icon="@drawable/ic_dice5"
         android:orderInCategory="200"
         android:title="@string/title_dice_activity"/>
+
+    <item
+        android:id="@+id/menu_rsp"
+        android:orderInCategory="200"
+        android:icon="@drawable/ic_location"
+        android:title="RSP"/>
 </menu>

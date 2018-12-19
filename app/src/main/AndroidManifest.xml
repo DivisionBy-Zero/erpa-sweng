@@ -19,16 +19,15 @@
         <activity android:name=".activities.DiceActivity" />
         <activity android:name=".activities.ExampleForToolbarActivity" />
         <activity android:name=".activities.JoinGameActivity" />
-        <activity android:name=".activities.GameListActivity" android:launchMode="singleTop" />
-        <activity android:name=".activities.GameViewerActivity" />
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.GameListActivity" android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.GameViewerActivity" />
+        <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.MyAccountActivity" />
         <activity android:name=".activities.ProfileActivity" />
         <activity android:name=".activities.RemoteServiceGreeterActivity" />

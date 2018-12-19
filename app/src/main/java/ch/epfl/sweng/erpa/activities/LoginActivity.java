@@ -71,7 +71,7 @@ public class LoginActivity extends DependencyConfigurationAgnosticActivity {
 
     @OnClick(R.id.no_login_button)
     public void continueWithoutLogin(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, GameListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         startActivity(intent);
         finish();
