@@ -15,6 +15,10 @@ import ch.epfl.sweng.erpa.services.GameService;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_STREAM_REFINER_KEY;
 
+/**
+ * The activity that's launched in order to pick the filters
+ * and the order of a list of games
+ */
 public class SortActivity extends DependencyConfigurationAgnosticActivity {
     private GameService.StreamRefinerBuilder streamRefinerBuilder;
 

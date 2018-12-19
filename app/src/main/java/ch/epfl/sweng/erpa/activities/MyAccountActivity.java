@@ -47,6 +47,10 @@ import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
+/**
+ * An activity that displays all of the user's information
+ * If no user is logged in, they are prompted to log in
+ */
 public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
     private static Map<GameListActivity.GameListType, Integer> strIdForGameListType =
         Collections.unmodifiableMap(new HashMap<GameListActivity.GameListType, Integer>() {{

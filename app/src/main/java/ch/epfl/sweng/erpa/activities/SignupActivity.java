@@ -23,6 +23,10 @@ import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
+/**
+ * An activity that communicates with the server in order to
+ * create a new account
+ */
 public class SignupActivity extends DependencyConfigurationAgnosticActivity {
     @BindView(R.id.signup_activity_loading_panel) View progressLoader;
     @BindView(R.id.user_input_panel) View inputPanel;

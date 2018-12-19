@@ -30,6 +30,11 @@ import ch.epfl.sweng.erpa.services.UserManagementService;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
+/**
+ * An activity that displays a user profile
+ * the user profile in question is passed in the form
+ * of its uuid
+ */
 public class UserProfileActivity extends DependencyConfigurationAgnosticActivity {
     @Inject OptionalDependencyManager optionalDependency;
     @Inject UserManagementService ups;

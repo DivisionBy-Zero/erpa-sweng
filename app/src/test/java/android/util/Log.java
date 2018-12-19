@@ -1,5 +1,8 @@
 package android.util;
 
+/**
+ * Mocks the Log utility; very helpful for testing
+ */
 public class Log {
     public static int d(String tag, String msg) {
         System.out.println("DEBUG: " + tag + ": " + msg);

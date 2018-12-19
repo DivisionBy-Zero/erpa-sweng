@@ -36,12 +36,16 @@ import toothpick.Toothpick;
 import static ch.epfl.sweng.erpa.ErpaApplication.RES_REMOTE_SERVICES_PROVIDERS;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
+/**
+ * An activity for configuring which remote service provider to use
+ * This is launched automatically when needed
+ */
 public class SelectRemoteServicesProviderActivity extends Activity {
     // FIXME(@Roos): Find a better way to express this: Ideally, I want to store this along with the class def.
     private static final Map<Class, String[]> REQUIRED_PERMISSIONS =
-        Collections.unmodifiableMap(new HashMap<Class, String[]>() {{
-            put(GCPRemoteServicesProvider.class, new String[]{Manifest.permission.INTERNET});
-        }});
+            Collections.unmodifiableMap(new HashMap<Class, String[]>() {{
+                put(GCPRemoteServicesProvider.class, new String[]{Manifest.permission.INTERNET});
+            }});
     private static final int REQUEST_PERMISSIONS_RESULT_CODE = 22345;
 
     @Inject @Named(RES_REMOTE_SERVICES_PROVIDERS) Set<Class<? extends RemoteServicesProvider>> rsps;
@@ -74,14 +78,14 @@ public class SelectRemoteServicesProviderActivity extends Activity {
     @OnClick(R.id.rspSelectionSubmit)
     public void rspSelect() {
         @SuppressLint("FindViewByIdCast")  // Linter is wrong. This will always be a RadioButton
-            Optional<RadioButton> maybeSelection = Optional.ofNullable(
-            findViewById(rspSelectionRadioGroup.getCheckedRadioButtonId()));
+                Optional<RadioButton> maybeSelection = Optional.ofNullable(
+                findViewById(rspSelectionRadioGroup.getCheckedRadioButtonId()));
 
         currentSelection = maybeSelection
-            .map(radioButton -> radioButton.getText().toString())
-            .flatMap(rspCoordinator::rspClassFromFullyQualifiedName)
-            .executeIfPresent(clsName -> Log.i("RSP Selection",
-                String.format("Selected Remote Services Provider %s", clsName)));
+                .map(radioButton -> radioButton.getText().toString())
+                .flatMap(rspCoordinator::rspClassFromFullyQualifiedName)
+                .executeIfPresent(clsName -> Log.i("RSP Selection",
+                        String.format("Selected Remote Services Provider %s", clsName)));
 
         if (tryBind()) finish();
     }
@@ -92,14 +96,14 @@ public class SelectRemoteServicesProviderActivity extends Activity {
 
         Class<? extends RemoteServicesProvider> rspClass = currentSelection.get();
         String[] missingPermissions =
-            Optional.ofNullable(REQUIRED_PERMISSIONS.get(rspClass)).stream().flatMap(Stream::of)
-                .map(p -> ContextCompat.checkSelfPermission(this, p))
-                .filter(p -> p != PackageManager.PERMISSION_GRANTED)
-                .toArray(String[]::new);
+                Optional.ofNullable(REQUIRED_PERMISSIONS.get(rspClass)).stream().flatMap(Stream::of)
+                        .map(p -> ContextCompat.checkSelfPermission(this, p))
+                        .filter(p -> p != PackageManager.PERMISSION_GRANTED)
+                        .toArray(String[]::new);
 
         if (missingPermissions.length > 0) {
             ActivityCompat.requestPermissions(this,
-                missingPermissions, REQUEST_PERMISSIONS_RESULT_CODE);
+                    missingPermissions, REQUEST_PERMISSIONS_RESULT_CODE);
             return false;
         }
 

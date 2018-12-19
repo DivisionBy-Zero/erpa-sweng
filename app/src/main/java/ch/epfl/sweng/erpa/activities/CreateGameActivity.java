@@ -38,6 +38,11 @@ import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
+/**
+ * Activity class for the creation of a game
+ * Sends the game to the server
+ * Sanitizes the input before sending it
+ */
 public class CreateGameActivity extends DependencyConfigurationAgnosticActivity implements CreateGameFormFragment.OnFragmentInteractionListener {
     private static final HashMap<String, Integer> sessionLengthTranslationTable = new HashMap<String, Integer>() {{
         put("Undefined", null);

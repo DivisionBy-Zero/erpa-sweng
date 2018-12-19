@@ -19,6 +19,10 @@ import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_AC
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
 
+/**
+ * Temporary main hub activity.
+ * Should be replaced by, for instance, the list of games
+ */
 public class MainActivity extends DependencyConfigurationAgnosticActivity {
     @BindView(R.id.main_drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.main_navigation_view) NavigationView navigationView;

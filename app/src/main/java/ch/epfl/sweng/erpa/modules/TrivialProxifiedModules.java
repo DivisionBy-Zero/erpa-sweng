@@ -22,6 +22,18 @@ import toothpick.config.Module;
 
 import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 
+/**
+ * This class provisions coordinated classes and eventual children services by using reflection.
+ *
+ * A coordinated `Class<T>` is managed by a `DependencyCoordinator<T>`. If such managed class
+ * has any zero-argument methods annotated with the @Service annotation and return type S, a
+ * virtual `DependencyCoordinator<S>` that depends on the parent coordinator is generated and
+ * registered. This process is recursive.
+ *
+ * DependencyCoordinators are tracked in a `Map<Class<T>, DependencyCoordinator<T>>`. This allows
+ * to freely register any DependencyConfigurator to any class. This map is published on the DI
+ * framework by using the name ${RES_DEPENDENCY_COORDINATORS}.
+ */
 @SuppressWarnings("unchecked")
 public class TrivialProxifiedModules extends Module {
     private Scope scope;

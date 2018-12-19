@@ -45,9 +45,7 @@ public class ActivityUtils {
         // set dialog message
         alertDialogBuilder.setCancelable(false).setPositiveButton("OK", (dialog, id) -> onUserAcknowledge.run());
 
-        // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
-        // show it
         alertDialog.show();
     }
 

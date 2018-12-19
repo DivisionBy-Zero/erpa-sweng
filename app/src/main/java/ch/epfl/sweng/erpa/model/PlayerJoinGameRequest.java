@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+/**
+ * An entity class used to model a join request
+ */
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

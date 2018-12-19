@@ -16,6 +16,12 @@ import ch.epfl.sweng.erpa.operations.DependencyCoordinator;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
+/**
+ * Base class for the activities of this Application
+ * It configures injection and dependency resolving
+ * By extending it, you can give your Activity access to
+ * any injectable objects
+ */
 public abstract class DependencyConfigurationAgnosticActivity extends AppCompatActivity {
     public static final String REQUESTING_ACTIVITY_INTENT_KEY = "Parent " + Intent.class.getCanonicalName();
     @Inject DependencyConfigurationHelper dependencyConfigurationHelper;
