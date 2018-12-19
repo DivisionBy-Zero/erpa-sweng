@@ -2,17 +2,17 @@
 
     <style name="ERPAStyle" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:padding">0dp</item>
-        <!--BaseColor-->
+        <!--Base Color-->
         <item name="android:colorPrimary">@color/primaryColor</item>
         <item name="android:colorPrimaryDark">@color/primaryColor</item>
         <item name="android:colorBackground">@color/secondaryColor</item>
-        <!--TextStyle-->
+        <!--Text Style-->
         <item name="android:colorAccent">@color/primaryColor</item>
         <item name="android:textColor">@color/textColor</item>
         <item name="android:textColorPrimary">@color/textColor</item>
         <item name="android:baselineAligned">true</item>
         <item name="android:textSize">23sp</item>
-        <!--ButtonStyle-->
+        <!--Button Style-->
         <item name="android:colorButtonNormal">@color/primaryColor</item>
         <item name="android:colorControlHighlight">@color/primaryDarkColor</item>
         <!--title and menu police-->

@@ -6,6 +6,9 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import com.annimon.stream.Optional;
@@ -19,18 +22,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.PlayerJoinGameRequest;
 import ch.epfl.sweng.erpa.model.Username;
+import ch.epfl.sweng.erpa.operations.LoggedUser;
 import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.UserManagementService;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.swipeLeft;
+import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.assertion.ViewAssertions.selectedDescendantsMatch;
 import static android.support.test.espresso.intent.Intents.intended;
@@ -41,6 +49,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVi
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivityTest.intentForGameListType;
 import static ch.epfl.sweng.erpa.util.TestUtils.getGame;
 import static junit.framework.TestCase.assertTrue;
 
@@ -54,6 +63,8 @@ public class GameViewerActivityTest extends DependencyConfigurationAgnosticTest 
     private Username u1, u2, gm, currentUser;
     private Game game, emptyOptGame;
     private GameViewerActivity activity;
+    private RecyclerView gameViewerPlayerListView;
+    private ItemTouchHelper itemTouchHelper;
 
     private static boolean gameViewerActivityAsyncVisualElementsReady(GameViewerActivity activity, int... except) {
         return Stream.of(activity.gmName, activity.playerListView, activity.joinGameButton)
@@ -87,7 +98,6 @@ public class GameViewerActivityTest extends DependencyConfigurationAgnosticTest 
         Utils.joinUserToGame(gameUuid, u2, gameService, PlayerJoinGameRequest.RequestStatus.CONFIRMED);
 
         registerCurrentlyLoggedUser(loggedUserCoordinator, currentUser);
-
         Intents.init();
         launchActivityForGame(gameUuid);
     }
@@ -105,7 +115,24 @@ public class GameViewerActivityTest extends DependencyConfigurationAgnosticTest 
         gameViewerActivityLaunchIntent.putExtras(bundle);
         activityTestRule.launchActivity(gameViewerActivityLaunchIntent);
         activity = activityTestRule.getActivity();
+        gameViewerPlayerListView = activity.findViewById(R.id.gameViewerPlayerListView);
+        itemTouchHelper = (ItemTouchHelper) gameViewerPlayerListView.getTag();
     }
+
+    @Test
+    public void canSwipePlayerBeeingGM() {
+        registerCurrentlyLoggedUser(loggedUserCoordinator, gm);
+        onView(withId(R.id.gameViewerPlayerListView)).perform(swipeLeft());
+        onView(withId(R.id.gameViewerPlayerListView)).perform(swipeRight());
+    }
+
+    @Test
+    public void canSwipePlayerBeeingPlayer() {
+        registerCurrentlyLoggedUser(loggedUserCoordinator, u1);
+        onView(withId(R.id.gameViewerPlayerListView)).perform(swipeLeft());
+        onView(withId(R.id.gameViewerPlayerListView)).perform(swipeRight());
+    }
+
 
     @Test
     public void activityHasGameUuidIntent() {

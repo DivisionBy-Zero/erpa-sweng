@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -11,10 +12,12 @@
 
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/gameViewerPlayerFlowLayout"
-            android:layout_width="0dp"
+            android:id="@+id/game_join_request_constraint_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintHorizontal_weight="1">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            tools:layout_editor_absoluteX="8dp">
 
             <TextView
                 android:id="@+id/gameJoinRequestUsername"
@@ -22,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="..."
+                android:textSize="@dimen/user_list_text"
                 app:layout_constraintHorizontal_weight="1" />
 
             <TextView
@@ -30,6 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="Status"
+                android:textSize="@dimen/user_list_text"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintStart_toEndOf="@id/gameJoinRequestUsername" />
         </android.support.constraint.ConstraintLayout>
