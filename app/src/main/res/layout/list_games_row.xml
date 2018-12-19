@@ -63,12 +63,14 @@
                         android:id="@+id/locationIcon"
                         android:layout_width="0dp"
                         android:layout_height="fill_parent"
-                        android:background="@color/primaryColor"
+                        android:background="@android:color/transparent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/location"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_location"
+                        tools:srcCompat="@drawable/ic_location" />
 
                     <TextView
                         android:id="@+id/location"
