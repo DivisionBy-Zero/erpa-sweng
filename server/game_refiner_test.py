@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 
 from contexts import with_context
 from game_refiner import refine_query, refine_queries
-from models import Game, GameStatus, User, UserUuid, Username
+from models import Game, GameStatus, PlayerJoinGameRequest, \
+        PlayerInGameStatus, User, UserUuid, Username
 from session import SessionBroker
 
 
@@ -175,3 +176,33 @@ class TestGameRefiner(unittest.TestCase):
         asc = refine_query(qGi(), 'sort_date', 'asc').all()
         desc = refine_query(qGi(), 'sort_date', 'desc').all()
         self.assertEqual(asc[::-1], desc)
+
+    @T.with_session_as_kwarg
+    @T.with_username
+    @T.with_game
+    @T.with_username
+    @T.with_game
+    @T.with_username
+    @T.with_game
+    def test_player_requests_queries(self, u1, g1, u2, g2, u3, g3, *_,
+                                     session: Session):
+        membership_state_1 = PlayerJoinGameRequest(
+                game_uuid=g2.uuid, user_uuid=u1.user_uuid,
+                request_status=PlayerInGameStatus.REQUEST_TO_JOIN)
+        membership_state_2 = PlayerJoinGameRequest(
+                game_uuid=g3.uuid, user_uuid=u1.user_uuid,
+                request_status=PlayerInGameStatus.CONFIRMED)
+        g3.game_status = GameStatus.FINISHED
+        session.add_all([membership_state_1, membership_state_2, g3])
+
+        pending_game = refine_query(session.query(Game.uuid),
+                                    'player_pending', u1.user_uuid).scalar()
+        self.assertEqual(g2.uuid, pending_game)
+
+        confirmed_game = refine_query(session.query(Game.uuid),
+                                      'player_confirmed', u1.user_uuid).scalar()
+        self.assertEqual(g3.uuid, confirmed_game)
+
+        finished_game = refine_query(session.query(Game.uuid),
+                                     'game_status', 'FINISHED').scalar()
+        self.assertEqual(g3.uuid, finished_game)

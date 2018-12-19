@@ -4,7 +4,7 @@ import logging
 from sqlalchemy.orm.query import Query
 from sqlalchemy import func
 
-from models import Game
+from models import Game, PlayerJoinGameRequest, PlayerInGameStatus
 
 
 log = logging.getLogger(__name__)
@@ -49,6 +49,22 @@ def refine_query(query: Query, key: str, value: str) -> Query:
         query = query.order_by(Game.min_players.asc())
     elif key == 'sort_min_players' and value == 'desc':
         query = query.order_by(Game.min_players.desc())
+    elif key == 'player_pending':
+        query = (query.join(PlayerJoinGameRequest,
+                            PlayerJoinGameRequest.game_uuid == Game.uuid)
+                 .filter(PlayerJoinGameRequest.user_uuid == value)
+                 .filter(PlayerJoinGameRequest.request_status ==
+                         PlayerInGameStatus.REQUEST_TO_JOIN)
+                 )
+    elif key == 'player_confirmed':
+        query = (query.join(PlayerJoinGameRequest,
+                            PlayerJoinGameRequest.game_uuid == Game.uuid)
+                 .filter(PlayerJoinGameRequest.user_uuid == value)
+                 .filter(PlayerJoinGameRequest.request_status ==
+                         PlayerInGameStatus.CONFIRMED)
+                 )
+    elif key == 'game_status':
+        query = query.filter(Game.game_status == value)
     else:
         log.warning('Could not parse query spec with key {} and value {}'
                     ''.format(key, value))
