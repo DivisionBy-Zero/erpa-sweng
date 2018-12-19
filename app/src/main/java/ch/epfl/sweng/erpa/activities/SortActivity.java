@@ -16,8 +16,7 @@ import ch.epfl.sweng.erpa.services.GameService;
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_STREAM_REFINER_KEY;
 
 public class SortActivity extends DependencyConfigurationAgnosticActivity {
-
-    private GameService.StreamRefinerBuilder streamRefinerBuilder = GameService.StreamRefiner.builder();
+    private GameService.StreamRefinerBuilder streamRefinerBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +24,14 @@ public class SortActivity extends DependencyConfigurationAgnosticActivity {
         if (dependenciesNotReady()) return;
         setContentView(R.layout.activity_sort);
         ButterKnife.bind(this);
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        streamRefinerBuilder = Optional.ofNullable(getIntent().getExtras())
+            .map(bundle -> bundle.getSerializable(GAME_LIST_VIEWER_STREAM_REFINER_KEY))
+            .map(s -> (GameService.StreamRefiner) s)
+            .orElse(new GameService.StreamRefiner()).toBuilder();
     }
 
     @OnClick({R.id.diffAsc, R.id.diffDesc, R.id.maxNumPlayerAsc, R.id.maxNumPlayerDesc,
@@ -76,12 +83,13 @@ public class SortActivity extends DependencyConfigurationAgnosticActivity {
                 break;
             default:
         }
+
         if (checkBox1.isChecked()) {
             checkBox1.setChecked(false);
             streamRefinerBuilder.removeOneCriteria(criteria);
-        } else
+        } else {
             streamRefinerBuilder.sortBy(criteria, ordering);
-
+        }
     }
 
     @OnClick(R.id.sortButton)

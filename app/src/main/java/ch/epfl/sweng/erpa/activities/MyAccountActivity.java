@@ -31,15 +31,18 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.UserProfile;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
+import ch.epfl.sweng.erpa.services.GameService;
 import ch.epfl.sweng.erpa.services.UserManagementService;
 import ch.epfl.sweng.erpa.util.Pair;
 import ch.epfl.sweng.erpa.util.Triplet;
 import lombok.Data;
 
 import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY;
+import static ch.epfl.sweng.erpa.activities.GameListActivity.GAME_LIST_VIEWER_STREAM_REFINER_KEY;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
@@ -53,17 +56,21 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
             put(GameListActivity.GameListType.HOSTED_GAMES, R.string.hostedGamesText);
             put(GameListActivity.GameListType.PAST_HOSTED_GAMES, R.string.pastHostedGamesText);
         }});
-
     @BindView(R.id.myAccountLayout) ListView myListView;
     @BindView(R.id.myAccountToolbar) Toolbar toolbar;
     @BindView(R.id.my_account_drawer_layout) DrawerLayout myDrawerLayout;
     @BindView(R.id.my_account_navigation_view) NavigationView myNavigationView;
-
     @Inject OptionalDependencyManager optionalDependency;
     @Inject UserProfile userProfile;
     @Inject Username username;
 
-    private static List<MyAccountButtonData> getAvailableButtonsData(boolean userIsPlayer, boolean userIsGm) {
+    private static MyAccountButtonData getMyProfileButtonData(String userUuid) {
+        Bundle bundle = new Bundle();
+        bundle.putString(UserManagementService.PROP_INTENT_USER, userUuid);
+        return new MyAccountButtonData(R.string.profileText, UserProfileActivity.class, bundle, R.drawable.ic_action_name);
+    }
+
+    private List<MyAccountButtonData> getAvailableButtonsData(boolean userIsPlayer, boolean userIsGm) {
         Stream<GameListActivity.GameListType> targetListType = Stream.of(
             new Triplet<>(GameListActivity.GameListType.PENDING_REQUEST, true, false),
             new Triplet<>(GameListActivity.GameListType.CONFIRMED_GAMES, true, false),
@@ -84,16 +91,40 @@ public class MyAccountActivity extends DependencyConfigurationAgnosticActivity {
 
         return Stream.zip(targetListType, images, Pair::new).map(p -> {
             Bundle bundle = new Bundle();
-            bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, p.getFirst());
-            return new MyAccountButtonData(strIdForGameListType.get(p.getFirst()),
+            GameListActivity.GameListType listType = p.getFirst();
+            // Add the activity class
+            bundle.putSerializable(GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY, listType);
+            // Add the base stream refiner associated to the activity class, if any present
+            getRefinerFromGameListType(listType).ifPresent(sr ->
+                bundle.putSerializable(GAME_LIST_VIEWER_STREAM_REFINER_KEY, sr)
+            );
+            return new MyAccountButtonData(strIdForGameListType.get(listType),
                 GameListActivity.class, bundle, p.getSecond());
         }).collect(Collectors.toList());
     }
 
-    private static MyAccountButtonData getMyProfileButtonData(String userUuid) {
-        Bundle bundle = new Bundle();
-        bundle.putString(UserManagementService.PROP_INTENT_USER, userUuid);
-        return new MyAccountButtonData(R.string.profileText, UserProfileActivity.class, bundle, R.drawable.ic_action_name);
+    private Optional<GameService.StreamRefiner> getRefinerFromGameListType(GameListActivity.GameListType listType) {
+        Map<GameListActivity.GameListType, GameService.StreamRefiner> gameListTypeStreamRefinerMap =
+            Collections.unmodifiableMap(new HashMap<GameListActivity.GameListType, GameService.StreamRefiner>() {{
+                put(GameListActivity.GameListType.PENDING_REQUEST,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithPlayerPending(username.getUserUuid())).build());
+                put(GameListActivity.GameListType.CONFIRMED_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithPlayerConfirmed(username.getUserUuid())).build());
+                put(GameListActivity.GameListType.PAST_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithPlayerConfirmed(username.getUserUuid()))
+                        .filterBy(new GameService.StreamRefiner.WithGameStatus(Game.GameStatus.FINISHED)).build());
+                put(GameListActivity.GameListType.HOSTED_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithGameMaster(username.getUserUuid())).build());
+                put(GameListActivity.GameListType.PAST_HOSTED_GAMES,
+                    new GameService.StreamRefinerBuilder()
+                        .filterBy(new GameService.StreamRefiner.WithGameMaster(username.getUserUuid()))
+                        .filterBy(new GameService.StreamRefiner.WithGameStatus(Game.GameStatus.FINISHED)).build());
+            }});
+        return Optional.ofNullable(gameListTypeStreamRefinerMap.get(listType));
     }
 
     @Override

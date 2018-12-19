@@ -30,7 +30,7 @@ class GCPApi {
          * @return a call to the fetched game list
          */
         @GET("/games")
-        Call<List<Game>> getGames(@QueryMap Map<String, String> orderingsAndSortings, @Query("from") int from, @Query("count") int count);
+        Call<List<Game>> getGames(@QueryMap Map<String, String> orderingsAndSortings, @Query("page_start") int from, @Query("page_length") int count);
 
         /**
          * Sends a get request for a single game to the server

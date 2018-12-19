@@ -136,7 +136,15 @@ def ping():
 @with_operations_and_maybe_user
 def get_games(ops, maybe_user):
     """Gets the list of games."""
-    ret = ops.get_games()
+    query = request.args.to_dict()
+    page_offset = int(query['page_start'] if 'page_start' in query else 0)
+    page_length = int(query['page_length'] if 'page_length' in query else 20)
+    if page_length > 100:
+        page_length = 100
+    refinements = {k: v for k, v in query.items() if k not in
+                   ['page_start', 'page_length']}
+    ret = ops.get_games(refinements=refinements,
+                        page_start=page_offset, page_length=page_length)
     return send_object(ret)
 
 
