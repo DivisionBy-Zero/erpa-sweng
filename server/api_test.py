@@ -257,3 +257,16 @@ class TestAPI(unittest.TestCase):
         join_request = Bunch(game_join_requests[0])
         self.assertEqual(models.PlayerInGameStatus.REJECTED.numerator,
                          join_request.requestStatus)
+
+    @with_user_token_and_game
+    @with_user_token_and_game
+    @with_user_token_and_game
+    def test_refinement(self, user, token, game, *_):
+        self.curl.token = token
+        request_query = {'page_start': 0, 'page_size': 2, 'sort_date': 'desc'}
+        res1 = self.curl.get('/games', query_string=request_query).asDict()
+
+        request_query = {'page_start': 1, 'page_size': 2, 'sort_date': 'desc'}
+        res2 = self.curl.get('/games', query_string=request_query).asDict()
+
+        self.assertEqual(res1[1]['uuid'], res2[0]['uuid'])
