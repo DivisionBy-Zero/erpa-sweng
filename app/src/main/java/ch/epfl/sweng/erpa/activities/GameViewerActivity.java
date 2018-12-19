@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.annotation.UiThread;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
@@ -49,6 +51,7 @@ import lombok.RequiredArgsConstructor;
 import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
     static List<PlayerJoinGameRequest.RequestStatus> userJoinRequestStatusThatShouldHideTheJoinButton = Stream.of(
@@ -71,7 +74,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     @BindView(R.id.oneShotOrCampaignTextView) TextView type;
     @BindView(R.id.sessionLengthTextView) TextView sessionLength;
     @BindView(R.id.sessionNumberTextView) TextView numSessions;
-    @BindView(R.id.titleTextView) TextView title;
+    @BindView(R.id.game_viewer_toolbar) Toolbar toolbar;
     @BindView(R.id.universeTextView) TextView universe;
     @Inject GameService gs;
     @Inject OptionalDependencyManager optionalDependency;
@@ -109,6 +112,8 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         }
 
         addNavigationMenu(this, myDrawerLayout, myNavigationView, optionalDependency);
+        setMenuInToolbar(this, toolbar);
+
         resetLoadersAndPanelsVisibilities();
 
         asyncTaskService.run(() -> gs.getGame(gameUuid), failIfNotFound(gameUuid, game -> {
@@ -165,6 +170,10 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         });
     }
 
+    protected void setToolbarText(String gameTitle) {
+        Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle(gameTitle));
+    }
+
     private void resetLoadersAndPanelsVisibilities() {
         contentPanel.setVisibility(View.GONE);
         joinGameButton.setVisibility(View.GONE);
@@ -198,7 +207,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         contentPanel.setVisibility(View.VISIBLE);
         panelLoader.setVisibility(View.GONE);
 
-        title.setText(game.getTitle());
+        setToolbarText(game.getTitle());
         description.setText(game.getDescription());
         universe.setText(game.getUniverse());
         difficulty.setText(game.getDifficulty().toString());
@@ -208,7 +217,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         numSessions.setText(numSessionsString);
 
         String gameLength = game.getSessionLengthInMinutes().map(Object::toString).orElse("Unspecified");
-        sessionLength.setText(gameLength);
+        sessionLength.setText(gameLength+" min/session");
     }
 
     @UiThread

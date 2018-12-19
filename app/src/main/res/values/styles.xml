@@ -15,8 +15,6 @@
         <!--Button Style-->
         <item name="android:colorButtonNormal">@color/primaryColor</item>
         <item name="android:colorControlHighlight">@color/primaryDarkColor</item>
-        <!--title and menu police-->
-        <item name="android:fontFamily">@font/yatraone_regular</item>
         <!--form Police-->
         <!--<item name="android:fontFamily">@font/morrisroman_black</item>-->
     </style>
