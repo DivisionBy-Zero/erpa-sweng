@@ -155,10 +155,21 @@ class Operations:
     def update_game_join_request(self, game_uuid: str, user: User,
                                  updated_request: PlayerJoinGameRequest,
                                  session: Session) -> PlayerJoinGameRequest:
+        def joined_user_leaving_game(old_request: PlayerJoinGameRequest,
+                                     new_request: PlayerJoinGameRequest):
+            if not old_request or not new_request:
+                return False
+            return (old_request.request_status == PlayerInGameStatus.REQUEST_TO_JOIN and
+                    new_request.request_status == PlayerInGameStatus.HAS_QUIT)
+
+        def has_left_user_joining_game(old_request: PlayerJoinGameRequest,
+                                       new_request: PlayerJoinGameRequest):
+            if not old_request or not new_request:
+                return False
+            return (old_request.request_status == PlayerInGameStatus.HAS_QUIT and
+                    new_request.request_status == PlayerInGameStatus.REQUEST_TO_JOIN)
+
         game = self.get_game(game_uuid)
-        if game.gm_user_uuid != user.uuid:  # ZKP
-            raise KeyError("Game does not exist or user does not have "
-                           "the permission to access it.")
         game_join_request = (session.query(PlayerJoinGameRequest)
                              .filter(PlayerJoinGameRequest.game_uuid
                                      == game_uuid)
@@ -166,6 +177,13 @@ class Operations:
                                      == updated_request.user_uuid)
                              .scalar()
                              )
+
+        if (game.gm_user_uuid != user.uuid):
+            if not (joined_user_leaving_game(game_join_request, updated_request) or
+                    has_left_user_joining_game(game_join_request, updated_request)):
+                raise KeyError("Game does not exist or user does not have "
+                               "the permission to access it.")  # ZKP
+
         if not game_join_request:
             raise KeyError("Player with uuid {} has no join request"
                            "".format(user.uuid))
