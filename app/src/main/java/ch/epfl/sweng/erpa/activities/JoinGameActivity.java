@@ -13,6 +13,11 @@ import ch.epfl.sweng.erpa.services.GameService;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
+/**
+ * An activity that is launched when a user wants to join a game
+ * it takes an extra that is the uuid of the game we want to
+ * attempt to join
+ */
 public class JoinGameActivity extends DependencyConfigurationAgnosticActivity {
     public static final String GAME_UUID_KEY = "game_uuid";
     @Inject GameService gs;

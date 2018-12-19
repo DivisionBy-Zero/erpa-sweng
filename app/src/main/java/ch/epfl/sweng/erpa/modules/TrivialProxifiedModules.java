@@ -22,6 +22,9 @@ import toothpick.config.Module;
 
 import static ch.epfl.sweng.erpa.ErpaApplication.RES_DEPENDENCY_COORDINATORS;
 
+/**
+ * TODO @Roos comment please
+ */
 @SuppressWarnings("unchecked")
 public class TrivialProxifiedModules extends Module {
     private Scope scope;

@@ -21,6 +21,11 @@ import ch.epfl.sweng.erpa.operations.LoggedUserCoordinator;
 
 import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
 
+/**
+ * An activity for logging in.
+ * Communicates with the server, using information given in fields
+ * The resulting user profile is then injectable
+ */
 public class LoginActivity extends DependencyConfigurationAgnosticActivity {
     @BindView(R.id.login_activity_loading_panel) View progressLoader;
     @BindView(R.id.login_activity_input_panel) View inputPanel;

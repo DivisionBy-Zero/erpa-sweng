@@ -12,6 +12,11 @@ import ch.epfl.sweng.erpa.R;
 import ch.epfl.sweng.erpa.operations.RemoteServicesProviderCoordinator;
 import ch.epfl.sweng.erpa.services.RemoteServicesProvider;
 
+
+/**
+ * The activity that displays information about the remote services provider
+ * if none is configured, the user is prompted to pick one
+ */
 public class RemoteServiceGreeterActivity extends DependencyConfigurationAgnosticActivity {
     @Inject RemoteServicesProvider remoteServicesProvider;
     @Inject RemoteServicesProviderCoordinator remoteServicesProviderCoordinator;

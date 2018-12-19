@@ -16,6 +16,14 @@ import ch.epfl.sweng.erpa.model.ObservableAsyncList;
 import ch.epfl.sweng.erpa.operations.AsyncTaskService;
 import lombok.Getter;
 
+/**
+ * A stream-like class that automatically tries to run a query,
+ * then add it to its internal list, then tell the observers
+ * that its size has changed
+ * the loadAhead function is the one that you need to override
+ * it's the one doing the querying
+ * @param <T>
+ */
 public abstract class LazyAsyncStream<T> extends AbstractList<T> implements Iterable<T>, ObservableAsyncList<T> {
     protected final List<T> elements;
     protected final int chunks;

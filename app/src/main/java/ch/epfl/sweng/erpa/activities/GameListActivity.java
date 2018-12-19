@@ -45,6 +45,11 @@ import toothpick.Scope;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
+/**
+ * The activity for viewing the list of games
+ * It takes an extra that contains a game list type
+ * Which is an enum to decide what this game list will show
+ */
 public class GameListActivity extends DependencyConfigurationAgnosticActivity {
     public static final String GAME_LIST_VIEWER_ACTIVITY_CLASS_KEY = "Game list viewer activity class key";
     public static final String GAME_LIST_VIEWER_STREAM_REFINER_KEY = "Game list viewer activity stream refiner";

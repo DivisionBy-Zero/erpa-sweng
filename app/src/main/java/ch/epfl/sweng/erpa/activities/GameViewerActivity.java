@@ -50,6 +50,13 @@ import static android.content.ContentValues.TAG;
 import static ch.epfl.sweng.erpa.operations.AsyncTaskService.failIfNotFound;
 import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
 
+/**
+ * An activity that shows a game
+ * It takes a String as an extra,
+ * which is the uuid of the game we want to show
+ *
+ * the activity then fetches the game from the server
+ */
 public class GameViewerActivity extends DependencyConfigurationAgnosticActivity {
     static List<PlayerJoinGameRequest.RequestStatus> userJoinRequestStatusThatShouldHideTheJoinButton = Stream.of(
             PlayerJoinGameRequest.RequestStatus.CONFIRMED,
