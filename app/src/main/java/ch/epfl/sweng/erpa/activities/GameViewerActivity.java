@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
@@ -139,6 +140,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
         };
 
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(playerListView);
+        playerListView.setTag(new ItemTouchHelper(itemTouchHelperCallback));
     }
 
 
@@ -247,6 +249,7 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
     class PlayerJoinGameRequestAdapter extends RecyclerView.Adapter<PlayerJoinGameRequestAdapter.PlayerJoinGameRequestHolder> {
         @NonNull List<PlayerJoinGameRequest> joinGameRequests;
 
+
         @NonNull
         @Override
         public PlayerJoinGameRequestHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
@@ -284,7 +287,6 @@ public class GameViewerActivity extends DependencyConfigurationAgnosticActivity 
                 gameJoinRequestStatusTV.setText(Optional.ofNullable(request.getRequestStatus())
                         .map(Object::toString).orElse("Unknown state"));
             }
-
             void handleErrorRetrievingUserData(Throwable exc, PlayerJoinGameRequest request) {
                 String errorMessage = "Could not retrieve User with UUID " + request.getUserUuid();
                 gameJoinRequestUsernameTV.setText(errorMessage);
