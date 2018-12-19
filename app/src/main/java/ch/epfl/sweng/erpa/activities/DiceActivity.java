@@ -1,41 +1,65 @@
 package ch.epfl.sweng.erpa.activities;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.annimon.stream.IntStream;
-
-import java.util.Random;
-
-import javax.inject.Inject;
+import android.widget.Button;
+import android.widget.FrameLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import ch.epfl.sweng.erpa.R;
-import ch.epfl.sweng.erpa.model.Username;
-import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
 
-import static ch.epfl.sweng.erpa.util.ActivityUtils.createPopup;
+import ch.epfl.sweng.erpa.activities.sketches.DieSketch;
+import ch.epfl.sweng.erpa.R;
+import ch.epfl.sweng.erpa.operations.OptionalDependencyManager;
+import ch.epfl.sweng.erpa.views.FlowLayout;
+
+import com.annimon.stream.Optional;
+import com.annimon.stream.Stream;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import processing.android.CompatUtils;
+import processing.android.PFragment;
+
 import static ch.epfl.sweng.erpa.util.ActivityUtils.installDefaultNavigationMenuHandler;
-import static ch.epfl.sweng.erpa.util.ActivityUtils.setUsernameInMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.addNavigationMenu;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.onOptionItemSelectedUtils;
+import static ch.epfl.sweng.erpa.util.ActivityUtils.setMenuInToolbar;
 
 public class DiceActivity extends DependencyConfigurationAgnosticActivity {
-    private static final int[] dice = {4, 6, 8, 10, 12, 20, 100};
-    private static final int MAX_DICE_NUMBER = 15;
 
     @BindView(R.id.dice_navigation_view) NavigationView navigationView;
     @BindView(R.id.dice_drawer_layout) DrawerLayout drawerLayout;
 
     @Inject OptionalDependencyManager optionalDependency;
 
-    private Random rng = new Random();
-    private TextView[] allResultViews;
+    private final int MAX_DICE_NUMBER = 9;
+    private final float ROTATION_SPEED = 3f;
+
+    private FlowLayout flowLayout;
+    private ArrayList<DieSketch> allDice = new ArrayList<>();
+
+    /**
+     * Map from number of faces to filename
+     */
+    private static final Map<Integer, String> compressedDiceResourcesPath =
+            Collections.unmodifiableMap(new HashMap<Integer, String>() {{
+                put(4, "shapes/d4.obj");
+                put(6, "shapes/d6.obj");
+                put(8, "shapes/d8.obj");
+                put(10, "shapes/d10.obj");
+                put(20, "shapes/d20.obj");
+            }});
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,118 +68,89 @@ public class DiceActivity extends DependencyConfigurationAgnosticActivity {
         setContentView(R.layout.activity_dice);
         ButterKnife.bind(this);
 
-        allResultViews = getAllResultViews();
         installDefaultNavigationMenuHandler(navigationView, drawerLayout, this);
     }
 
     @Override protected void onResume() {
         super.onResume();
-        setUsernameInMenu(navigationView, optionalDependency.get(Username.class));
+        if (dependenciesNotReady()) return;
+        Toolbar toolbar = findViewById(R.id.dice_toolbar);
+        setSupportActionBar(toolbar);
+
+        //Handle navigationMenu interactions
+        addNavigationMenu(this, findViewById(R.id.dice_drawer_layout), findViewById(R.id.dice_navigation_view), optionalDependency);
+        setMenuInToolbar(this, findViewById(R.id.dice_toolbar));
+        Optional.ofNullable(getSupportActionBar()).ifPresent(b -> b.setTitle(R.string.title_dice_activity));
+
+        flowLayout = findViewById(R.id.dice_layout);
+        for (DieSketch die : allDice)
+            die.draw();
     }
 
-    @OnClick(R.id.rollButton)
-    public void rollDices(View view) {
-        int[] rolls = getNumberOfRolls();
-        if (IntStream.of(rolls).sum() > 15) {
-            createPopup("The number of dice must be less or equal to 15", this);
-        } else {
-            clearAllResults();
-            rollAndShowAllDice(rolls);
-        }
+    //Handle toolbar items clicks
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Boolean found = onOptionItemSelectedUtils(item.getItemId(), findViewById(R.id.dice_drawer_layout));
+        return found || super.onOptionsItemSelected(item);
     }
 
     /**
-     * Rolls and shows all dice
-     *
-     * @param rolls An array containing all the dice to roll
+     * If no die is rolling, rolls all dice
+     * @param view not used
      */
-    @SuppressLint("SetTextI18n") private void rollAndShowAllDice(int[] rolls) {
-        int n = 0;
-        for (int i = 0; i < 7; ++i) {
-            String dieType = "D" + dice[i];
-            for (int j = 0; j < rolls[i]; ++j) {
-                allResultViews[n].setText(dieType + ": " + rollDie(dieType));
-                ++n;
+    @OnClick(R.id.rollButton)
+    public void rollDices(View view) {
+        if (Stream.of(allDice).allMatch(dice -> !dice.isRolling())) {
+            for (DieSketch die : allDice) {
+                die.roll();
             }
         }
     }
 
     /**
-     * Rolls one die
-     *
-     * @param dieType The type of die to roll
-     * @return The result of the roll
+     * Removes the last die on the layout
+     * @param view
      */
-    private int rollDie(String dieType) {
-        int result = -1;
-        switch (dieType) {
-            case "D4":
-                result = rng.nextInt(4);
-                break;
-            case "D6":
-                result = rng.nextInt(6);
-                break;
-            case "D8":
-                result = rng.nextInt(8);
-                break;
-            case "D10":
-                result = rng.nextInt(10);
-                break;
-            case "D12":
-                result = rng.nextInt(12);
-                break;
-            case "D20":
-                result = rng.nextInt(20);
-                break;
-            case "D100":
-                result = rng.nextInt(100);
-                break;
-            default:
-                throw new AssertionError("Die type is incorrect");
+    @OnClick(R.id.dice_layout)
+    public void removeDie(View view) {
+        if (!allDice.isEmpty()) {
+            int index = allDice.size() - 1;
+            allDice.remove(index);
+            flowLayout.removeViewAt(index);
         }
-        return ++result;
     }
 
     /**
-     * Gets all the TextViews where we write the results of the rolls
-     *
-     * @return An array containing all the TextViews
+     * If there is place left for another die, add the die corresponding to the pressed button
+     * @param button The button that has been pressed
      */
-    private TextView[] getAllResultViews() {
-        TextView[] list = new TextView[MAX_DICE_NUMBER];
-        for (int i = 1; i < list.length + 1; ++i) {
-            String textId = "roll" + i;
-            int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
-            list[i - 1] = findViewById(id);
+    //I need to cast the view to button because if I don't do it android doesn't recognize it as an onClick function
+    public void addAndUpdateDie(View button) {
+        if (allDice.size() < MAX_DICE_NUMBER) {
+            addAndShowDie(Integer.parseInt(((Button) button).getText().toString().substring(1)));
         }
-        return list;
     }
 
     /**
-     * Gets all the dice to be rolled
-     *
-     * @return An array containing all the number of rolls of each die
+     * Add a die of with numberOfFaces faces on the layout
+     * @param numberOfFaces The number of faces of the die to show
      */
-    private int[] getNumberOfRolls() {
-        int[] rolls = new int[dice.length];
-        for (int i = 0; i < dice.length; ++i) {
-            String textId = "d" + dice[i] + "_number";
-            int id = getResources().getIdentifier(textId, "id", getBaseContext().getPackageName());
-            String text = ((EditText) findViewById(id)).getText().toString();
-            if (text.isEmpty())
-                rolls[i] = 0;
-            else
-                rolls[i] = Integer.parseInt(text);
-        }
-        return rolls;
+    private void addAndShowDie(int numberOfFaces) {
+        DieSketch dieSketch = new DieSketch(compressedDiceResourcesPath.get(numberOfFaces), ROTATION_SPEED);
+        allDice.add(dieSketch);
+        showDie(dieSketch);
     }
 
     /**
-     * Clears all the dice results
+     * Shows a dieSketch
+     * @param die the dieSketch to show
      */
-    private void clearAllResults() {
-        for (int i = 0; i < allResultViews.length; ++i) {
-            allResultViews[i].setText("");
-        }
+    private void showDie(DieSketch die) {
+        FrameLayout frame = new FrameLayout(this);
+        frame.setId(CompatUtils.getUniqueViewId());
+        flowLayout.addView(frame);
+
+        PFragment fragment = new PFragment(die);
+        fragment.setView(frame, this);
     }
 }
