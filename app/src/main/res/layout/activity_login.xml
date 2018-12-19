@@ -63,11 +63,11 @@
             android:layout_height="wrap_content"
             android:onClick="login"
             android:text="Login"
-            app:layout_constraintBottom_toTopOf="@+id/no-login-button"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/password" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/no-login-button"
@@ -76,6 +76,18 @@
             android:onClick="continueWithoutLogin"
             android:text="Continue without login"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sign_up_button" />
+
+        <Button
+            android:id="@+id/sign_up_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="launchSignUpActivity"
+            android:text="Sign Up"
+            app:layout_constraintBottom_toTopOf="@+id/no-login-button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"

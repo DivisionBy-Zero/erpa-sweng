@@ -63,10 +63,12 @@ public class LoginActivity extends DependencyConfigurationAgnosticActivity {
             });
     }
 
-    @Override protected void onStop() {
-        super.onStop();
-        if (loginTask != null)
-            loginTask.cancel(true);
+    @OnClick(R.id.sign_up_button)
+    public void launchSignUpActivity(View view) {
+        Intent intent =  new Intent(this, SignupActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        startActivity(intent);
+        finish();
     }
 
     @OnClick(R.id.no_login_button)
@@ -75,6 +77,12 @@ public class LoginActivity extends DependencyConfigurationAgnosticActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         startActivity(intent);
         finish();
+    }
+
+    @Override protected void onStop() {
+        super.onStop();
+        if (loginTask != null)
+            loginTask.cancel(true);
     }
 
     Optional<String> getErrorMessage(String username, String password) {

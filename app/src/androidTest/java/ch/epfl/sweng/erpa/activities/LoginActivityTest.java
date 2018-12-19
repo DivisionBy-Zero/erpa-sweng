@@ -86,6 +86,13 @@ public class LoginActivityTest extends DependencyConfigurationAgnosticTest {
     public void testWithoutLogin() {
         onView(ViewMatchers.withId(R.id.no_login_button)).perform(ViewActions.click());
         // Check if the correct activity is displayed
-        intended(hasComponent(ch.epfl.sweng.erpa.activities.MainActivity.class.getName()));
+        intended(hasComponent(MainActivity.class.getName()));
+    }
+
+    @Test
+    public void testLaunchSignUp() {
+        onView(ViewMatchers.withId(R.id.launch_signup_button)).perform(ViewActions.click());
+        // Check if the correct activity is displayed
+        intended(hasComponent(SignupActivity.class.getName()));
     }
 }
