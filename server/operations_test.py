@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 from sqlalchemy import create_engine
+import base64
+import ed25519
 import pytest
 import unittest
 import uuid
@@ -19,8 +21,13 @@ def with_operations(f):
     return with_context(mk_ops)(f)
 
 
+def mk_x509_ed22519_cert(public_key: ed25519.VerifyingKey):
+    # Empirically obtained x509 Secure curve header segment
+    return base64.b64decode('MCowBQYDK2VwAyEA') + public_key.to_bytes()
+
+
+test_signing_key, test_verifying_key = ed25519.create_keypair()
 username_str = "avestruz57"
-test_user_auth_obj = {'public_key': "Hello, I'm a BASE64 public key :D"}
 test_user_obj = {'is_gm': True, 'is_player': True}
 test_game_obj = {'title': "My super game",
                  'description': "A super game description",
@@ -44,8 +51,17 @@ def mk_game(**overrides):
 
 def create_and_register_username(username, ops):
     new_user_uuid = ops.register_username(username)
-    user_auth_obj = {**test_user_auth_obj, 'user_uuid': new_user_uuid}
-    ops.register_user_auth(models.UserAuth(**user_auth_obj))
+
+    x509b = mk_x509_ed22519_cert(test_verifying_key)
+    ops.register_user_auth(models.UserAuth(
+        user_uuid=new_user_uuid, public_key=base64.b64encode(x509b)))
+
+    challenge = ops.gen_auth_challenge_for_user(new_user_uuid)
+    signature = test_signing_key.sign(challenge.user_challenge.encode('UTF-8'))
+    b64signature = base64.b64encode(signature)
+
+    ops.session_token_from_signed_challenge(new_user_uuid, b64signature)
+
     return ops.register_user(mk_user(uuid=new_user_uuid))
 
 
@@ -82,16 +98,27 @@ class TestOperations(unittest.TestCase):
     def test_register_new_user(self, ops):
         new_user_uuid = ops.register_username(username_str)
 
-        user_auth_obj = {**test_user_auth_obj, 'user_uuid': new_user_uuid}
-        user_auth = ops.register_user_auth(models.UserAuth(**user_auth_obj))
+        signing_key, verifying_key = ed25519.create_keypair()
+        x509b = mk_x509_ed22519_cert(verifying_key)
+        user_auth = ops.register_user_auth(models.UserAuth(
+            user_uuid=new_user_uuid, public_key=base64.b64encode(x509b)))
 
         self.assertIsNotNone(user_auth)
         self.assertIsNotNone(user_auth.authentication_strategy)
         self.assertIsNotNone(user_auth.timestamp_registered)
 
-        registered_user = ops.register_user(mk_user(uuid=new_user_uuid))
+        challenge = ops.gen_auth_challenge_for_user(new_user_uuid)
+        signature = signing_key.sign(challenge.user_challenge.encode('UTF-8'))
+        b64signature = base64.b64encode(signature)
 
+        registered_user = ops.register_user(mk_user(uuid=new_user_uuid))
         self.assertIsNotNone(registered_user.timestamp_created)
+
+        session_token = ops.session_token_from_signed_challenge(
+                new_user_uuid, b64signature)
+        self.assertIsNotNone(session_token.user_uuid)
+        self.assertIsNotNone(session_token.session_token)
+        self.assertIsNotNone(session_token.timestamp_created)
 
     @with_operations_and_user
     def test_update_user(self, ops, user):
@@ -103,6 +130,24 @@ class TestOperations(unittest.TestCase):
 
         self.assertNotEqual(old_gm, user.is_gm)
         self.assertEqual(user.is_gm, new_user.is_gm)
+
+    @with_operations
+    def test_get_authenticated_user(self, ops):
+        new_user_uuid = ops.register_username(username_str)
+        registered_user = ops.register_user(mk_user(uuid=new_user_uuid))
+        signing_key, verifying_key = ed25519.create_keypair()
+        x509b = mk_x509_ed22519_cert(verifying_key)
+        ops.register_user_auth(models.UserAuth(
+            user_uuid=new_user_uuid, public_key=base64.b64encode(x509b)))
+        challenge = ops.gen_auth_challenge_for_user(new_user_uuid)
+        signature = signing_key.sign(challenge.user_challenge.encode('UTF-8'))
+        b64signature = base64.b64encode(signature)
+        session_token = ops.session_token_from_signed_challenge(
+                new_user_uuid, b64signature)
+        detected_user = ops.get_authenticated_user(session_token.session_token)
+        # We can't directly compare the internal representation with the dto
+        [self.assertEqual(str(detected_user.__json__()[k]), str(v))
+            for k, v in registered_user.__json__().items()]
 
     @with_operations_and_user
     def test_create_game_invalid_uuid(self, ops, user):
@@ -163,31 +208,39 @@ class TestOperations(unittest.TestCase):
         self.assertTrue(len(stored_games) > 0)
         [self.assertIsNotNone(game) for game in stored_games]
 
-    @with_operations_and_user
-    def test_get_user_from_session_token(self, ops, user):
-        new_session_token = ops.register_session_token(user.uuid)
+    @with_operations
+    def test_no_session_token_for_new_user(self, ops):
+        new_user_uuid = ops.register_username(username_str)
+        registered_user = ops.register_user(mk_user(uuid=new_user_uuid))
+        self.assertIsNotNone(registered_user)
+        self.assertEqual(0, len(ops.get_user_tokens_for_user(new_user_uuid)))
 
-        self.assertIsNotNone(new_session_token)
+    @with_operations
+    def test_get_user_from_session_token(self, ops):
+        user = create_and_register_username(username_str, ops)
+        user_token = ops.get_user_tokens_for_user(user.uuid).pop()
 
-        user_from_token = ops.get_user_from_session_token(
-                new_session_token.session_token)
-
-        self.assertEqual(user_from_token.uuid, user.uuid)
+        self.assertIsNotNone(user_token.session_token)
+        self.assertEqual(user_token.user_uuid, user.uuid)
 
     @with_operations_and_user
     def test_get_user_tokens(self, ops, user):
         for i in range(0, 5):
-            ops.register_session_token(user.uuid)
+            challenge = ops.gen_auth_challenge_for_user(user.uuid)
+            signature = test_signing_key.sign(
+                    challenge.user_challenge.encode('UTF-8'))
+            b64signature = base64.b64encode(signature)
+            ops.session_token_from_signed_challenge(user.uuid, b64signature)
 
         tokens = ops.get_user_tokens_for_user(user.uuid)
 
-        self.assertEqual(5, len(tokens))
+        self.assertEqual(5 + 1, len(tokens))  # +1: Injected user
         [self.assertEqual(session_token.user_uuid, user.uuid)
             for session_token in tokens]
 
     @with_operations_and_user
     def test_register_and_retrieve_auth_challenges(self, ops, user):
-        challenge = ops.register_auth_challenge(user.uuid)
+        challenge = ops.gen_auth_challenge_for_user(user.uuid)
         retrieved_challenge = ops.get_auth_challenge_for_user(user.uuid)
 
         self.assertEqual(challenge.user_uuid, user.uuid)

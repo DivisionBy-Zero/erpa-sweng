@@ -13,6 +13,7 @@ import javax.inject.Singleton;
 
 import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.model.UserSessionToken;
 import ch.epfl.sweng.erpa.model.Username;
 import ch.epfl.sweng.erpa.services.GCP.ServerException;
 import ch.epfl.sweng.erpa.services.UserManagementService;
@@ -38,6 +39,16 @@ public class DummyUserService implements UserManagementService {
     @Override
     public UserProfile registerUserProfile(UserProfile up) throws IOException, ServerException {
         return saveUserProfile(up);
+    }
+
+    @Override
+    public String getBase64AuthenticationChallenge(String userUuid) throws IOException, ServerException {
+        return userUuid;
+    }
+
+    @Override
+    public UserSessionToken getSessionToken(String userUuid, String challengeResponse) throws IOException, ServerException {
+        return new UserSessionToken(userUuid, userUuid);
     }
 
     @Override

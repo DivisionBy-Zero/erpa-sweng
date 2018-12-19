@@ -1,5 +1,7 @@
 package ch.epfl.sweng.erpa.services.GCP;
 
+import android.util.Log;
+
 import com.annimon.stream.Optional;
 
 import java.io.IOException;
@@ -44,6 +46,19 @@ public class GCPUserManagementService implements UserManagementService {
     @Override
     public UserProfile registerUserProfile(UserProfile up) throws IOException, ServerException {
         return GCPRemoteServicesProvider.executeAndThrowOnError(userInterface.registerUser(up)).body();
+    }
+
+    @Override
+    public String getBase64AuthenticationChallenge(String userUuid) throws IOException, ServerException {
+        return GCPRemoteServicesProvider.executeAndThrowOnError(
+            userInterface.getAuthenticationChallenge(userUuid)).body().string();
+    }
+
+    @Override
+    public UserSessionToken getSessionToken(String userUuid, String challengeResponse) throws IOException, ServerException {
+        Log.i("getSessionToken", "Sending challenge response: " + challengeResponse + " For user uuid: " + userUuid);
+        return GCPRemoteServicesProvider.executeAndThrowOnError(
+            userInterface.getSessionToken(userUuid, challengeResponse)).body();
     }
 
     @Override

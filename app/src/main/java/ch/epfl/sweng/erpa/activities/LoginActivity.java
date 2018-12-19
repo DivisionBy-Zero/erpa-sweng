@@ -58,8 +58,8 @@ public class LoginActivity extends DependencyConfigurationAgnosticActivity {
             exception -> {
                 inputPanel.setVisibility(View.VISIBLE);
                 progressLoader.setVisibility(View.GONE);
-                createPopup("Could not login: " + exception.getMessage(), this);
                 Log.e("tryLogin", "Could not login", exception);
+                createPopup("Could not login: " + exception.getMessage(), this);
             });
     }
 

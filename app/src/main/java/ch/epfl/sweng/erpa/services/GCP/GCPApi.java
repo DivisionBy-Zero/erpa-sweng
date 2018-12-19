@@ -7,6 +7,7 @@ import ch.epfl.sweng.erpa.model.Game;
 import ch.epfl.sweng.erpa.model.PlayerJoinGameRequest;
 import ch.epfl.sweng.erpa.model.UserAuth;
 import ch.epfl.sweng.erpa.model.UserProfile;
+import ch.epfl.sweng.erpa.model.UserSessionToken;
 import ch.epfl.sweng.erpa.model.Username;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -90,6 +91,23 @@ class GCPApi {
          * @return nothing
          */
         @POST("/users/register_auth") Call<Void> registerAuth(@Body UserAuth userAuth);
+
+        /**
+         * Requests a challenge to authenticate the user.
+         * @param userUuid the user's uuid
+         * @return the authentication challenge
+         */
+        @GET("/auth/challenge/{userUuid}")
+        Call<ResponseBody> getAuthenticationChallenge(@Path("userUuid") String userUuid);
+
+        /**
+         * Retrieves a session token from a challenge response.
+         * @param userUuid the user's uuid
+         * @param challengeResponse the challenge response
+         * @return the session token
+         */
+        @POST("/auth/challenge/{userUuid}")
+        Call<UserSessionToken> getSessionToken(@Path("userUuid") String userUuid, @Body String challengeResponse);
 
         /**
          * Saves a <b>new</b> user

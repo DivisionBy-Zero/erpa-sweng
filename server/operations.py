@@ -1,10 +1,12 @@
 from contextlib import contextmanager
 from typing import List, Optional, Set
+import base64
 
 from datetime import datetime
 from sqlalchemy.orm import Session
 
 from contexts import with_context_using_instance
+from crypto import Crypto
 from models import Game, GameStatus, User, UserAuth, UserAuthChallenge, \
     UserSessionToken, UserUuid, Username, \
     PlayerJoinGameRequest, PlayerInGameStatus
@@ -231,7 +233,7 @@ class Operations:
 
     @with_session
     def get_user_auth(self, user_uuid: str, session: Session) -> UserAuth:
-        existing_user_auth = (session.query(UserAuth.public_key)
+        existing_user_auth = (session.query(UserAuth)
                               .filter(UserAuth.user_uuid == user_uuid)
                               .scalar()
                               )
@@ -284,24 +286,6 @@ class Operations:
         return existing_user
 
     @with_session
-    def register_session_token(self, user_uuid: str, session: Session,
-                               session_token_str: Optional[str] = None
-                               ) -> UserSessionToken:
-        if session_token_str:
-            existing_token = (session.query(UserSessionToken)
-                              .filter(UserSessionToken.session_token
-                                      == session_token_str)
-                              .scalar()
-                              )
-            if existing_token and existing_token.user_uuid != user_uuid:
-                raise KeyError("Session token already associated to a user")
-
-        session_token = UserSessionToken(user_uuid=user_uuid,
-                                         session_token=session_token_str)
-        session.add(session_token)
-        return session_token
-
-    @with_session
     def get_user_from_session_token(self, session_token: str,
                                     session: Session):
         existing_token_user_uuid = (session.query(UserSessionToken.user_uuid)
@@ -323,27 +307,40 @@ class Operations:
                    )
 
     @with_session
-    def register_auth_challenge(self, user_uuid: str, session: Session,
-                                user_challenge: Optional[str] = None
-                                ) -> UserAuthChallenge:
-        if user_challenge:
-            existing_challenge = (session.query(UserAuthChallenge)
-                                  .filter(UserAuthChallenge.user_uuid
-                                          == user_uuid)
-                                  .scalar()
-                                  )
-            if existing_challenge and \
-                    existing_challenge.user_uuid != user_uuid:
-                raise KeyError("Specified challenge already exists")
-        challenge = UserAuthChallenge(user_uuid=user_uuid,
-                                      user_challenge=user_challenge)
-        session.add(challenge)
-        return challenge
-
-    @with_session
     def get_auth_challenge_for_user(self, user_uuid: str, session: Session
                                     ) -> UserAuthChallenge:
-        return (session.query(UserAuthChallenge)
-                .filter(UserAuthChallenge.user_uuid == user_uuid)
-                .scalar()
-                )
+        existing_challenge = (session.query(UserAuthChallenge)
+                              .filter(UserAuthChallenge.user_uuid == user_uuid)
+                              .scalar()
+                              )
+        if not existing_challenge:
+            raise ValueError('No challenge exist for the specified user uuid.')
+        return existing_challenge
+
+    @with_session
+    def gen_auth_challenge_for_user(self, user_uuid: str, session: Session
+                                    ) -> UserAuthChallenge:
+        existing_challenge = (session.query(UserAuthChallenge)
+                              .filter(UserAuthChallenge.user_uuid == user_uuid)
+                              .scalar()
+                              )
+        if existing_challenge:
+            session.delete(existing_challenge)
+            session.flush()
+        new_challenge = UserAuthChallenge(user_uuid=user_uuid)
+        session.add(new_challenge)
+        return new_challenge
+
+    @with_session
+    def session_token_from_signed_challenge(self, user_uuid: str,
+                                            b64_signed: str, session: Session
+                                            ) -> UserSessionToken:
+        existing_challenge = self.get_auth_challenge_for_user(user_uuid)
+        user_auth = self.get_user_auth(user_uuid)
+        if not Crypto().verify_message_signature(
+                b64_signed, existing_challenge.user_challenge, user_auth):
+            raise ValueError('Invalid challenge.')
+        session.delete(existing_challenge)
+        created_token = UserSessionToken(user_uuid=user_uuid)
+        session.add(created_token)
+        return created_token
